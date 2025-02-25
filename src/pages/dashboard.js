@@ -43,7 +43,7 @@ const Dashboard = () => {
                     toggleMode={toggleMode}
                 />
                 <main
-                    className={`flex-1 p-4 md:p-8 pt-14 transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : 'ml-10 lg:ml-20'} ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#f7f1eb] text-black'} w-full`}
+                    className={`flex-1 p-4 md:p-8 transition-all duration-300 ${isSidebarOpen ? 'lg:ml-[20em]' : 'ml-10 lg:ml-20'} ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#ececec] text-black'} w-full`}
                 >
                     <div className="space-y-6">
                         <div>
@@ -52,11 +52,8 @@ const Dashboard = () => {
                                 <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
                             </div>
                         </div>
-                        <div className="pt-12">
-                            <h2 className="text-4xl font-bold text-teal-600 mb-4 text-center">Leaderboard</h2>
-                            <h3 className="text-2xl font-bold text-[#ff9409] mb-4 text-center">See Who's Leading the Pack!</h3>
-                            <p className="mb-4 text-center">Stay competitive! Check the live leaderboard to see who's winning.</p>
-                        </div>
+                            <h2 className="text-4xl font-bold main-blue mb-4">Welcome Philip to NDSI!</h2>
+                            <p className="mb-4 ">Explore resources, training, and key strategic documents to support sustainability efforts.</p>
                     </div>
                 </main>
             </div>

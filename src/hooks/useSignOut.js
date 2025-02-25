@@ -8,7 +8,7 @@ const useSignOut = () => {
     const handleSignOut = () => {
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
-        localStorage.removeItem('supabase_session');
+        localStorage.removeItem('custom_auth_token');
         localStorage.removeItem('loginEmail');
         localStorage.removeItem('loginPassword');
 

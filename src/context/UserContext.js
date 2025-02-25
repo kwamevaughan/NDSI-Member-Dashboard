@@ -9,11 +9,9 @@ export function UserProvider({ children }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        console.log('UserContext useEffect running');
         const storedToken = localStorage.getItem('custom_auth_token');
         const storedUser = localStorage.getItem('custom_auth_user');
         if (storedToken && storedUser) {
-            console.log('Verifying stored token:', storedToken);
             fetch('/api/auth/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -21,26 +19,18 @@ export function UserProvider({ children }) {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Verify response:', data);
                     if (data.valid) {
                         setToken(storedToken);
                         setUser(JSON.parse(storedUser));
-                        console.log('Session restored: token=', storedToken);
                     } else {
                         setToken(null);
                         setUser(null);
-                        if (!localStorage.getItem('rememberMe')) { // Set this in login
-                            localStorage.removeItem('custom_auth_token');
-                            localStorage.removeItem('custom_auth_user');
-                        }
                         localStorage.removeItem('custom_auth_token');
                         localStorage.removeItem('custom_auth_user');
-                        console.log('Invalid token, cleared session');
                     }
                     setIsLoading(false);
                 })
                 .catch(error => {
-                    console.error('Verify error:', error);
                     setToken(null);
                     setUser(null);
                     localStorage.removeItem('custom_auth_token');
@@ -48,7 +38,6 @@ export function UserProvider({ children }) {
                     setIsLoading(false);
                 });
         } else {
-            console.log('No stored token/user, skipping verify');
             setIsLoading(false);
         }
     }, []);
@@ -69,7 +58,6 @@ export function UserProvider({ children }) {
         setUser(data.user);
         localStorage.setItem('custom_auth_token', data.token);
         localStorage.setItem('custom_auth_user', JSON.stringify(data.user));
-        console.log('Login successful: token=', data.token);
 
         return data;
     };
@@ -79,7 +67,6 @@ export function UserProvider({ children }) {
         setUser(null);
         localStorage.removeItem('custom_auth_token');
         localStorage.removeItem('custom_auth_user');
-        console.log('Logged out');
     };
 
     return (

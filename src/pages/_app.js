@@ -53,33 +53,27 @@ const UserComponent = ({ mode, isSessionExpired, setIsSessionExpired, router, Co
     const { token, isLoading } = useUser();
 
     useEffect(() => {
-        console.log('Session check: isLoading=', isLoading, 'token=', token, 'pathname=', router.pathname);
         if (isLoading) return;
 
-        const excludedPaths = ['/', '/reset-password']; // Add /reset-password
+        const excludedPaths = ['/', '/reset-password'];
         if (!excludedPaths.includes(router.pathname)) {
             if (!token) {
-                console.log('No token, redirecting to /');
                 setIsSessionExpired(true);
                 router.push('/');
             } else {
-                console.log('Token found, staying on route');
                 setIsSessionExpired(false);
             }
         }
     }, [router.pathname, token, isLoading, setIsSessionExpired]);
 
     if (isLoading) {
-        console.log('Rendering loading state');
         return <div>Loading...</div>;
     }
 
     if (isSessionExpired && router.pathname !== '/') {
-        console.log('Rendering SessionExpired');
         return <SessionExpired isSessionExpired={isSessionExpired} />;
     }
 
-    console.log('Rendering Component:', Component.displayName || Component.name);
     return (
         <div className={mode === 'dark' ? 'dark' : ''}>
             <Component {...pageProps} mode={mode} />
