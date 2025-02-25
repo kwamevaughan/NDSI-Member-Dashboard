@@ -1,7 +1,6 @@
 // src/pages/dashboard.js
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from 'lib/supabase';
 import Header from "@/layouts/header";
 import Sidebar from "@/layouts/sidebar";
 import { toast } from 'react-toastify';
@@ -9,6 +8,7 @@ import useTheme from '@/hooks/useTheme';
 import useSidebar from '@/hooks/useSidebar';
 import useModal from '@/hooks/useModal';
 import useSignOut from '@/hooks/useSignOut';
+import { useUser } from '@/context/UserContext';
 
 const Dashboard = () => {
     const router = useRouter();
@@ -17,11 +17,14 @@ const Dashboard = () => {
     const { isOpen: isVerificationModalOpen, openModal: openVerificationModal, closeModal: closeVerificationModal } = useModal();
     const notify = (message) => toast(message);
     const { handleSignOut } = useSignOut();
+    const { user } = useUser(); // Fetch user from UserContext
 
     const handleDownloadApp = (message) => notify(message, 'success');
 
     const openModal = () => {};
     const closeModal = () => {};
+
+    const firstName = user?.first_name || 'Guest';
 
     return (
         <div className={`flex flex-col h-screen ${mode === 'dark' ? 'bg-[#1a1a1a]' : 'bg-[#f7f1eb]'}`}>
@@ -52,8 +55,8 @@ const Dashboard = () => {
                                 <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
                             </div>
                         </div>
-                            <h2 className="text-4xl font-bold main-blue mb-4">Welcome Philip to NDSI!</h2>
-                            <p className="mb-4 ">Explore resources, training, and key strategic documents to support sustainability efforts.</p>
+                        <h2 className="text-4xl font-bold text-[#28A8E0] mb-4">Welcome {firstName} to NDSI!</h2>
+                        <p className="mb-4">Explore resources, training, and key strategic documents to support sustainability efforts.</p>
                     </div>
                 </main>
             </div>
