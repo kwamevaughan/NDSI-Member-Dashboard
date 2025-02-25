@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useUser } from '@/context/UserContext';
+import { toast } from 'react-toastify';
 
 export default function Register({ closeRegister, notify, setError, router, recaptchaRef, onCaptchaChange }) {
     const { login } = useUser();
@@ -44,7 +45,8 @@ export default function Register({ closeRegister, notify, setError, router, reca
             }
 
             toast.dismiss(toastId);
-            const loginResult = await login(email, password, captchaToken);
+            // Skip reCAPTCHA for auto-login since it’s already verified
+            const loginResult = await login(email, password, null);
             if (loginResult && loginResult.token) {
                 const welcomeMessage = `Authenticated, Welcome ${firstName || 'User'}`;
                 toast.success(welcomeMessage);
@@ -70,7 +72,7 @@ export default function Register({ closeRegister, notify, setError, router, reca
 
     const handleCaptchaChange = (token) => {
         setCaptchaToken(token);
-        onCaptchaChange(token); // Sync with parent
+        onCaptchaChange(token);
     };
 
     return (
