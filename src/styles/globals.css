@@ -72,3 +72,24 @@ html {
 .main-blue{
     color: #28A8E0;
 }
+
+.main-blue-bg{
+    background-color: #28A8E0;
+}
+
+.main-green{
+    color: #8DC63F;
+}
+
+.main-green-bg{
+    background-color: #8DC63F;
+}
+
+.main-gray{
+    color: #403F41;
+}
+
+input::placeholder {
+    font-weight: 600;
+    /*color: #403F41;*/
+}
