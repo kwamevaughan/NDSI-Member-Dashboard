@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bars3Icon, XMarkIcon, MoonIcon, SunIcon, MagnifyingGlassIcon, ChevronDownIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, MoonIcon, SunIcon, MagnifyingGlassIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
+import { Icon } from '@iconify/react'; // Import Icon from @iconify/react
 
 const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -33,7 +34,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-sm border-b ${
                 mode === 'dark' ? 'border-[#8DC63F] bg-[#0a0c1d] text-white' : 'border-gray-300 bg-[#ececec] text-black'
-            } ${isSidebarOpen ? 'md:ml-[300px]' : 'md:ml-[80px]'}`}
+            } ${isSidebarOpen ? 'md:ml-[300px]' : 'md:ml-[80px]'} backdrop-blur-md bg-opacity-30`}
         >
             <div className="flex items-center justify-between p-2 md:p-4">
                 {/* Left Section: Logo, Toggle, and Search (Desktop) */}
@@ -65,6 +66,9 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                     className={`w-full pl-10 pr-10 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-[#8DC63F] ${
                                         mode === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-black text-[#403F41]'
                                     }`}
+                                    style={{
+                                        fontWeight: 'bold', // Make placeholder text bold
+                                    }}
                                 />
                                 <MagnifyingGlassIcon
                                     className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${
@@ -76,16 +80,17 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
                                     aria-label="Close search"
                                 >
-                                    <XMarkIcon className="h-5 w-5" />
+                                    <XMarkIcon className="h-5 w-5"/>
                                 </button>
                             </form>
+
                         ) : (
                             <button
                                 onClick={() => setIsSearchOpen(true)}
                                 className="p-2 focus:outline-none md:hidden"
                                 aria-label="Open search"
                             >
-                                <MagnifyingGlassIcon className="h-6 w-6" />
+                                <MagnifyingGlassIcon className="h-6 w-6"/>
                             </button>
                         )}
                         <form onSubmit={handleSearch} className="hidden md:block relative w-96">
@@ -149,11 +154,12 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                 />
                             </div>
                             <div className="hidden md:block">
-                                <span>{fullName}</span>
+                                <span className="text-[#403F41] font-bold">{fullName}</span>
                                 <span className="block text-sm font-normal text-[#28A8E0]">Member</span>
                             </div>
-                            <ChevronDownIcon
-                                className={`h-5 w-5 ${mode === 'dark' ? 'text-white' : 'text-gray-500'}`}
+                            <Icon
+                                icon={dropdownOpen ? "bxs:up-arrow" : "bxs:down-arrow"} // Conditional icon based on dropdownOpen state
+                                className={`h-5 w-5 font-bold transform transition-transform duration-300 ${mode === 'dark' ? 'text-white' : 'text-[#403F41]'}`}
                             />
                         </div>
 
