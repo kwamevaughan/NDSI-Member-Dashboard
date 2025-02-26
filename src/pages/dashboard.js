@@ -8,6 +8,11 @@ import useSidebar from '@/hooks/useSidebar';
 import useModal from '@/hooks/useModal';
 import useSignOut from '@/hooks/useSignOut';
 import { useUser } from '@/context/UserContext';
+import StrategicDocuments from '@/components/StrategicDocuments';
+import TrainingMaterials from "@/components/TrainingMaterials";
+import ESGToolkit from "@/components/ESGToolkit";
+import Newsletter from "@/components/Newsletter";
+import WorkingGroupDocumentation from "@/components/WorkingGroupDocumentation";
 
 const Dashboard = () => {
     const router = useRouter();
@@ -56,16 +61,43 @@ const Dashboard = () => {
                                 : 'pt-[80px] md:pt-[120px]' // Increased padding when sidebar is hidden
                         } ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#ececec] text-black'} w-full min-h-screen`}
                     >
-                        <div className="space-y-6">
+                        <div className="space-y-6 ">
                             <div>
                                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-white text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
-                                    <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
+                                    <div
+                                        className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-white text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
+                                    <div
+                                        className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
                                 </div>
                             </div>
                             <h2 className="text-4xl font-bold text-[#28A8E0] mb-4">Welcome {firstName} to NDSI!</h2>
-                            <p className="mb-4">Explore resources, training, and key strategic documents to support sustainability efforts.</p>
+                            <p className="mb-4">Explore resources, training, and key strategic documents to support
+                                sustainability efforts.</p>
                         </div>
+
+                        <div className="grid pt-14 pb-14 gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 h-full">
+                            <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                                <StrategicDocuments/>
+                            </div>
+                            <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                                <TrainingMaterials/>
+                            </div>
+                            <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                                <ESGToolkit/>
+                            </div>
+                            <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                                <Newsletter/>
+                            </div>
+                        </div>
+
+                        <div className="grid pb-14 gap-8 grid-cols-1 h-full">
+                            <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                                <WorkingGroupDocumentation/>
+                            </div>
+
+                        </div>
+
+
                     </main>
                 </div>
             </div>
