@@ -119,10 +119,10 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                         className="p-2 focus:outline-none md:hidden"
                         aria-label="Toggle dark mode"
                     >
-                        {mode === 'dark' ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
+                        {mode === 'dark' ? <SunIcon className="h-6 w-6"/> : <MoonIcon className="h-6 w-6"/>}
                     </button>
                     <label className="hidden md:inline-flex items-center cursor-pointer">
-                        <input type="checkbox" checked={mode === 'dark'} onChange={toggleMode} className="hidden" />
+                        <input type="checkbox" checked={mode === 'dark'} onChange={toggleMode} className="hidden"/>
                         <div
                             className={`relative w-14 h-8 rounded-full border-2 flex items-center ${
                                 mode === 'dark' ? 'border-blue-600 bg-blue-600' : 'border-gray-300 bg-gray-300'
@@ -134,15 +134,16 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                 }`}
                             >
                                 {mode === 'dark' ? (
-                                    <MoonIcon className="h-6 w-6 text-gray-700" />
+                                    <MoonIcon className="h-6 w-6 text-gray-700"/>
                                 ) : (
-                                    <SunIcon className="h-6 w-6 text-yellow-500" />
+                                    <SunIcon className="h-6 w-6 text-yellow-500"/>
                                 )}
                             </div>
                         </div>
                     </label>
 
-                    <div className="flex items-center gap-2 relative group cursor-default" ref={dropdownRef} onClick={() => setDropdownOpen(!dropdownOpen)}>
+                    <div className="flex items-center gap-2 relative group cursor-default" ref={dropdownRef}
+                         onClick={() => setDropdownOpen(!dropdownOpen)}>
                         <div className="flex items-center gap-2 cursor-pointer">
                             <div className="w-10 h-10 rounded-full overflow-hidden">
                                 <Image
@@ -154,8 +155,10 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                 />
                             </div>
                             <div className="hidden md:block">
-                                <span className="text-[#403F41] font-bold">{fullName}</span>
-                                <span className="block text-sm font-normal text-[#28A8E0]">Member</span>
+                                <span
+                                    className={`font-bold ${mode === 'dark' ? 'text-white' : 'text-[#403F41]'}`}>{fullName}</span>
+                                <span
+                                    className={`block text-sm font-normal ${mode === 'dark' ? 'text-[#28A8E0]' : 'text-[#28A8E0]'}`}>Member</span>
                             </div>
                             <Icon
                                 icon={dropdownOpen ? "bxs:up-arrow" : "bxs:down-arrow"} // Conditional icon based on dropdownOpen state
@@ -172,7 +175,8 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                             >
                                 <div className="p-8">
                                     <p className="text-lg mb-6">User Profile</p>
-                                    <div className="flex items-center gap-2 border-b pb-6 w-full transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
+                                    <div
+                                        className="flex items-center gap-2 border-b pb-6 w-full transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
                                         <div className="rounded-full overflow-hidden flex-shrink-0">
                                             <Image
                                                 src={user?.profile_image || '/assets/images/placeholder.png'}
@@ -183,18 +187,21 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                             />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-md font-bold">{fullName}</span>
+                                            <span
+                                                className={`text-md font-bold ${mode === 'dark' ? 'text-white' : 'text-black'}`}>{fullName}</span>
                                             <span className="text-sm">Customer</span>
                                             <div className="flex items-center justify-center gap-2">
-                                                <EnvelopeIcon className="h-4 w-4" />
+                                                <EnvelopeIcon className="h-4 w-4"/>
                                                 <span className="text-sm">{user?.email || 'N/A'}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <Link href="/profile">
-                                        <div className="flex gap-2 capitalize py-6 transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
-                                            <LockClosedIcon className="bg-[#e7f8f7] text-[#28A8E0] rounded-full p-2 h-10 w-10" />
+                                        <div
+                                            className="flex gap-2 capitalize py-6 transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
+                                            <LockClosedIcon
+                                                className="bg-[#e7f8f7] text-[#28A8E0] rounded-full p-2 h-10 w-10"/>
                                             <div className="flex flex-col">
                                                 <span className="text-md font-bold">My Profile</span>
                                                 <span className="text-sm">Account Settings</span>
@@ -214,6 +221,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
         </header>
