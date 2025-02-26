@@ -1,4 +1,3 @@
-// src/pages/dashboard.js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Header from "@/layouts/header";
@@ -17,7 +16,7 @@ const Dashboard = () => {
     const { isOpen: isVerificationModalOpen, openModal: openVerificationModal, closeModal: closeVerificationModal } = useModal();
     const notify = (message) => toast(message);
     const { handleSignOut } = useSignOut();
-    const { user } = useUser(); // Fetch user from UserContext
+    const { user } = useUser();
 
     const handleDownloadApp = (message) => notify(message, 'success');
 
@@ -35,7 +34,7 @@ const Dashboard = () => {
                 toggleMode={toggleMode}
                 onLogout={handleSignOut}
             />
-            <div className="flex flex-1 transition-all duration-300">
+            <div className="flex flex-1">
                 <Sidebar
                     isOpen={isSidebarOpen}
                     toggleSidebar={toggleSidebar}
@@ -45,20 +44,30 @@ const Dashboard = () => {
                     openVerificationModal={openVerificationModal}
                     toggleMode={toggleMode}
                 />
-                <main
-                    className={`flex-1 p-4 md:p-8 transition-all duration-300 ${isSidebarOpen ? 'lg:ml-[20em]' : 'ml-10 lg:ml-20'} ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#ececec] text-black'} w-full`}
+                <div
+                    className={`flex-1 transition-margin duration-300 ${
+                        isSidebarOpen ? 'lg:ml-[300px]' : 'ml-0 lg:ml-[80px]'
+                    }`}
                 >
-                    <div className="space-y-6">
-                        <div>
-                            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-white text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
-                                <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
+                    <main
+                        className={`p-4 md:p-8 ${
+                            isSidebarOpen
+                                ? 'pt-[60px] md:pt-[70px]'
+                                : 'pt-[80px] md:pt-[120px]' // Increased padding when sidebar is hidden
+                        } ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#ececec] text-black'} w-full min-h-screen`}
+                    >
+                        <div className="space-y-6">
+                            <div>
+                                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-white text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
+                                    <div className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
+                                </div>
                             </div>
+                            <h2 className="text-4xl font-bold text-[#28A8E0] mb-4">Welcome {firstName} to NDSI!</h2>
+                            <p className="mb-4">Explore resources, training, and key strategic documents to support sustainability efforts.</p>
                         </div>
-                        <h2 className="text-4xl font-bold text-[#28A8E0] mb-4">Welcome {firstName} to NDSI!</h2>
-                        <p className="mb-4">Explore resources, training, and key strategic documents to support sustainability efforts.</p>
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
         </div>
     );
