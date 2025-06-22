@@ -1,7 +1,7 @@
 // src/pages/index.js
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from 'lib/supabase';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { FaRegEnvelope, FaEye, FaEyeSlash } from 'react-icons/fa';
 import Register from './register';
 import ForgotPasswordModal from '../components/forgotPassword';

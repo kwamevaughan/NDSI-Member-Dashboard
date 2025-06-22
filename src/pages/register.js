@@ -1,9 +1,11 @@
 // src/pages/register.js
-import { useState } from 'react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
+import { supabase } from 'lib/supabase';
+import { toast } from 'react-hot-toast';
+import { FaRegEnvelope, FaEye, FaEyeSlash, FaUser, FaPhone } from 'react-icons/fa';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useUser } from '@/context/UserContext';
-import { toast } from 'react-toastify';
 
 export default function Register({ closeRegister, notify, setError, router, recaptchaRef, onCaptchaChange }) {
     const { login } = useUser();
@@ -45,7 +47,7 @@ export default function Register({ closeRegister, notify, setError, router, reca
             }
 
             toast.dismiss(toastId);
-            // Skip reCAPTCHA for auto-login since it’s already verified
+            // Skip reCAPTCHA for auto-login since it's already verified
             const loginResult = await login(email, password, null);
             if (loginResult && loginResult.token) {
                 const welcomeMessage = `Authenticated, Welcome ${firstName || 'User'}`;

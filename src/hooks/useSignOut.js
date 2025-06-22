@@ -1,6 +1,6 @@
 // useSignOut.js
 import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const useSignOut = () => {
     const router = useRouter();

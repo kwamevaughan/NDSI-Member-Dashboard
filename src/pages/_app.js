@@ -2,10 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { Toaster } from 'react-hot-toast';
 import { UserProvider, useUser } from '@/context/UserContext';
 import SessionExpired from '../components/SessionExpired';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
@@ -49,7 +48,17 @@ function MyApp({ Component, pageProps }) {
                 Component={Component}
                 pageProps={pageProps}
             />
-            <ToastContainer position="top-center" />
+            <Toaster 
+                position="top-center"
+                toastOptions={{
+                    duration: 4000,
+                    style: {
+                        background: mode === 'dark' ? '#374151' : '#fff',
+                        color: mode === 'dark' ? '#fff' : '#374151',
+                        border: mode === 'dark' ? '1px solid #4B5563' : '1px solid #E5E7EB',
+                    },
+                }}
+            />
         </UserProvider>
     );
 }

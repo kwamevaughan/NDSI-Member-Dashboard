@@ -1,7 +1,7 @@
 // src/pages/reset-password.js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 

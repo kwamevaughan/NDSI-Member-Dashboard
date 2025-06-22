@@ -1,6 +1,6 @@
 // src/components/forgotPassword.js
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 export default function ForgotPasswordModal({ isOpen, closeModal, notify }) {
@@ -43,7 +43,7 @@ export default function ForgotPasswordModal({ isOpen, closeModal, notify }) {
 
                 <h2 className="text-3xl font-bold mb-4 text-[#28A8E0] text-center">Forgot Password</h2>
                 <p className="mb-6 text-gray-600 text-center">
-                    Enter your email below, and we’ll send you a link to reset your password.
+                    Enter your email below, and we&apos;ll send you a link to reset your password.
                 </p>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-6">
