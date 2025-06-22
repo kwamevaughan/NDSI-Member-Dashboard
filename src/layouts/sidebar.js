@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline';
+import { ArrowRightStartOnRectangleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -131,8 +131,8 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                 {isOpen && <span>{label}</span>}
                                 {!isOpen && (
                                     <span className="absolute left-full ml-2 text-xs text-white bg-gray-700 rounded py-1 px-2 opacity-0 group-hover:opacity-75 transition-opacity whitespace-nowrap">
-                    {label}
-                  </span>
+                                        {label}
+                                    </span>
                                 )}
                             </Link>
                         </li>
@@ -159,8 +159,8 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                         />
                                     </div>
                                     <span className={`text-md ${mode === 'dark' ? 'text-white' : 'text-black'}`}>
-                        {fullName}
-                    </span>
+                                        {fullName}
+                                    </span>
                                 </div>
                                 <button
                                     onClick={onLogout}
@@ -180,14 +180,37 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                     <ArrowRightStartOnRectangleIcon className="h-6 w-6" />
                                 </button>
                                 <span className="absolute left-full ml-2 text-xs text-white bg-gray-700 rounded py-1 px-2 opacity-0 group-hover:opacity-75 transition-opacity whitespace-nowrap">
-                    Sign Out
-                </span>
+                                    Sign Out
+                                </span>
                             </div>
                         )}
                     </div>
                 )}
 
-
+                {/* Toggle Button - Only show on desktop */}
+                {windowWidth >= 640 && (
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-600">
+                        <button
+                            onClick={toggleSidebar}
+                            className={`w-full flex items-center justify-center p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
+                                mode === 'dark' ? 'text-white hover:bg-[#28A8E0]' : 'text-[#403F41] hover:bg-[#28A8E0]'
+                            }`}
+                            aria-label="Toggle sidebar"
+                        >
+                            {isOpen ? (
+                                <>
+                                    <XMarkIcon className="h-5 w-5 mr-2" />
+                                    <span>Collapse</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Bars3Icon className="h-5 w-5 mr-2" />
+                                    <span>Expand</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

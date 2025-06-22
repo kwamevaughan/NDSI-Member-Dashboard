@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bars3Icon, XMarkIcon, MoonIcon, SunIcon, MagnifyingGlassIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { MoonIcon, SunIcon, MagnifyingGlassIcon, EnvelopeIcon, LockClosedIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
 import { Icon } from '@iconify/react'; // Import Icon from @iconify/react
 
-const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) => {
+const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -37,7 +37,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
             } ${isSidebarOpen ? 'md:ml-[300px]' : 'md:ml-[80px]'} backdrop-blur-md bg-opacity-30`}
         >
             <div className="flex items-center justify-between p-2 md:p-4">
-                {/* Left Section: Logo, Toggle, and Search (Desktop) */}
+                {/* Left Section: Logo and Search (Desktop) */}
                 <div className="flex items-center space-x-2">
                     <div className={`${isSidebarOpen ? 'hidden md:hidden' : 'block'}`}>
                         <Image
@@ -48,71 +48,29 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                             className="w-32 md:w-[200px]"
                         />
                     </div>
-                    <button
-                        onClick={toggleSidebar}
-                        className="p-2 focus:outline-none"
-                        aria-label="Toggle sidebar"
-                    >
-                        {isSidebarOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
-                    </button>
-                    <div className="flex items-center space-x-2">
-                        {isSearchOpen ? (
-                            <form onSubmit={handleSearch} className="relative flex-grow md:flex-grow-0 md:w-96">
+                    
+                    {/* Search Bar */}
+                    <div className="hidden md:flex items-center space-x-2">
+                        <form onSubmit={handleSearch} className="relative">
+                            <div className="relative">
+                                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                                 <input
                                     type="text"
+                                    placeholder="Search for resources"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search for resources"
-                                    className={`w-full pl-10 pr-10 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-[#8DC63F] ${
-                                        mode === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-black text-[#403F41]'
-                                    }`}
-                                    style={{
-                                        fontWeight: 'bold', // Make placeholder text bold
-                                    }}
-                                />
-                                <MagnifyingGlassIcon
-                                    className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${
-                                        mode === 'dark' ? 'text-gray-400' : 'text-[#403F41]'
+                                    className={`w-64 pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#28A8E0] ${
+                                        mode === 'dark'
+                                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-black placeholder-gray-500'
                                     }`}
                                 />
-                                <button
-                                    onClick={() => setIsSearchOpen(false)}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
-                                    aria-label="Close search"
-                                >
-                                    <XMarkIcon className="h-5 w-5"/>
-                                </button>
-                            </form>
-
-                        ) : (
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="p-2 focus:outline-none md:hidden"
-                                aria-label="Open search"
-                            >
-                                <MagnifyingGlassIcon className="h-6 w-6"/>
-                            </button>
-                        )}
-                        <form onSubmit={handleSearch} className="hidden md:block relative w-96">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search for resources"
-                                className={`w-full pl-10 pr-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-[#8DC63F] ${
-                                    mode === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-black text-[#403F41]'
-                                }`}
-                            />
-                            <MagnifyingGlassIcon
-                                className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${
-                                    mode === 'dark' ? 'text-gray-400' : 'text-[#403F41]'
-                                }`}
-                            />
+                            </div>
                         </form>
                     </div>
                 </div>
 
-                {/* Right Section: Dark Mode, User */}
+                {/* Right Section: Theme Toggle, Notifications, and User Profile */}
                 <div className="flex items-center space-x-2">
                     <button
                         onClick={toggleMode}
@@ -186,42 +144,31 @@ const Header = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) =>
                                                 className="object-cover"
                                             />
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span
-                                                className={`text-md font-bold ${mode === 'dark' ? 'text-white' : 'text-black'}`}>{fullName}</span>
-                                            <span className="text-sm">Customer</span>
-                                            <div className="flex items-center justify-center gap-2">
-                                                <EnvelopeIcon className="h-4 w-4"/>
-                                                <span className="text-sm">{user?.email || 'N/A'}</span>
-                                            </div>
+                                        <div className="flex-1">
+                                            <p className="font-semibold">{fullName}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">Member</p>
                                         </div>
                                     </div>
-
-                                    <Link href="/profile">
-                                        <div
-                                            className="flex gap-2 capitalize py-6 transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
-                                            <LockClosedIcon
-                                                className="bg-[#e7f8f7] text-[#28A8E0] rounded-full p-2 h-10 w-10"/>
-                                            <div className="flex flex-col">
-                                                <span className="text-md font-bold">My Profile</span>
-                                                <span className="text-sm">Account Settings</span>
-                                            </div>
-                                        </div>
-                                    </Link>
-
-                                    <button
-                                        onClick={onLogout}
-                                        className={`block w-full text-center text-white px-4 py-2 bg-[#28A8E0] rounded-full transition-all duration-500 ease-out transform hover:-translate-y-[10px] ${
-                                            mode === 'dark' ? 'hover:bg-gray-600' : 'hover:bg-[#8DC63F]'
-                                        }`}
-                                    >
-                                        Logout
-                                    </button>
+                                    <div className="space-y-4 pt-6">
+                                        <Link
+                                            href="/profile"
+                                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            <Icon icon="mdi:account-circle" className="h-6 w-6"/>
+                                            <span>Profile Settings</span>
+                                        </Link>
+                                        <button
+                                            onClick={onLogout}
+                                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full text-left"
+                                        >
+                                            <LockClosedIcon className="h-6 w-6"/>
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </div>
-
                 </div>
             </div>
         </header>

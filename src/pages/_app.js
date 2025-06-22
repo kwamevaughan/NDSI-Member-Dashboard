@@ -1,6 +1,7 @@
 // src/pages/_app.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { UserProvider, useUser } from '@/context/UserContext';
 import SessionExpired from '../components/SessionExpired';
 import { ToastContainer } from 'react-toastify';
@@ -36,6 +37,10 @@ function MyApp({ Component, pageProps }) {
 
     return (
         <UserProvider>
+            <Head>
+                <title>NDSI Member Dashboard</title>
+                <meta name="description" content="NDSI Member Dashboard - Access your member portal" />
+            </Head>
             <UserComponent
                 mode={mode}
                 isSessionExpired={isSessionExpired}

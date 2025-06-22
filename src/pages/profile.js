@@ -20,7 +20,6 @@ const ProfilePage = () => {
     return (
         <div className={`flex flex-col h-screen ${mode === 'dark' ? 'bg-[#1a1a1a]' : 'bg-[#f7f1eb]'}`}>
             <Header
-                toggleSidebar={toggleSidebar}
                 isSidebarOpen={isSidebarOpen}
                 mode={mode}
                 toggleMode={toggleMode}

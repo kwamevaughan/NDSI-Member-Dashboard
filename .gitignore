@@ -1,1 +1,41 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Next.js
+.next/
+
+# Environment variables
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# IDE or editor specific files
+.idea/
+.vscode/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
+
+# Package distribution
+dist/
+build/
+
+# Editor history
+.history/
+.history
