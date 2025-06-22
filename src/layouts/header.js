@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MoonIcon, SunIcon, MagnifyingGlassIcon, EnvelopeIcon, LockClosedIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
-import { Icon } from '@iconify/react'; // Import Icon from @iconify/react
+import { Icon } from '@iconify/react';
 
 const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,7 +27,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
         // Add search logic here if needed
     };
 
-    const fullName = user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Guest';
+    const fullName = user ? `${user.full_name || ''}`.trim() : 'Guest';
 
     return (
         <header
@@ -53,7 +52,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                     <div className="hidden md:flex items-center space-x-2">
                         <form onSubmit={handleSearch} className="relative">
                             <div className="relative">
-                                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                <Icon icon="heroicons:magnifying-glass" className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Search for resources"
@@ -77,7 +76,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                         className="p-2 focus:outline-none md:hidden"
                         aria-label="Toggle dark mode"
                     >
-                        {mode === 'dark' ? <SunIcon className="h-6 w-6"/> : <MoonIcon className="h-6 w-6"/>}
+                        {mode === 'dark' ? <Icon icon="heroicons:sun" className="h-6 w-6"/> : <Icon icon="heroicons:moon" className="h-6 w-6"/>}
                     </button>
                     <label className="hidden md:inline-flex items-center cursor-pointer">
                         <input type="checkbox" checked={mode === 'dark'} onChange={toggleMode} className="hidden"/>
@@ -92,9 +91,9 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                                 }`}
                             >
                                 {mode === 'dark' ? (
-                                    <MoonIcon className="h-6 w-6 text-gray-700"/>
+                                    <Icon icon="heroicons:moon" className="h-6 w-6 text-gray-700"/>
                                 ) : (
-                                    <SunIcon className="h-6 w-6 text-yellow-500"/>
+                                    <Icon icon="heroicons:sun" className="h-6 w-6 text-yellow-500"/>
                                 )}
                             </div>
                         </div>
@@ -161,7 +160,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                                             onClick={onLogout}
                                             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full text-left"
                                         >
-                                            <LockClosedIcon className="h-6 w-6"/>
+                                            <Icon icon="heroicons:arrow-right-start-on-rectangle" className="h-6 w-6"/>
                                             <span>Sign Out</span>
                                         </button>
                                     </div>

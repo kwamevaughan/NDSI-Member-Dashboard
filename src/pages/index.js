@@ -13,6 +13,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Autoplay } from 'swiper/modules';
+import Image from 'next/image';
 
 export default function Home() {
     const { login } = useUser();
@@ -102,23 +103,23 @@ export default function Home() {
       <div className="w-full h-screen flex items-center justify-center">
         <div className="flex h-full max-w-sm lg:max-w-full w-full">
           <div className="flex flex-col md:flex-row shadow-2xl overflow-hidden w-full">
-            <div className="w-full md:w-1/3 p-8 px-10 h-full flex flex-col justify-center">
-              <div className="pb-20">
-                <a
+            <div className="w-full md:w-1/3 p-8 px-10 h-full flex flex-col overflow-y-auto">
+              <div className="pb-8">
+                <Link
                   href="https://sustainableinsurancedeclaration.org/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <img
+                  <Image
                     src="/assets/images/logo.svg"
                     alt="Logo"
-                    width="200"
-                    height="50"
+                    width={180}
+                    height={50}
                   />
-                </a>
+                </Link>
               </div>
-              <div className="flex flex-col justify-center">
-                <div>
+              <div className="flex flex-col justify-start flex-1">
+                <div className="mb-6">
                   <p className="text-3xl leading-10 mobile:text-2xl pb-2 text-black font-medium">
                     {isRegistering ? "Join the NDSI Community" : "Welcome Back to NDSI"}
                   </p>
@@ -204,7 +205,7 @@ export default function Home() {
                         />
                         Remember me
                       </label>
-                      <a
+                      <Link
                         href="#"
                         className="text-gray-400 hover:text-gray-900"
                         onClick={(e) => {
@@ -213,7 +214,7 @@ export default function Home() {
                         }}
                       >
                         Forgot my password?
-                      </a>
+                      </Link>
                     </div>
 
                     <div className="mt-8">
@@ -233,7 +234,7 @@ export default function Home() {
                       ? "Already have an account?"
                       : "Don't have an account yet?"}{" "}
                   </span>
-                  <a
+                  <Link
                     href="#"
                     className="hover:text-gray-900 underline"
                     onClick={handleFormSwitch}
@@ -241,7 +242,7 @@ export default function Home() {
                     <span className="text-[#28A8E0] underline hover:text-gray-900">
                       {isRegistering ? "Back to Login" : "Sign Up Here"}
                     </span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { ArrowRightStartOnRectangleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -54,7 +53,7 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
 
     if (windowWidth === null) return null;
 
-    const fullName = user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Guest';
+    const fullName = user ? `${user.full_name || ''}`.trim() : 'Guest';
 
     return (
         <div
@@ -167,7 +166,7 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                     className="flex items-center justify-center text-red-500 hover:text-red-600"
                                     aria-label="Logout"
                                 >
-                                    <ArrowRightStartOnRectangleIcon className="h-8 w-8" />
+                                    <Icon icon="heroicons:arrow-right-start-on-rectangle" className="h-8 w-8" />
                                 </button>
                             </div>
                         ) : (
@@ -177,7 +176,7 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                     className="flex items-center justify-center text-red-500 hover:text-red-600"
                                     aria-label="Logout"
                                 >
-                                    <ArrowRightStartOnRectangleIcon className="h-6 w-6" />
+                                    <Icon icon="heroicons:arrow-right-start-on-rectangle" className="h-6 w-6" />
                                 </button>
                                 <span className="absolute left-full ml-2 text-xs text-white bg-gray-700 rounded py-1 px-2 opacity-0 group-hover:opacity-75 transition-opacity whitespace-nowrap">
                                     Sign Out
@@ -199,12 +198,12 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                         >
                             {isOpen ? (
                                 <>
-                                    <XMarkIcon className="h-5 w-5 mr-2" />
+                                    <Icon icon="heroicons:x-mark" className="h-5 w-5 mr-2" />
                                     <span>Collapse</span>
                                 </>
                             ) : (
                                 <>
-                                    <Bars3Icon className="h-5 w-5 mr-2" />
+                                    <Icon icon="heroicons:bars-3" className="h-5 w-5 mr-2" />
                                     <span>Expand</span>
                                 </>
                             )}
