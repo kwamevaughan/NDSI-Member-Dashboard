@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email, password, first_name, last_name, recaptchaToken } = req.body;
+    const { email, password, full_name, organization_name, role_job_title, recaptchaToken } = req.body;
     const normalizedEmail = email.toLowerCase();
 
     if (!normalizedEmail || !password) {
@@ -54,8 +54,9 @@ export default async function handler(req, res) {
             .insert({
                 email: normalizedEmail,
                 password: hashedPassword,
-                first_name: first_name || null,
-                last_name: last_name || null,
+                full_name: full_name || null,
+                organization_name: organization_name || null,
+                role_job_title: role_job_title || null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             })
@@ -77,7 +78,7 @@ export default async function handler(req, res) {
             },
         });
 
-        const firstName = first_name || 'User';
+        const displayName = full_name || 'User';
         const protocol = req.headers['x-forwarded-proto'] || 'http';
         const host = req.headers['x-forwarded-host'] || req.headers.host;
         const baseUrl = `${protocol}://${host}`;
@@ -87,16 +88,16 @@ export default async function handler(req, res) {
             from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
             to: normalizedEmail,
             subject: 'Welcome to NDSI!',
-            text: `Hello ${firstName},\n\nWelcome to NDSI! We’re thrilled to have you join us. Your account has been successfully created. Log in to explore resources, training, and more:\n\n${loginLink}\n\nBest,\nThe NDSI Team`,
+            text: `Hello ${displayName},\n\nWelcome to NDSI! We're thrilled to have you join us. Your account has been successfully created. Log in to explore resources, training, and more:\n\n${loginLink}\n\nBest,\nThe NDSI Team`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
                     </div>
                     <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Hello ${firstName},</h2>
+                        <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Hello ${displayName},</h2>
                         <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                            Welcome to NDSI! We’re thrilled to have you join us. Your account has been successfully created. Log in now to explore resources, training, and key strategic documents:
+                            Welcome to NDSI! We're thrilled to have you join us. Your account has been successfully created. Log in now to explore resources, training, and key strategic documents:
                         </p>
                         <div style="text-align: center; margin-bottom: 25px;">
                             <a href="${loginLink}" style="background-color: #28A8E0; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block;">Log In</a>

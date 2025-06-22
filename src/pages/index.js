@@ -99,176 +99,197 @@ export default function Home() {
     };
 
     return (
-        <div className="w-full h-screen flex items-center justify-center">
-            <div className="flex h-full max-w-sm lg:max-w-full w-full">
-                <div className="flex flex-col md:flex-row shadow-2xl overflow-hidden w-full">
-                    <div className="w-full md:w-1/3 p-8 px-10 h-full flex flex-col justify-center">
-                        <div className="pb-20">
-                            <a href="https://sustainableinsurancedeclaration.org/" target="_blank" rel="noopener noreferrer">
-                                <img src="/assets/images/logo.svg" alt="Logo" width="200" height="50" />
-                            </a>
-                        </div>
-                        <div className="flex flex-col justify-center">
-                            <div>
-                                <p className="text-3xl leading-10 mobile:text-2xl pb-2 text-black font-medium">
-                                    {isRegistering ? 'Join NDSI' : 'Welcome Back to NDSI'}
-                                </p>
-                                <p>
-                                    {isRegistering
-                                        ? 'Create an account to access your personalized dashboard and more.'
-                                        : 'Sign in to access your personalized dashboard and stay connected with sustainable insurance initiatives.'}
-                                </p>
-                            </div>
-
-                            {isRegistering ? (
-                                <Register
-                                    closeRegister={handleFormSwitch}
-                                    notify={notify}
-                                    setError={setError}
-                                    router={router}
-                                    recaptchaRef={recaptchaRef}
-                                    onCaptchaChange={onCaptchaChange}
-                                />
-                            ) : (
-                                <form onSubmit={handleLogin}>
-                                    <div className="mt-8">
-                                        <label className="text-gray-900 text-sm mb-2">E-mail</label>
-                                        <div className="flex items-center border border-[#28A8E0] rounded focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out">
-                                            <input
-                                                className="bg-transparent py-2 px-4 block w-full rounded"
-                                                type="text"
-                                                value={loginEmail}
-                                                onChange={(e) => setLoginEmail(e.target.value)}
-                                                placeholder="example@gmail.com"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-4">
-                                        <label className="text-gray-900 text-sm mb-2">Password</label>
-                                        <div className="relative">
-                                            <span
-                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                                                onClick={togglePasswordVisibility}
-                                            >
-                                                {showPassword ? (
-                                                    <FaEyeSlash className="text-gray-500 h-5 w-5" />
-                                                ) : (
-                                                    <FaEye className="text-gray-500 h-5 w-5" />
-                                                )}
-                                            </span>
-                                            <input
-                                                className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
-                                                type={showPassword ? 'text' : 'password'}
-                                                value={loginPassword}
-                                                onChange={(e) => setLoginPassword(e.target.value)}
-                                                placeholder="Enter your password"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-4">
-                                        <ReCAPTCHA
-                                            ref={recaptchaRef}
-                                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                                            onChange={onCaptchaChange}
-                                        />
-                                    </div>
-
-                                    {error && (
-                                        <p className="mt-2 text-red-500 text-sm">{error}</p>
-                                    )}
-
-                                    <div className="flex items-center justify-between mt-2">
-                                        <label className="flex items-center text-xs text-gray-500">
-                                            <input
-                                                type="checkbox"
-                                                className="mr-2"
-                                                checked={rememberMe}
-                                                onChange={() => setRememberMe(!rememberMe)}
-                                            />
-                                            Remember me
-                                        </label>
-                                        <a
-                                            href="#"
-                                            className="text-gray-400 hover:text-gray-900"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setIsForgotPasswordModalOpen(true);
-                                            }}
-                                        >
-                                            Forgot my password?
-                                        </a>
-                                    </div>
-
-                                    <div className="mt-8">
-                                        <button
-                                            type="submit"
-                                            className="bg-[#28A8E0] text-white font-bold py-4 px-4 w-full rounded-lg transform transition-transform duration-700 ease-in-out hover:scale-105"
-                                        >
-                                            Login
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-
-                            <div className="mt-6 flex items-center w-full space-x-2">
-                                <span className="text-gray-400">
-                                    {isRegistering ? 'Already have an account?' : "Don't have an account yet?"}{' '}
-                                </span>
-                                <a href="#" className="hover:text-gray-900 underline" onClick={handleFormSwitch}>
-                                    <span className="text-[#28A8E0] underline hover:text-gray-900">
-                                        {isRegistering ? 'Back to Login' : 'Sign Up Here'}
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        className="md:block lg:w-2/3 bg-cover bg-center transition-all duration-700 ease-in-out h-full relative"
-                        style={{ backgroundImage: `url('/assets/images/form-bg.png')` }}
-                    >
-                        {quotes.length > 0 && (
-                            <Swiper
-                                spaceBetween={50}
-                                slidesPerView={1}
-                                pagination={{
-                                    clickable: true,
-                                    type: 'bullets',
-                                    dynamicBullets: false,
-                                }}
-                                autoplay={{
-                                    delay: 10000,
-                                    disableOnInteraction: false,
-                                }}
-                                loop={true}
-                                modules={[Pagination, Autoplay]}
-                                className="h-full"
-                            >
-                                {quotes.map((quote, index) => (
-                                    <SwiperSlide key={index}>
-                                        <div className="h-full flex flex-col justify-end items-start text-left p-10 text-white">
-                                            <div className="mb-12">
-                                                <p className="text-xl">{quote.q}</p>
-                                                <p className="mt-2 text-lg text-green-400">- {quote.a}</p>
-                                            </div>
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        )}
-                    </div>
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="flex h-full max-w-sm lg:max-w-full w-full">
+          <div className="flex flex-col md:flex-row shadow-2xl overflow-hidden w-full">
+            <div className="w-full md:w-1/3 p-8 px-10 h-full flex flex-col justify-center">
+              <div className="pb-20">
+                <a
+                  href="https://sustainableinsurancedeclaration.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/assets/images/logo.svg"
+                    alt="Logo"
+                    width="200"
+                    height="50"
+                  />
+                </a>
+              </div>
+              <div className="flex flex-col justify-center">
+                <div>
+                  <p className="text-3xl leading-10 mobile:text-2xl pb-2 text-black font-medium">
+                    {isRegistering ? "Join the NDSI Community" : "Welcome Back to NDSI"}
+                  </p>
+                  <p>
+                    {isRegistering
+                      ? "Become a member of the National Dialogue on Sustainable Insurance (NDSI) platform to access exclusive resources, training, and collaborative tools that support a more sustainable future in the insurance sector."
+                      : "Sign in to access your personalized dashboard and stay connected with sustainable insurance initiatives."}
+                  </p>
                 </div>
+
+                {isRegistering ? (
+                  <Register
+                    closeRegister={handleFormSwitch}
+                    notify={notify}
+                    setError={setError}
+                    router={router}
+                    recaptchaRef={recaptchaRef}
+                    onCaptchaChange={onCaptchaChange}
+                  />
+                ) : (
+                  <form onSubmit={handleLogin}>
+                    <div className="mt-8">
+                      <label className="text-gray-900 text-sm mb-2">
+                        E-mail
+                      </label>
+                      <div className="flex items-center border border-[#28A8E0] rounded focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out">
+                        <input
+                          className="bg-transparent py-2 px-4 block w-full rounded"
+                          type="text"
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
+                          placeholder="example@gmail.com"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="text-gray-900 text-sm mb-2">
+                        Password
+                      </label>
+                      <div className="relative">
+                        <span
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                          onClick={togglePasswordVisibility}
+                        >
+                          {showPassword ? (
+                            <FaEyeSlash className="text-gray-500 h-5 w-5" />
+                          ) : (
+                            <FaEye className="text-gray-500 h-5 w-5" />
+                          )}
+                        </span>
+                        <input
+                          className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
+                          type={showPassword ? "text" : "password"}
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          placeholder="Enter your password"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                        onChange={onCaptchaChange}
+                      />
+                    </div>
+
+                    {error && (
+                      <p className="mt-2 text-red-500 text-sm">{error}</p>
+                    )}
+
+                    <div className="flex items-center justify-between mt-2">
+                      <label className="flex items-center text-xs text-gray-500">
+                        <input
+                          type="checkbox"
+                          className="mr-2"
+                          checked={rememberMe}
+                          onChange={() => setRememberMe(!rememberMe)}
+                        />
+                        Remember me
+                      </label>
+                      <a
+                        href="#"
+                        className="text-gray-400 hover:text-gray-900"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsForgotPasswordModalOpen(true);
+                        }}
+                      >
+                        Forgot my password?
+                      </a>
+                    </div>
+
+                    <div className="mt-8">
+                      <button
+                        type="submit"
+                        className="bg-[#28A8E0] text-white font-bold py-4 px-4 w-full rounded-lg transform transition-transform duration-700 ease-in-out hover:scale-105"
+                      >
+                        Login
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                <div className="mt-6 flex items-center w-full space-x-2">
+                  <span className="text-gray-400">
+                    {isRegistering
+                      ? "Already have an account?"
+                      : "Don't have an account yet?"}{" "}
+                  </span>
+                  <a
+                    href="#"
+                    className="hover:text-gray-900 underline"
+                    onClick={handleFormSwitch}
+                  >
+                    <span className="text-[#28A8E0] underline hover:text-gray-900">
+                      {isRegistering ? "Back to Login" : "Sign Up Here"}
+                    </span>
+                  </a>
+                </div>
+              </div>
             </div>
 
-            <ForgotPasswordModal
-                isOpen={isForgotPasswordModalOpen}
-                closeModal={() => setIsForgotPasswordModalOpen(false)}
-                notify={notify}
-            />
+            <div
+              className="md:block lg:w-2/3 bg-cover bg-center transition-all duration-700 ease-in-out h-full relative"
+              style={{ backgroundImage: `url('/assets/images/form-bg.png')` }}
+            >
+              {quotes.length > 0 && (
+                <Swiper
+                  spaceBetween={50}
+                  slidesPerView={1}
+                  pagination={{
+                    clickable: true,
+                    type: "bullets",
+                    dynamicBullets: false,
+                  }}
+                  autoplay={{
+                    delay: 10000,
+                    disableOnInteraction: false,
+                  }}
+                  loop={true}
+                  modules={[Pagination, Autoplay]}
+                  className="h-full"
+                >
+                  {quotes.map((quote, index) => (
+                    <SwiperSlide key={index}>
+                      <div className="h-full flex flex-col justify-end items-start text-left p-10 text-white">
+                        <div className="mb-12">
+                          <p className="text-xl">{quote.q}</p>
+                          <p className="mt-2 text-lg text-green-400">
+                            - {quote.a}
+                          </p>
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              )}
+            </div>
+          </div>
         </div>
+
+        <ForgotPasswordModal
+          isOpen={isForgotPasswordModalOpen}
+          closeModal={() => setIsForgotPasswordModalOpen(false)}
+          notify={notify}
+        />
+      </div>
     );
 }

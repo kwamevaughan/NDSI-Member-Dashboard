@@ -11,19 +11,31 @@ export default function Register({ closeRegister, notify, setError, router, reca
     const { login } = useUser();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [organizationName, setOrganizationName] = useState('');
+    const [roleJobTitle, setRoleJobTitle] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [localError, setLocalError] = useState('');
     const [captchaToken, setCaptchaToken] = useState(null);
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        
+        // Validate passwords match
+        if (password !== confirmPassword) {
+            setLocalError('Passwords do not match');
+            setError('Passwords do not match');
+            return;
+        }
+
         if (!captchaToken) {
             setLocalError('Please complete the CAPTCHA');
             setError('Please complete the CAPTCHA');
             return;
         }
+        
         setLocalError('');
         setError('');
         const toastId = notify('Please wait...');
@@ -35,8 +47,9 @@ export default function Register({ closeRegister, notify, setError, router, reca
                 body: JSON.stringify({
                     email,
                     password,
-                    first_name: firstName,
-                    last_name: lastName,
+                    full_name: fullName,
+                    organization_name: organizationName,
+                    role_job_title: roleJobTitle,
                     recaptchaToken: captchaToken,
                 }),
             });
@@ -50,7 +63,7 @@ export default function Register({ closeRegister, notify, setError, router, reca
             // Skip reCAPTCHA for auto-login since it's already verified
             const loginResult = await login(email, password, null);
             if (loginResult && loginResult.token) {
-                const welcomeMessage = `Authenticated, Welcome ${firstName || 'User'}`;
+                const welcomeMessage = `Authenticated, Welcome ${fullName || 'User'}`;
                 toast.success(welcomeMessage);
                 setTimeout(() => {
                     router.push('/dashboard');
@@ -72,6 +85,10 @@ export default function Register({ closeRegister, notify, setError, router, reca
         setShowPassword(!showPassword);
     };
 
+    const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
+
     const handleCaptchaChange = (token) => {
         setCaptchaToken(token);
         onCaptchaChange(token);
@@ -80,6 +97,18 @@ export default function Register({ closeRegister, notify, setError, router, reca
     return (
         <form onSubmit={handleRegister}>
             <div className="mt-8">
+                <label className="text-gray-900 text-sm mb-2">Full Name</label>
+                <input
+                    className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Your official name"
+                    required
+                />
+            </div>
+
+            <div className="mt-4">
                 <label className="text-gray-900 text-sm mb-2">E-mail</label>
                 <div className="flex items-center border border-[#28A8E0] rounded focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out">
                     <input
@@ -87,10 +116,34 @@ export default function Register({ closeRegister, notify, setError, router, reca
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="example@gmail.com"
+                        placeholder="Example@gmail.com"
                         required
                     />
                 </div>
+            </div>
+
+            <div className="mt-4">
+                <label className="text-gray-900 text-sm mb-2">Organization Name</label>
+                <input
+                    className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
+                    type="text"
+                    value={organizationName}
+                    onChange={(e) => setOrganizationName(e.target.value)}
+                    placeholder="E.g. Value Village, Equity Bank, etc."
+                    required
+                />
+            </div>
+
+            <div className="mt-4">
+                <label className="text-gray-900 text-sm mb-2">Role / Job Title</label>
+                <input
+                    className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
+                    type="text"
+                    value={roleJobTitle}
+                    onChange={(e) => setRoleJobTitle(e.target.value)}
+                    placeholder="Let us know your position within your organization."
+                    required
+                />
             </div>
 
             <div className="mt-4">
@@ -118,25 +171,27 @@ export default function Register({ closeRegister, notify, setError, router, reca
             </div>
 
             <div className="mt-4">
-                <label className="text-gray-900 text-sm mb-2">First Name</label>
-                <input
-                    className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First Name"
-                />
-            </div>
-
-            <div className="mt-4">
-                <label className="text-gray-900 text-sm mb-2">Last Name</label>
-                <input
-                    className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last Name"
-                />
+                <label className="text-gray-900 text-sm mb-2">Confirm Password</label>
+                <div className="relative">
+                    <span
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                        onClick={toggleConfirmPasswordVisibility}
+                    >
+                        {showConfirmPassword ? (
+                            <FaEyeSlash className="text-gray-500 h-5 w-5" />
+                        ) : (
+                            <FaEye className="text-gray-500 h-5 w-5" />
+                        )}
+                    </span>
+                    <input
+                        className="bg-transparent border border-[#28A8E0] rounded py-2 px-4 block w-full focus:outline-none focus:border-fuchsia-900 hover:border-fuchsia-900 transition-all duration-700 ease-in-out"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm your password"
+                        required
+                    />
+                </div>
             </div>
 
             <div className="mt-4">
