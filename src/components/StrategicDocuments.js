@@ -17,7 +17,7 @@ const StrategicDocuments = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, on
                 <div className="mb-4">
                     <Icon icon="fe:document" className={`text-5xl ${mode === 'dark' ? 'text-sky-400' : 'text-sky-500'}`}/>
                 </div>
-                <h3 className={`font-bold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Strategic Documents</h3>
+                <h3 className={`font-semibold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Strategic Documents</h3>
                 <p className={`mb-6 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Access key documents including the NDSI Charter, strategy, and official logos.</p>
                 <button
                     className={`transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-end rounded-full hover:translate-y-[-5px] 

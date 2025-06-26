@@ -17,7 +17,7 @@ const ESGToolkit = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }
                 <div className="mb-4">
                     <Icon icon="healthicons:medium-bars" className={`text-5xl ${mode === 'dark' ? 'text-sky-400' : 'text-sky-500'}`}/>
                 </div>
-                <h3 className={`font-bold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>ESG Toolkit</h3>
+                <h3 className={`font-semibold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>ESG Toolkit</h3>
                 <p className={`mb-6 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Practical tools and frameworks for integrating ESG principles into your business.</p>
 
                 <div className={`w-full rounded-full h-2.5 mb-4 ${mode === 'dark' ? 'bg-gray-700' : 'bg-sky-200'}`}>
@@ -26,7 +26,7 @@ const ESGToolkit = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }
 
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col text-gray-600">
-                        <span className={`font-bold text-xl mb-1 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>65%</span>
+                        <span className={`font-semibold text-xl mb-1 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>65%</span>
                         <span className={`${mode === 'dark' ? 'text-white' : 'text-black'}`}>Toolkit Usage</span>
                     </div>
 

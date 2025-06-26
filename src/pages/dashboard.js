@@ -60,7 +60,7 @@ const Dashboard = () => {
                                         className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
                                 </div>
                             </div>
-                            <h2 className="text-4xl font-bold text-[#28A8E0] mb-4">Welcome {firstName} to NDSI!</h2>
+                            <h2 className="text-4xl font-semibold text-[#28A8E0] mb-4">Welcome {firstName} to NDSI!</h2>
                             <p className="mb-4">Explore resources, training, and key strategic documents to support
                                 sustainability efforts.</p>
                         </div>

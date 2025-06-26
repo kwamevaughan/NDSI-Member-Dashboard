@@ -17,7 +17,7 @@ const Newsletter = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }
                 <div className="mb-4">
                     <Icon icon="fluent-mdl2:news" className={`text-5xl ${mode === 'dark' ? 'text-sky-400' : 'text-sky-500'}`}/>
                 </div>
-                <h3 className={`font-bold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Newsletter</h3>
+                <h3 className={`font-semibold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Newsletter</h3>
                 <p className={`mb-6 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Stay updated with the latest news, reports, and industry insights.</p>
 
                 <button

@@ -45,9 +45,9 @@ const ESGToolkitPage = () => {
                                 : 'pt-[80px] md:pt-[120px]'
                         } ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#ececec] text-black'} w-full min-h-screen`}
                     >
-                        <div className="space-y-6">
+                        <div className="space-y-6 mt-10">
                             <div>
-                                <h2 className="text-4xl font-bold text-[#28A8E0] mb-4">ESG Toolkit</h2>
+                                <h2 className="text-4xl font-semibold text-[#28A8E0] mb-4">ESG Toolkit</h2>
                                 <p className="mb-4 text-gray-600 dark:text-gray-300">
                                     Access the comprehensive ESG toolkit and resources
                                 </p>

@@ -72,22 +72,46 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
             }}
         >
             <div className="flex flex-col h-full" style={{ backgroundColor: 'rgba(40, 168, 224, 0.3)' }}>
-                {/* Logo */}
-                <div className={`flex flex-col items-center py-10 ${isOpen ? 'px-4' : 'px-0'}`}>
-                    {isOpen ? (
-                        <Link href="/">
-                            <Image
-                                src={mode === 'dark' ? '/assets/images/logo-white.svg' : '/assets/images/logo.svg'}
-                                alt="NDSI Logo"
-                                width={200}
-                                height={75}
-                            />
-                        </Link>
-                    ) : (
-                        <Link href="/">
-                            <Image src="/favicon.png" alt="NDSI Logo" width={40} height={40} />
-                        </Link>
-                    )}
+                {/* Logo and Toggle Section */}
+                <div className={`flex flex-col items-center py-6 ${isOpen ? 'px-4' : 'px-0'}`}>
+                    <div className="flex items-center justify-between w-full">
+                        {isOpen ? (
+                            <>
+                                <Link href="/">
+                                    <Image
+                                        src={mode === 'dark' ? '/assets/images/logo-white.svg' : '/assets/images/logo.svg'}
+                                        alt="NDSI Logo"
+                                        width={200}
+                                        height={75}
+                                    />
+                                </Link>
+                                <button
+                                    onClick={toggleSidebar}
+                                    className={`p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
+                                        mode === 'dark' ? 'text-white hover:bg-[#28A8E0]' : 'text-[#403F41] hover:bg-[#28A8E0]'
+                                    }`}
+                                    aria-label="Collapse sidebar"
+                                >
+                                    <Icon icon="heroicons:chevron-left" className="h-5 w-5" />
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/">
+                                    <Image src="/favicon.png" alt="NDSI Logo" width={40} height={40} />
+                                </Link>
+                                <button
+                                    onClick={toggleSidebar}
+                                    className={`p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
+                                        mode === 'dark' ? 'text-white hover:bg-[#28A8E0]' : 'text-[#403F41] hover:bg-[#28A8E0]'
+                                    }`}
+                                    aria-label="Expand sidebar"
+                                >
+                                    <Icon icon="heroicons:chevron-right" className="h-5 w-5" />
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 {/* Navigation */}
@@ -183,31 +207,6 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                 </span>
                             </div>
                         )}
-                    </div>
-                )}
-
-                {/* Toggle Button - Only show on desktop */}
-                {windowWidth >= 640 && (
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-600">
-                        <button
-                            onClick={toggleSidebar}
-                            className={`w-full flex items-center justify-center p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
-                                mode === 'dark' ? 'text-white hover:bg-[#28A8E0]' : 'text-[#403F41] hover:bg-[#28A8E0]'
-                            }`}
-                            aria-label="Toggle sidebar"
-                        >
-                            {isOpen ? (
-                                <>
-                                    <Icon icon="heroicons:x-mark" className="h-5 w-5 mr-2" />
-                                    <span>Collapse</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Icon icon="heroicons:bars-3" className="h-5 w-5 mr-2" />
-                                    <span>Expand</span>
-                                </>
-                            )}
-                        </button>
                     </div>
                 )}
             </div>

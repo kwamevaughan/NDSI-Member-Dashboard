@@ -63,7 +63,7 @@ export default function ResetPassword() {
                         <img src="/assets/images/logo.svg" alt="NDSI Logo" width={200} height={50} />
                     </Link>
                 </div>
-                <h2 className="text-3xl font-bold mb-4 text-[#28A8E0] text-center">Reset Your Password</h2>
+                <h2 className="text-3xl font-semibold mb-4 text-[#28A8E0] text-center">Reset Your Password</h2>
                 <p className="mb-6 text-gray-600 text-center">Enter a new password for your NDSI account.</p>
 
                 {success ? (
