@@ -55,7 +55,7 @@ const ESGToolkitEmbed = () => {
             )}
 
             <iframe
-                src="/esg-toolkit/index.html"
+                src="/esg-toolkit/content/index.html"
                 className="w-full h-[calc(100vh-200px)] border-0 rounded-lg shadow-lg"
                 onLoad={handleLoad}
                 onError={handleError}
