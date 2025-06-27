@@ -37,7 +37,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
         >
             <div className="flex items-center justify-between p-2 md:p-4">
                 {/* Left Section: Logo and Search (Desktop) */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-10">
                     <div className={`${isSidebarOpen ? 'hidden md:hidden' : 'block'}`}>
                         <Image
                             src={mode === 'dark' ? '/assets/images/logo-white.svg' : '/assets/images/logo.svg'}
@@ -58,7 +58,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                                     placeholder="Search for resources"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className={`w-64 pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#28A8E0] ${
+                                    className={`w-96 pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#28A8E0] ${
                                         mode === 'dark'
                                             ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
                                             : 'bg-white border-gray-300 text-black placeholder-gray-500'
@@ -76,7 +76,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                         className="p-2 focus:outline-none md:hidden"
                         aria-label="Toggle dark mode"
                     >
-                        {mode === 'dark' ? <Icon icon="heroicons:sun" className="h-6 w-6"/> : <Icon icon="heroicons:moon" className="h-6 w-6"/>}
+                        {mode === 'dark' ? <Icon icon="heroicons:sun" className="h-2 w-2"/> : <Icon icon="heroicons:moon" className="h-2 w-2"/>}
                     </button>
                     <label className="hidden md:inline-flex items-center cursor-pointer">
                         <input type="checkbox" checked={mode === 'dark'} onChange={toggleMode} className="hidden"/>
@@ -113,7 +113,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                             </div>
                             <div className="hidden md:block">
                                 <span
-                                    className={`font-bold ${mode === 'dark' ? 'text-white' : 'text-[#403F41]'}`}>{fullName}</span>
+                                    className={`font-semibold ${mode === 'dark' ? 'text-white' : 'text-[#403F41]'}`}>{fullName}</span>
                                 <span
                                     className={`block text-sm font-normal ${mode === 'dark' ? 'text-[#28A8E0]' : 'text-[#28A8E0]'}`}>Member</span>
                             </div>
@@ -144,7 +144,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                                             />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="font-semibold">{fullName}</p>
+                                            <p className="font-medium">{fullName}</p>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Member</p>
                                         </div>
                                     </div>
