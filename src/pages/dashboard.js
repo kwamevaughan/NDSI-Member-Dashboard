@@ -104,9 +104,7 @@ const Dashboard = () => {
               </div>
 
               <div className="grid pb-14 gap-8 grid-cols-1 h-full">
-                <Link href="/working-group-docs" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                  <WorkingGroupDocumentation mode={mode} />
-                </Link>
+                <WorkingGroupDocumentation mode={mode} />
               </div>
             </main>
           </div>
