@@ -67,4 +67,82 @@ export const listFilesInFolder = async (folder = '/StrategicDocs') => {
     }
 };
 
+export const listSubfoldersInFolder = async (folder = '/TrainingMaterials') => {
+    try {
+        const result = await imagekit.listFiles({
+            path: folder,
+            limit: 100,
+            skip: 0,
+            type: 'folder',
+        });
+        // Only return unique folder names
+        const folders = Array.from(new Set(result
+            .filter(f => f.type === 'folder')
+            .map(f => f.name)));
+        return folders;
+    } catch (error) {
+        console.error('Error listing subfolders from ImageKit:', error);
+        throw error;
+    }
+};
+
+export const listAllFilesRecursively = async (folder = '/TrainingMaterials') => {
+    let allFiles = [];
+    let skip = 0;
+    const limit = 100;
+    let hasMore = true;
+    try {
+        while (hasMore) {
+            const files = await imagekit.listFiles({
+                path: folder,
+                limit,
+                skip,
+            });
+            // Add files (not folders)
+            allFiles = allFiles.concat(files.filter(f => f.type === 'file'));
+            // Find subfolders
+            const subfolders = files.filter(f => f.type === 'folder');
+            for (const sub of subfolders) {
+                const subFiles = await listAllFilesRecursively(`${folder}/${sub.name}`);
+                allFiles = allFiles.concat(subFiles);
+            }
+            hasMore = files.length === limit;
+            skip += limit;
+        }
+    } catch (error) {
+        console.error('Error recursively listing files from ImageKit:', error);
+        throw error;
+    }
+    return allFiles;
+};
+
+export const listAllFilesByPrefix = async (folder = '/TrainingMaterials') => {
+    let allFiles = [];
+    let skip = 0;
+    const limit = 100;
+    let hasMore = true;
+    try {
+        while (hasMore) {
+            const files = await imagekit.listFiles({
+                limit,
+                skip,
+            });
+            // Only include files in the desired folder or its subfolders
+            allFiles = allFiles.concat(
+                files.filter(f =>
+                    f.type === 'file' &&
+                    f.folder &&
+                    (f.folder === folder || f.folder.startsWith(folder + '/'))
+                )
+            );
+            hasMore = files.length === limit;
+            skip += limit;
+        }
+    } catch (error) {
+        console.error('Error listing files by prefix from ImageKit:', error);
+        throw error;
+    }
+    return allFiles;
+};
+
 export { imagekit }; // Only export imagekit here
