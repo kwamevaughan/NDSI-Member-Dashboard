@@ -75,17 +75,15 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
             <div className="flex flex-col h-full" style={{ backgroundColor: 'rgba(40, 168, 224, 0.3)' }}>
                 {/* Logo and Toggle Section */}
                 <div className={`flex flex-col items-center py-6 ${isOpen ? 'px-4' : 'px-0'}`}>
-                    <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center justify-center w-full gap-6">
                         {isOpen ? (
                             <>
-                                <Link href="/">
                                     <Image
                                         src={mode === 'dark' ? '/assets/images/logo-white.svg' : '/assets/images/logo.svg'}
                                         alt="NDSI Logo"
                                         width={150}
                                         height={75}
                                     />
-                                </Link>
                                 <button
                                     onClick={toggleSidebar}
                                     className={`p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
@@ -98,9 +96,6 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                             </>
                         ) : (
                             <>
-                                <Link href="/">
-                                    <Image src="/favicon.png" alt="NDSI Logo" width={40} height={40} />
-                                </Link>
                                 <button
                                     onClick={toggleSidebar}
                                     className={`p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
