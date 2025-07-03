@@ -123,21 +123,27 @@ export const listAllFilesByPrefix = async (folder = '/TrainingMaterials') => {
     let hasMore = true;
     try {
         while (hasMore) {
+            console.log(`[ImageKit] Fetching files: skip=${skip}, limit=${limit}`);
             const files = await imagekit.listFiles({
                 limit,
                 skip,
             });
-            // Only include files in the desired folder or its subfolders
-            allFiles = allFiles.concat(
-                files.filter(f =>
-                    f.type === 'file' &&
-                    f.folder &&
-                    (f.folder === folder || f.folder.startsWith(folder + '/'))
+            console.log(`[ImageKit] API returned ${files.length} files`);
+            files.forEach(f => console.log(`[ImageKit] file: name=${f.name}, filePath=${f.filePath}, type=${f.type}`));
+            const filtered = files.filter(f =>
+                f.type === 'file' &&
+                (
+                  (f.filePath && (f.filePath === folder || f.filePath.startsWith(folder + '/')))
+                  ||
+                  (f.name && (f.name === folder || f.name.startsWith(folder + '/')))
                 )
             );
+            console.log(`[ImageKit] Filtered to ${filtered.length} files for folder: ${folder}`);
+            allFiles = allFiles.concat(filtered);
             hasMore = files.length === limit;
             skip += limit;
         }
+        console.log(`[ImageKit] Total files found for ${folder}: ${allFiles.length}`);
     } catch (error) {
         console.error('Error listing files by prefix from ImageKit:', error);
         throw error;

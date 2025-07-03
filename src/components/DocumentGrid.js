@@ -7,7 +7,7 @@ import {
   listAllFilesByPrefix,
 } from "@/utils/imageKitService";
 
-function truncateText(text, maxLength = 30) {
+function truncateText(text, maxLength = 25) {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - 1) + "…";
 }
