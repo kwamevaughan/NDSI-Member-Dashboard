@@ -3,6 +3,12 @@ import { FaFilePdf, FaFileWord } from 'react-icons/fa';
 import SimpleModal from '@/components/SimpleModal';
 import { listFilesInFolder, listSubfoldersInFolder, listAllFilesRecursively, listAllFilesByPrefix } from '@/utils/imageKitService';
 
+// Utility function to truncate text
+function truncateText(text, maxLength = 20) {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength - 1) + '…';
+}
+
 const DocumentGrid = ({ folder, title, description = 'Browse and filter documents below.', mode, showSubfolderFilter = false }) => {
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
@@ -148,7 +154,7 @@ const DocumentGrid = ({ folder, title, description = 'Browse and filter document
                                     )}
                                 </div>
                                 <div className="flex-1 flex flex-col items-center text-center">
-                                    <h3 className="font-semibold text-lg mb-1 line-clamp-2">{doc.title}</h3>
+                                    <h3 className="font-semibold text-lg mb-1 line-clamp-2">{truncateText(doc.title)}</h3>
                                     <span className="text-xs text-gray-400 mb-2">{doc.type.toUpperCase()} &bull; {doc.year}</span>
                                     <span className="text-xs text-gray-400 mb-4">Uploaded: {doc.date}</span>
                                 </div>

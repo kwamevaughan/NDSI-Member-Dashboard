@@ -7,6 +7,10 @@ import useTheme from '@/hooks/useTheme';
 import useSidebar from '@/hooks/useSidebar';
 import { useUser } from '@/context/UserContext';
 import useSignOut from '@/hooks/useSignOut';
+import { FaFilePdf, FaFileWord } from 'react-icons/fa';
+import { listFilesInFolder } from '@/utils/imageKitService';
+import SimpleModal from '@/components/SimpleModal';
+import DocumentGrid from '@/components/DocumentGrid';
 
 
 const WorkingGroupDocsPage = () => {
@@ -46,19 +50,12 @@ const WorkingGroupDocsPage = () => {
                                 : 'pt-[80px] md:pt-[120px]' // Increased padding when sidebar is hidden
                         } ${mode === 'dark' ? 'bg-[#0a0c1d] text-white' : 'bg-[#ececec] text-black'} w-full min-h-screen`}
                     >
-                        <div className="space-y-6 ">
-                            <div>
-                                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div
-                                        className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-white text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
-                                    <div
-                                        className={`${mode === 'dark' ? 'bg-[#101720] text-white' : 'bg-[#0CB4AB] text-black'} rounded-lg hover:shadow-md transition-all duration-300 ease-in-out`}></div>
-                                </div>
-                            </div>
-                            <h2 className="text-4xl font-semibold text-[#28A8E0] mb-4">Working Group Page</h2>
-                            <p className="mb-4">Page is under development... Check back soon!</p>
-                        </div>
-
+                        <DocumentGrid
+                            folder="WorkingGroups"
+                            title="Working Group Documents"
+                            description="Browse and filter working group documents below."
+                            mode={mode}
+                        />
                     </main>
                 </div>
             </div>
