@@ -91,12 +91,12 @@ const StrategicDocumentsPage = () => {
             toggleMode={toggleMode}
           />
           <div
-            className={`flex-1 transition-margin duration-300 pt-20 ${
+            className={`flex-1 transition-margin duration-300 ${
               isSidebarOpen ? "lg:ml-[250px]" : "ml-0 lg:ml-[80px]"
             }`}
           >
             <main
-              className={`p-4 md:p-8 ${
+              className={`p-4 md:p-8 mt-10 ${
                 isSidebarOpen
                   ? "pt-[60px] md:pt-[70px]"
                   : "pt-[80px] md:pt-[120px]"

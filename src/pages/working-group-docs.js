@@ -63,6 +63,7 @@ const WorkingGroupDocsPage = () => {
                 title="Working Group Documents"
                 description="Browse and filter working group documents below."
                 mode={mode}
+                showSubfolderFilter={true}
               />
             </main>
           </div>

@@ -46,7 +46,7 @@ const CommsPage = () => {
           }`}
         >
           <main
-            className={`p-4 md:p-8 ${
+            className={`p-4 md:p-8 mt-10 ${
               isSidebarOpen
                 ? "pt-[60px] md:pt-[70px]"
                 : "pt-[80px] md:pt-[120px]" // Increased padding when sidebar is hidden

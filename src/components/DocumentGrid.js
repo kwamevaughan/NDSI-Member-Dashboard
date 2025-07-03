@@ -101,7 +101,7 @@ const DocumentGrid = ({
   return (
     <div className="space-y-8">
       <header>
-        <h2 className="text-3xl md:text-4xl font-bold text-[#28A8E0] mb-1">
+        <h2 className="text-3xl md:text-4xl font-semibold text-[#28A8E0] mb-4">
           {title}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -116,12 +116,20 @@ const DocumentGrid = ({
           placeholder="Search documents..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-[#28A8E0] dark:bg-[#101720] dark:text-white dark:border-gray-700"
+          className={`w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-[#28A8E0] ${
+            mode === "dark"
+              ? "bg-transparent text-white border-gray-700"
+              : "bg-white text-black border-gray-300"
+          }`}
         />
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 text-sm dark:bg-[#101720] dark:text-white dark:border-gray-700"
+          className={`w-full rounded-lg border px-3 py-2 text-sm ${
+            mode === "dark"
+              ? "bg-transparent text-white border-gray-700"
+              : "bg-white text-black border-gray-300"
+          }`}
         >
           <option value="all">All Types</option>
           <option value="pdf">PDF</option>
@@ -130,7 +138,11 @@ const DocumentGrid = ({
         <select
           value={yearFilter}
           onChange={(e) => setYearFilter(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 text-sm dark:bg-[#101720] dark:text-white dark:border-gray-700"
+          className={`w-full rounded-lg border px-3 py-2 text-sm ${
+            mode === "dark"
+              ? "bg-transparent text-white border-gray-700"
+              : "bg-white text-black border-gray-300"
+          }`}
         >
           <option value="all">All Years</option>
           {years.map((y) => (
@@ -143,7 +155,11 @@ const DocumentGrid = ({
           <select
             value={subfolderFilter}
             onChange={(e) => setSubfolderFilter(e.target.value)}
-            className="w-full rounded-lg border px-3 py-2 text-sm dark:bg-[#101720] dark:text-white dark:border-gray-700"
+            className={`w-full rounded-lg border px-3 py-2 text-sm ${
+              mode === "dark"
+                ? "bg-[#286380] text-white border-gray-700"
+                : "bg-white text-black border-gray-300"
+            }`}
           >
             <option value="all">All Categories</option>
             {subfolders.map((f) => (
@@ -171,7 +187,11 @@ const DocumentGrid = ({
           {filteredDocuments.map((doc) => (
             <div
               key={doc.id}
-              className="flex flex-col items-center p-5 rounded-2xl shadow hover:shadow-lg transition-all bg-white dark:bg-[#101720] dark:text-white"
+              className={`flex flex-col items-center p-5 rounded-2xl shadow hover:shadow-lg transition-all ${
+                mode === "dark"
+                  ? "bg-[#19506a] text-white"
+                  : "bg-white text-black"
+              }`}
             >
               <div className="mb-4">
                 {doc.type === "pdf" ? (
@@ -221,19 +241,16 @@ const DocumentGrid = ({
             className="w-full h-[70vh] rounded-xl border"
           />
         ) : selectedDoc?.type === "docx" ? (
-          <div className="flex flex-col items-center justify-center min-h-[40vh]">
-            <p className="mb-4">
-              DOCX preview is not supported. Download instead:
-            </p>
-            <a
-              href={selectedDoc.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#28A8E0] hover:bg-[#0CB4AB] text-white py-2 px-6 rounded-lg"
-            >
-              Download DOCX
-            </a>
-          </div>
+          <iframe
+            src={`https://docs.google.com/gview?url=${encodeURIComponent(
+              selectedDoc.url
+            )}&embedded=true`}
+            title={selectedDoc.title}
+            className={`w-full h-[70vh] rounded-xl border ${
+              mode === "dark" ? "bg-[#286380]" : "bg-white"
+            }`}
+            style={{ backgroundColor: mode === "dark" ? "#286380" : "#fff" }}
+          />
         ) : null}
       </SimpleModal>
     </div>

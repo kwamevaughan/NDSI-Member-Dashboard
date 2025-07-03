@@ -127,17 +127,11 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                         className="w-full h-[70vh] rounded-xl border"
                     />
                 ) : selectedDoc && selectedDoc.type === 'docx' ? (
-                    <div className="flex flex-col items-center justify-center min-h-[40vh]">
-                        <p className="mb-4">DOCX preview is not supported. You can download the file below:</p>
-                        <a
-                            href={selectedDoc.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-[#28A8E0] hover:bg-[#0CB4AB] text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
-                        >
-                            Download DOCX
-                        </a>
-                    </div>
+                    <iframe
+                        src={`https://docs.google.com/gview?url=${encodeURIComponent(selectedDoc.url)}&embedded=true`}
+                        title={selectedDoc.name}
+                        className="w-full h-[70vh] rounded-xl border bg-white"
+                    />
                 ) : null}
             </SimpleModal>
         </main>

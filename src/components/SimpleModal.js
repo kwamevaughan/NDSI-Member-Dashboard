@@ -82,7 +82,7 @@ const SimpleModal = ({
             {/* Premium Header with Gradient Overlay */}
             <div
               className={`relative px-8 py-3 overflow-hidden ${
-                mode === "dark" ? "bg-blue-600" : "bg-[#172840]"
+                mode === "dark" ? "bg-[#28A8E0]" : "bg-[#172840]"
               }`}
               style={{
                 backdropFilter: "blur(8px)",
