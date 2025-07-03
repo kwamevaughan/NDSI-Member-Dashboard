@@ -53,4 +53,18 @@ export const uploadImage = async (file, userName, referralCode) => {
     }
 };
 
+export const listFilesInFolder = async (folder = '/StrategicDocs') => {
+    try {
+        const result = await imagekit.listFiles({
+            path: folder,
+            limit: 100,
+            skip: 0,
+        });
+        return result;
+    } catch (error) {
+        console.error('Error listing files from ImageKit:', error);
+        throw error;
+    }
+};
+
 export { imagekit }; // Only export imagekit here
