@@ -20,15 +20,15 @@ const TrainingMaterials = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onL
                 <h3 className={`font-semibold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Training Materials</h3>
                 <p className={`mb-6 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Watch training videos and access presentations designed to build capacity.</p>
 
-                <div className={`w-full rounded-full h-2.5 mb-4 ${mode === 'dark' ? 'bg-gray-700' : 'bg-sky-200'}`}>
+                {/* <div className={`w-full rounded-full h-2.5 mb-4 ${mode === 'dark' ? 'bg-gray-700' : 'bg-sky-200'}`}>
                     <div className="bg-sky-500 h-2.5 rounded-full" style={{width: '65%'}}></div>
-                </div>
+                </div> */}
 
                 <div className="flex justify-between items-center">
-                    <div className="flex flex-col text-gray-600">
+                    {/* <div className="flex flex-col text-gray-600">
                         <span className={`font-semibold text-xl mb-1 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>65%</span>
                         <span className={`${mode === 'dark' ? 'text-white' : 'text-black'}`}>Completion</span>
-                    </div>
+                    </div> */}
 
                     <button
                         className={`transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-end rounded-full hover:translate-y-[-5px] 
