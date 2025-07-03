@@ -204,7 +204,7 @@ const DocumentGrid = ({ folder, title, description = 'Browse and filter document
           }}
           title={selectedDoc ? selectedDoc.title : ""}
           mode={mode}
-          width="max-w-4xl"
+          width="max-w-5xl"
         >
           {selectedDoc && selectedDoc.type === "pdf" ? (
             <iframe
