@@ -52,7 +52,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                 alt="Logo"
                 width={120}
                 height={40}
-                className="w-32 md:w-[200px]"
+                className="w-32 md:w-[150px]"
               />
             </div>
 

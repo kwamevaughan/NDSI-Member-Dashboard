@@ -82,7 +82,7 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                                     <Image
                                         src={mode === 'dark' ? '/assets/images/logo-white.svg' : '/assets/images/logo.svg'}
                                         alt="NDSI Logo"
-                                        width={200}
+                                        width={150}
                                         height={75}
                                     />
                                 </Link>
