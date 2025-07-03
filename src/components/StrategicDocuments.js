@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUser } from '@/context/UserContext';
 import { Icon } from '@iconify/react';
+import Link from 'next/link';
 
 const StrategicDocuments = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) => {
     const { user } = useUser();
@@ -19,6 +20,7 @@ const StrategicDocuments = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, on
                 </div>
                 <h3 className={`font-semibold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Strategic Documents</h3>
                 <p className={`mb-6 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Access key documents including the NDSI Charter, strategy, and official logos.</p>
+                {/* <Link href="/" */}
                 <button
                     className={`transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-end rounded-full hover:translate-y-[-5px] 
                         ${mode === 'dark' ? 'hover:bg-sky-400' : 'hover:bg-sky-600'}`}

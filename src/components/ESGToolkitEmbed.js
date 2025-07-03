@@ -60,7 +60,7 @@ const ESGToolkitEmbed = () => {
                 onLoad={handleLoad}
                 onError={handleError}
                 title="ESG Toolkit"
-                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation allow-downloads"
                 loading="lazy"
             />
         </div>
