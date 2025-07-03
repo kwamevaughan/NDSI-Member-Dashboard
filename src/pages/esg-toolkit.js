@@ -35,7 +35,7 @@ const ESGToolkitPage = () => {
                 />
                 <div
                     className={`flex-1 transition-margin duration-300 ${
-                        isSidebarOpen ? 'lg:ml-[300px]' : 'ml-0 lg:ml-[80px]'
+                        isSidebarOpen ? 'lg:ml-[250px]' : 'ml-0 lg:ml-[80px]'
                     }`}
                 >
                     <main

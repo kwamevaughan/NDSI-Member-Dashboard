@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useUser } from '@/context/UserContext';
 import { Icon } from '@iconify/react';
+import navLinks from '@/data/nav';
 
 const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
     const { user } = useUser();
@@ -62,7 +63,7 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
                 mode === 'dark' ? 'text-white' : 'text-black'
             }`}
             style={{
-                width: isOpen ? '300px' : windowWidth < 640 ? '0' : '80px',
+                width: isOpen ? '250px' : windowWidth < 640 ? '0' : '80px',
                 backgroundColor:
                     mode === 'dark' && windowWidth < 640
                         ? 'rgba(40, 168, 224, 1)' // Full blue on mobile in dark mode
@@ -116,22 +117,7 @@ const Sidebar = ({ isOpen, mode, onLogout, toggleSidebar }) => {
 
                 {/* Navigation */}
                 <ul className="flex-grow">
-                    {[
-                        { href: '/dashboard', icon: 'ri:home-line', label: 'NDSI Home' },
-                        {
-                            href: '/strategic-documents',
-                            icon: 'majesticons:document-line',
-                            label: 'NDSI Strategic Documents',
-                        },
-                        {
-                            href: '/training-materials',
-                            icon: 'healthicons:i-training-class-outline-24px',
-                            label: 'Training Materials',
-                        },
-                        { href: '/newsletter', icon: 'quill:inbox-newsletter', label: 'Newsletter' },
-                        { href: '/working-group-docs', icon: 'pixelarticons:group', label: 'Working Group Docs' },
-                        { href: '/esg-toolkit', icon: 'mdi:briefcase-outline', label: 'ESG Toolkit' },
-                    ].map(({ href, icon, label }) => (
+                    {navLinks.map(({ href, icon, label }) => (
                         <li key={href} className="py-2">
                             <Link
                                 href={href}
