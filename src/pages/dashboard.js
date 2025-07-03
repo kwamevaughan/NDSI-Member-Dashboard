@@ -12,6 +12,7 @@ import TrainingMaterials from "@/components/TrainingMaterials";
 import ESGToolkit from "@/components/ESGToolkit";
 import Newsletter from "@/components/Newsletter";
 import WorkingGroupDocumentation from "@/components/WorkingGroupDocumentation";
+import Link from 'next/link';
 
 const Dashboard = () => {
     const router = useRouter();
@@ -88,24 +89,24 @@ const Dashboard = () => {
               </div>
 
               <div className="grid pt-14 pb-14 gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 h-full">
-                <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                <Link href="/strategic-documents" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
                   <StrategicDocuments mode={mode} />
-                </div>
-                <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                </Link>
+                <Link href="/training-materials" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
                   <TrainingMaterials mode={mode} />
-                </div>
-                <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                </Link>
+                <Link href="/esg-toolkit" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
                   <ESGToolkit mode={mode} />
-                </div>
-                <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                </Link>
+                <Link href="/newsletter" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
                   <Newsletter mode={mode} />
-                </div>
+                </Link>
               </div>
 
               <div className="grid pb-14 gap-8 grid-cols-1 h-full">
-                <div className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300">
+                <Link href="/working-group-docs" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
                   <WorkingGroupDocumentation mode={mode} />
-                </div>
+                </Link>
               </div>
             </main>
           </div>
