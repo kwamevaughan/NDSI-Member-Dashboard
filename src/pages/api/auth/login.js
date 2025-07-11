@@ -54,7 +54,24 @@ export default async function handler(req, res) {
             { expiresIn: '1h' }
         );
 
-        return res.status(200).json({ token, user });
+        // Update last_login_at and handle first time login
+        let enforcePasswordChange = false;
+        if (user.is_first_time) {
+            enforcePasswordChange = true;
+            // Do NOT set is_first_time to false here. Only update last_login_at.
+            await supabaseAdmin
+                .from('users')
+                .update({ last_login_at: new Date().toISOString() })
+                .eq('id', user.id);
+        } else {
+            // Just update last_login_at
+            await supabaseAdmin
+                .from('users')
+                .update({ last_login_at: new Date().toISOString() })
+                .eq('id', user.id);
+        }
+
+        return res.status(200).json({ token, user, enforcePasswordChange });
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ error: 'Internal server error' });

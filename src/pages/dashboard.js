@@ -22,6 +22,20 @@ const Dashboard = () => {
     const { handleSignOut } = useSignOut();
     const { user } = useUser();
 
+    useEffect(() => {
+        if (!user) return;
+        // Check if first time, or missing required info
+        const needsFirstTimeSetup = user.is_first_time || !user.first_name || !user.last_name || !user.password;
+        if (needsFirstTimeSetup) {
+            router.replace('/first-time-setup');
+        }
+    }, [user, router]);
+
+    if (!user || user.is_first_time || !user.first_name || !user.last_name || !user.password) {
+        // Optionally show a loading spinner or nothing while redirecting
+        return null;
+    }
+
     const firstName = user?.first_name || 'Guest';
 
     return (
