@@ -122,69 +122,69 @@ const ProfilePage = () => {
                         <div className="space-y-10 mt-10">
                             <h2 className="text-4xl font-semibold text-[#28A8E0] mb-4 text-center">My Profile</h2>
                             {/* Profile Card */}
-                            <div className="bg-white rounded-lg shadow-lg p-8 border border-[#e0e0e0] mx-auto max-w-2xl">
+                            <div className={`rounded-lg shadow-lg p-8 border mx-auto max-w-2xl ${mode === 'dark' ? 'bg-[#181f2a] border-[#232a36] text-white' : 'bg-white border-[#e0e0e0] text-black'}`}>
                                 <form onSubmit={handleProfileSubmit}>
                                     <h3 className="text-2xl font-bold text-[#28A8E0] mb-6 flex items-center gap-2"><FaUserCircle /> Profile Information</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         <div className="relative">
-                                            <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={first_name}
                                                 onChange={e => setFirstName(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="First Name"
                                                 required
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={last_name}
                                                 onChange={e => setLastName(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="Last Name"
                                                 required
                                             />
                                         </div>
                                         <div className="relative md:col-span-2">
-                                            <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaEnvelope className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="email"
                                                 value={user?.email || ''}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded bg-gray-100 cursor-not-allowed"
+                                                className={`w-full pl-10 p-2 rounded bg-gray-100 cursor-not-allowed border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-gray-400' : 'border-[#28A8E0] text-gray-500'}`}
                                                 placeholder="Email"
                                                 disabled
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaBuilding className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaBuilding className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={organization_name}
                                                 onChange={e => setOrganizationName(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="Organization Name"
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaBriefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaBriefcase className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={role_job_title}
                                                 onChange={e => setRoleJobTitle(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="Role / Job Title"
                                             />
                                         </div>
                                         <div className="relative md:col-span-2">
-                                            <FaUserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaUserCircle className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={full_name}
                                                 onChange={e => setFullName(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="Full Name"
                                             />
                                         </div>
@@ -193,7 +193,7 @@ const ProfilePage = () => {
                                     {profileSuccess && <p className="text-green-600 text-sm mb-4 text-center">Profile updated successfully!</p>}
                                     <button
                                         type="submit"
-                                        className="w-full px-4 py-3 bg-[#28A8E0] text-white font-bold rounded-lg hover:bg-[#8DC63F] transition-all duration-300 text-lg shadow-md disabled:opacity-60"
+                                        className={`w-full px-4 py-3 font-bold rounded-lg transition-all duration-300 text-lg shadow-md disabled:opacity-60 ${mode === 'dark' ? 'bg-[#28A8E0] text-white hover:bg-[#8DC63F]' : 'bg-[#28A8E0] text-white hover:bg-[#8DC63F]'}`}
                                         disabled={profileLoading}
                                     >
                                         {profileLoading ? 'Saving...' : 'Save Changes'}
@@ -201,28 +201,28 @@ const ProfilePage = () => {
                                 </form>
                             </div>
                             {/* Password Card */}
-                            <div className="bg-white rounded-lg shadow-lg p-8 border border-[#e0e0e0] mx-auto max-w-2xl">
+                            <div className={`rounded-lg shadow-lg p-8 border mx-auto max-w-2xl ${mode === 'dark' ? 'bg-[#181f2a] border-[#232a36] text-white' : 'bg-white border-[#e0e0e0] text-black'}`}>
                                 <form onSubmit={handlePasswordSubmit}>
                                     <h3 className="text-2xl font-bold text-[#28A8E0] mb-6 flex items-center gap-2"><FaLock /> Change Password</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         <div className="relative">
-                                            <FaKey className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaKey className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="password"
                                                 value={currentPassword}
                                                 onChange={e => setCurrentPassword(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="Current Password"
                                                 required
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                            <FaLock className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="password"
                                                 value={newPassword}
                                                 onChange={e => setNewPassword(e.target.value)}
-                                                className="w-full pl-10 p-2 border border-[#28A8E0] rounded focus:outline-none focus:border-[#8DC63F] transition-all"
+                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
                                                 placeholder="New Password"
                                                 required
                                             />
@@ -232,7 +232,7 @@ const ProfilePage = () => {
                                     {passwordSuccess && <p className="text-green-600 text-sm mb-4 text-center">Password changed successfully!</p>}
                                     <button
                                         type="submit"
-                                        className="w-full px-4 py-3 bg-[#28A8E0] text-white font-bold rounded-lg hover:bg-[#8DC63F] transition-all duration-300 text-lg shadow-md disabled:opacity-60"
+                                        className={`w-full px-4 py-3 font-bold rounded-lg transition-all duration-300 text-lg shadow-md disabled:opacity-60 ${mode === 'dark' ? 'bg-[#28A8E0] text-white hover:bg-[#8DC63F]' : 'bg-[#28A8E0] text-white hover:bg-[#8DC63F]'}`}
                                         disabled={passwordLoading}
                                     >
                                         {passwordLoading ? 'Changing...' : 'Change Password'}
