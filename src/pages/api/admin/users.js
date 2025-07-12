@@ -40,6 +40,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
         // Get pending users
         try {
+            // First, get all non-admin users
             const { data: users, error } = await supabaseAdmin
                 .from('users')
                 .select('*')
@@ -50,7 +51,32 @@ export default async function handler(req, res) {
                 throw error;
             }
 
-            return res.status(200).json({ users });
+            // Get admin names for users who have been approved/rejected
+            const adminIds = users
+                .filter(user => user.approved_by)
+                .map(user => user.approved_by);
+
+            let adminNames = {};
+            if (adminIds.length > 0) {
+                const { data: admins, error: adminError } = await supabaseAdmin
+                    .from('users')
+                    .select('id, full_name, email')
+                    .in('id', adminIds);
+
+                if (!adminError && admins) {
+                    admins.forEach(admin => {
+                        adminNames[admin.id] = admin.full_name || admin.email;
+                    });
+                }
+            }
+
+            // Add admin names to user data
+            const usersWithAdminNames = users.map(user => ({
+                ...user,
+                approved_by_name: user.approved_by ? adminNames[user.approved_by] : null
+            }));
+
+            return res.status(200).json({ users: usersWithAdminNames });
         } catch (error) {
             console.error('Error fetching pending users:', error);
             return res.status(500).json({ error: 'Internal server error' });

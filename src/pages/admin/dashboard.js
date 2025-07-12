@@ -31,6 +31,8 @@ export default function AdminDashboard() {
   const [showDeleteAdminModal, setShowDeleteAdminModal] = useState(false);
   const [adminToEdit, setAdminToEdit] = useState(null);
   const [adminToDelete, setAdminToDelete] = useState(null);
+  const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [editAdminData, setEditAdminData] = useState({
     full_name: '',
     email: '',
@@ -129,6 +131,11 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleViewUser = (user) => {
+    setSelectedUser(user);
+    setShowUserDetailsModal(true);
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
@@ -208,6 +215,7 @@ export default function AdminDashboard() {
               data={userManagement.users}
               title="Regular Users"
               emptyMessage="No regular users found."
+              onRefresh={userManagement.fetchPendingUsers}
               onBulkDelete={(selectedIds, selectedItems) => {
                 setSelectedUsers(selectedItems);
                 handleBulkDeleteClick();
@@ -276,6 +284,12 @@ export default function AdminDashboard() {
                 },
               ]}
               actions={[
+                {
+                  label: "View Details",
+                  icon: "mdi:eye",
+                  className: "hover:bg-blue-100 text-blue-600",
+                  onClick: (row) => handleViewUser(row),
+                },
                 {
                   label: (row) => userManagement.processingUser === row.id ? "Processing..." : "Approve",
                   icon: (row) => userManagement.processingUser === row.id ? "mdi:loading" : "mdi:check",
@@ -860,6 +874,176 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
+        </SimpleModal>
+
+        {/* User Details Modal */}
+        <SimpleModal
+          isOpen={showUserDetailsModal}
+          onClose={() => setShowUserDetailsModal(false)}
+          title="User Details"
+          width="max-w-2xl"
+        >
+          {selectedUser && (
+            <div className="space-y-6">
+              {/* User Header */}
+              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                <div className="h-16 w-16 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Icon icon="mdi:account" className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {selectedUser.full_name || "No name provided"}
+                  </h3>
+                  <p className="text-gray-600">{selectedUser.email}</p>
+                  <div className="mt-2">
+                    {selectedUser.approval_status === 'rejected' ? (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                        Rejected
+                      </span>
+                    ) : selectedUser.is_approved === true ? (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        Approved
+                      </span>
+                    ) : (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* User Information Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+                    Personal Information
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Full Name</label>
+                      <p className="text-gray-900">{selectedUser.full_name || "Not provided"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Email Address</label>
+                      <p className="text-gray-900">{selectedUser.email}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Organization</label>
+                      <p className="text-gray-900">{selectedUser.organization_name || "Not provided"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Job Title</label>
+                      <p className="text-gray-900">{selectedUser.role_job_title || "Not provided"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Information */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+                    Account Information
+                  </h4>
+                  <div className="space-y-3">
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Registration Date</label>
+                      <p className="text-gray-900">{formatDate(selectedUser.created_at)}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Last Updated</label>
+                      <p className="text-gray-900">{selectedUser.updated_at ? formatDate(selectedUser.updated_at) : "Never"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Last Login</label>
+                      <p className="text-gray-900">{selectedUser.last_login_at ? formatDate(selectedUser.last_login_at) : "Never"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">First Time Setup</label>
+                      <p className="text-gray-900">{selectedUser.is_first_time ? "Yes" : "No"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Approval Information */}
+              {(selectedUser.approval_status === 'rejected' || selectedUser.is_approved === true) && (
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+                    Approval Information
+                  </h4>
+                  <div className="space-y-3">
+                                         {selectedUser.approved_by_name && (
+                       <div>
+                         <label className="text-sm font-medium text-gray-500">Approved By</label>
+                         <p className="text-gray-900">{selectedUser.approved_by_name}</p>
+                       </div>
+                     )}
+                    {selectedUser.approved_at && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Approved At</label>
+                        <p className="text-gray-900">{formatDate(selectedUser.approved_at)}</p>
+                      </div>
+                    )}
+                    {selectedUser.rejection_reason && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Rejection Reason</label>
+                        <p className="text-gray-900 bg-red-50 border border-red-200 rounded-lg p-3 text-red-800">
+                          {selectedUser.rejection_reason}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setShowUserDetailsModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Close
+                </button>
+                {selectedUser.is_approved === false || selectedUser.is_approved === null ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        setShowUserDetailsModal(false);
+                        userManagement.handleApproval(selectedUser.id, "approve");
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                    >
+                      <Icon icon="mdi:check" className="mr-2 h-4 w-4" />
+                      Approve User
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowUserDetailsModal(false);
+                        handleRejectClick(selectedUser);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                    >
+                      <Icon icon="mdi:close" className="mr-2 h-4 w-4" />
+                      Reject User
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setShowUserDetailsModal(false);
+                      handleDeleteClick(selectedUser);
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                  >
+                    <Icon icon="mdi:delete" className="mr-2 h-4 w-4" />
+                    Delete User
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </SimpleModal>
       </main>
     </div>

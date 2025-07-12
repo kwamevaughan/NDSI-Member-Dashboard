@@ -6,6 +6,7 @@ import { format, parseISO, isWithinInterval } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import ReactDOM from 'react-dom';
+import { toast } from 'react-hot-toast';
 
 // Enhanced useTable hook
 function useTable(data, initialPageSize = 10) {
@@ -161,6 +162,7 @@ export function GenericTable({
   customRowRender,
   importType,
   enableDateFilter = false,
+  onRefresh,
 }) {
   // Ensure data is an array and filter out any null/undefined items
   const safeData = Array.isArray(data) ? data.filter(item => item != null) : [];
@@ -172,6 +174,7 @@ export function GenericTable({
       key: 'selection',
     },
   ]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const datePickerRef = useRef();
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef();
@@ -340,6 +343,28 @@ export function GenericTable({
     setShowDatePicker((v) => !v);
   };
 
+  // Handle refresh
+  const handleRefresh = async () => {
+    if (onRefresh) {
+      setIsRefreshing(true);
+      const loadingToast = toast.loading('Refreshing data...');
+      
+      try {
+        await onRefresh();
+        toast.success('Data refreshed successfully!', {
+          id: loadingToast,
+        });
+      } catch (error) {
+        console.error('Error refreshing data:', error);
+        toast.error('Failed to refresh data. Please try again.', {
+          id: loadingToast,
+        });
+      } finally {
+        setIsRefreshing(false);
+      }
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
@@ -383,6 +408,22 @@ export function GenericTable({
                     <option value="rejected">Rejected</option>
                   </select>
                 </div>
+                {/* Refresh Button */}
+                {onRefresh && (
+                  <button
+                    type="button"
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Refresh data"
+                  >
+                    <Icon 
+                      icon={isRefreshing ? "mdi:loading" : "mdi:refresh"} 
+                      className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} 
+                    />
+                    {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                  </button>
+                )}
                 {/* Date Filter Button */}
                 {enableDateFilter && (
                   <div className="relative">
@@ -481,9 +522,9 @@ export function GenericTable({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-96 overflow-y-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
             <tr>
               {selectable && (
                 <th className="w-12 px-4 py-4">
