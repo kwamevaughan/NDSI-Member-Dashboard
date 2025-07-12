@@ -116,14 +116,15 @@ export default function FirstTimeSetup() {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-[#ececec] to-[#d9f2e6] py-8 px-2">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl border border-[#e0e0e0]">
+    <div className="w-full min-h-screen flex items-center justify-center bg-cover bg-center py-8 px-2"
+    style={{ backgroundImage: `url('/assets/images/form-bg.png')` }}  >
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl border border-[#e0e0e0] bg-white/80 backdrop-blur-sm">
         <div className="flex flex-col items-center mb-6">
           <Link href="/">
             <Image
               src="/assets/images/logo.svg"
               alt="NDSI Logo"
-              width={120}
+              width={220}
               height={40}
               className="mb-2"
             />
