@@ -15,6 +15,13 @@ export default function AdminDashboard() {
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [userToReject, setUserToReject] = useState(null);
+  const [showApprovedModal, setShowApprovedModal] = useState(false);
+  const [showRejectedModal, setShowRejectedModal] = useState(false);
+  const [stats, setStats] = useState({
+    approvedToday: 0,
+    rejectedToday: 0,
+    totalPending: 0
+  });
 
   useEffect(() => {
     // Check admin authentication
@@ -55,7 +62,9 @@ export default function AdminDashboard() {
       }
 
       const data = await response.json();
-      setUsers(data.users || []);
+      const userData = data.users || [];
+      setUsers(userData);
+      calculateStats(userData);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast.error("Failed to load pending users");
@@ -89,7 +98,7 @@ export default function AdminDashboard() {
       const data = await response.json();
       toast.success(data.message);
 
-      // Refresh the users list
+      // Refresh the users list and recalculate stats
       fetchPendingUsers(adminToken);
     } catch (error) {
       console.error("Error processing user:", error);
@@ -124,6 +133,105 @@ export default function AdminDashboard() {
     setShowRejectionModal(false);
     setUserToReject(null);
     setRejectionReason("");
+  };
+
+  const handleDelete = async (user) => {
+    if (!confirm(`Are you sure you want to permanently delete ${user.full_name || user.email}? This action cannot be undone.`)) {
+      return;
+    }
+
+    setProcessingUser(user.id);
+    const adminToken = localStorage.getItem("admin_token");
+
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          userId: user.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+
+      // Refresh the users list and recalculate stats
+      fetchPendingUsers(adminToken);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
+    } finally {
+      setProcessingUser(null);
+    }
+  };
+
+  const calculateStats = (userData) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Debug: Log a few users to see their structure
+    console.log('Sample users for debugging:', userData.slice(0, 3).map(user => ({
+      id: user.id,
+      email: user.email,
+      is_approved: user.is_approved,
+      approval_status: user.approval_status,
+      rejection_reason: user.rejection_reason
+    })));
+
+    const approvedToday = userData.filter(user => {
+      if (!user.updated_at || !user.is_approved) return false;
+      const updatedDate = new Date(user.updated_at);
+      updatedDate.setHours(0, 0, 0, 0);
+      return updatedDate.getTime() === today.getTime() && user.is_approved === true;
+    }).length;
+
+    const rejectedToday = userData.filter(user => {
+      if (!user.updated_at || user.is_approved !== false) return false;
+      const updatedDate = new Date(user.updated_at);
+      updatedDate.setHours(0, 0, 0, 0);
+      return updatedDate.getTime() === today.getTime() && user.is_approved === false;
+    }).length;
+
+    const totalPending = userData.filter(user => 
+      user.is_approved === false || user.is_approved === null
+    ).length;
+
+    setStats({
+      approvedToday,
+      rejectedToday,
+      totalPending
+    });
+  };
+
+  const getApprovedUsers = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return users.filter(user => {
+      if (!user.updated_at || !user.is_approved) return false;
+      const updatedDate = new Date(user.updated_at);
+      updatedDate.setHours(0, 0, 0, 0);
+      return updatedDate.getTime() === today.getTime() && user.is_approved === true;
+    });
+  };
+
+  const getRejectedUsers = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return users.filter(user => {
+      if (!user.updated_at || user.is_approved !== false) return false;
+      const updatedDate = new Date(user.updated_at);
+      updatedDate.setHours(0, 0, 0, 0);
+      return updatedDate.getTime() === today.getTime() && user.approval_status === 'rejected';
+    });
   };
 
   const formatDate = (dateString) => {
@@ -228,14 +336,17 @@ export default function AdminDashboard() {
                     Pending Approvals
                   </p>
                   <p className="text-3xl font-bold text-slate-800 mt-1">
-                    {users.length}
+                    {stats.totalPending}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50">
+          <div 
+            className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 cursor-pointer"
+            onClick={() => setShowApprovedModal(true)}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
             <div className="p-6">
               <div className="flex items-center">
@@ -248,13 +359,19 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                     Approved Today
                   </p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">0</p>
+                  <p className="text-3xl font-bold text-slate-800 mt-1">{stats.approvedToday}</p>
+                </div>
+                <div className="flex-shrink-0">
+                  <Icon icon="mdi:chevron-right" className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50">
+          <div 
+            className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 cursor-pointer"
+            onClick={() => setShowRejectedModal(true)}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
             <div className="p-6">
               <div className="flex items-center">
@@ -267,7 +384,10 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                     Rejected Today
                   </p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">0</p>
+                  <p className="text-3xl font-bold text-slate-800 mt-1">{stats.rejectedToday}</p>
+                </div>
+                <div className="flex-shrink-0">
+                  <Icon icon="mdi:chevron-right" className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
                 </div>
               </div>
             </div>
@@ -277,8 +397,8 @@ export default function AdminDashboard() {
         {/* Users Management Card */}
         <GenericTable
           data={users}
-          title="Pending User Approvals"
-          emptyMessage="No pending approvals. All user registrations have been processed."
+          title="User Management"
+          emptyMessage="No users found."
           columns={[
             {
               accessor: "full_name",
@@ -322,7 +442,13 @@ export default function AdminDashboard() {
               accessor: "status",
               header: "Status",
               render: (row) => {
-                if (row.is_approved === true) {
+                if (row.approval_status === 'rejected') {
+                  return (
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                      Rejected
+                    </span>
+                  );
+                } else if (row.is_approved === true) {
                   return (
                     <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                       Approved
@@ -348,6 +474,7 @@ export default function AdminDashboard() {
                   handleApproval(row.id, "approve");
                 }
               },
+              show: (row) => row.is_approved === false || row.is_approved === null,
             },
             {
               label: (row) => processingUser === row.id ? "Processing..." : "Reject",
@@ -356,6 +483,17 @@ export default function AdminDashboard() {
               onClick: (row) => {
                 if (processingUser !== row.id) {
                   handleRejectClick(row);
+                }
+              },
+              show: (row) => row.is_approved === false || row.is_approved === null,
+            },
+            {
+              label: (row) => processingUser === row.id ? "Processing..." : "Delete",
+              icon: (row) => processingUser === row.id ? "mdi:loading" : "mdi:delete",
+              className: "hover:bg-red-100 text-red-600",
+              onClick: (row) => {
+                if (processingUser !== row.id) {
+                  handleDelete(row);
                 }
               },
             },
@@ -420,6 +558,103 @@ export default function AdminDashboard() {
                 )}
               </button>
             </div>
+          </div>
+        </SimpleModal>
+
+        {/* Approved Users Modal */}
+        <SimpleModal
+          isOpen={showApprovedModal}
+          onClose={() => setShowApprovedModal(false)}
+          title="Users Approved Today"
+          width="max-w-4xl"
+        >
+          <div className="space-y-4">
+            {getApprovedUsers().length === 0 ? (
+              <div className="text-center py-8">
+                <Icon icon="mdi:check-circle" className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <p className="text-gray-600">No users have been approved today.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {getApprovedUsers().map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center">
+                        <Icon icon="mdi:account" className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {user.full_name || `${user.first_name || ""} ${user.last_name || ""}`.trim() || "No name provided"}
+                        </p>
+                        <p className="text-sm text-gray-600">{user.email}</p>
+                        {user.organization_name && (
+                          <p className="text-xs text-gray-500">{user.organization_name}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        Approved
+                      </span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formatDate(user.updated_at)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </SimpleModal>
+
+        {/* Rejected Users Modal */}
+        <SimpleModal
+          isOpen={showRejectedModal}
+          onClose={() => setShowRejectedModal(false)}
+          title="Users Rejected Today"
+          width="max-w-4xl"
+        >
+          <div className="space-y-4">
+            {getRejectedUsers().length === 0 ? (
+              <div className="text-center py-8">
+                <Icon icon="mdi:close-circle" className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                <p className="text-gray-600">No users have been rejected today.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {getRejectedUsers().map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-10 w-10 rounded-full bg-red-500 flex items-center justify-center">
+                        <Icon icon="mdi:account" className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {user.full_name || `${user.first_name || ""} ${user.last_name || ""}`.trim() || "No name provided"}
+                        </p>
+                        <p className="text-sm text-gray-600">{user.email}</p>
+                        {user.organization_name && (
+                          <p className="text-xs text-gray-500">{user.organization_name}</p>
+                        )}
+                        {user.rejection_reason && (
+                          <p className="text-xs text-red-600 mt-1">
+                            <strong>Reason:</strong> {user.rejection_reason}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                        Rejected
+                      </span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formatDate(user.updated_at)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </SimpleModal>
       </main>

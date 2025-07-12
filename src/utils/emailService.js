@@ -103,4 +103,56 @@ export async function sendApprovalEmail(user, action, reason = null) {
         console.error(`Error sending ${action} email:`, error);
         throw error;
     }
+}
+
+export async function sendDeletionEmail(user) {
+    try {
+        const displayName = user.full_name || user.first_name || 'User';
+        
+        const subject = 'NDSI Account Deleted';
+        const text = `Hello ${displayName},\n\nWe regret to inform you that your NDSI account has been permanently deleted by an administrator.\n\nIf you believe this was an error or have any questions, please contact us immediately.\n\nBest,\nThe NDSI Team`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
+                </div>
+                <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Hello ${displayName},</h2>
+                    <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                        We regret to inform you that your NDSI account has been permanently deleted by an administrator.
+                    </p>
+                    <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="color: #721c24; font-size: 14px; margin: 0;">
+                            <strong>Status:</strong> Account Deleted ❌<br>
+                            Your account and all associated data have been permanently removed.
+                        </p>
+                    </div>
+                    <p style="color: #666666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                        If you believe this was an error or have any questions, please contact us immediately at ${process.env.EMAIL_USER}.
+                    </p>
+                    <p style="color: #666666; font-size: 14px; line-height: 1.5; margin-top: 20px;">
+                        Best regards,<br />
+                        <span style="color: #8DC63F; font-weight: bold;">The NDSI Team</span>
+                    </p>
+                </div>
+                <div style="text-align: center; margin-top: 20px; border-top: 1px solid #d9d9d9; padding-top: 15px;">
+                    <p style="color: #999999; font-size: 12px;">© ${new Date().getFullYear()} NDSI. All rights reserved.</p>
+                </div>
+            </div>
+        `;
+
+        const mailOptions = {
+            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: subject,
+            text: text,
+            html: html,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Deletion email sent successfully to ${user.email}`);
+    } catch (error) {
+        console.error('Error sending deletion email:', error);
+        throw error;
+    }
 } 

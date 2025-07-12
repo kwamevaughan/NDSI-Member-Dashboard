@@ -2,7 +2,7 @@ import { supabaseAdmin } from 'lib/supabase';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
-    if (req.method !== 'GET' && req.method !== 'POST') {
+    if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'DELETE') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
@@ -43,7 +43,6 @@ export default async function handler(req, res) {
             const { data: users, error } = await supabaseAdmin
                 .from('users')
                 .select('*')
-                .eq('is_approved', false)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -98,6 +97,59 @@ export default async function handler(req, res) {
             });
         } catch (error) {
             console.error('Error updating user approval:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    if (req.method === 'DELETE') {
+        // Delete user
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        try {
+            // First, get the user to check if they exist and for email notification
+            const { data: user, error: fetchError } = await supabaseAdmin
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (fetchError || !user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            // Prevent admin from deleting themselves
+            if (user.id === adminUser.id) {
+                return res.status(400).json({ error: 'Cannot delete your own account' });
+            }
+
+            // Delete the user
+            const { error: deleteError } = await supabaseAdmin
+                .from('users')
+                .delete()
+                .eq('id', userId);
+
+            if (deleteError) {
+                throw deleteError;
+            }
+
+            // Send email notification to user about deletion
+            try {
+                const { sendDeletionEmail } = await import('../../../utils/emailService');
+                await sendDeletionEmail(user);
+            } catch (emailError) {
+                console.error('Error sending deletion email:', emailError);
+                // Don't fail the deletion if email fails
+            }
+
+            return res.status(200).json({ 
+                message: 'User deleted successfully'
+            });
+        } catch (error) {
+            console.error('Error deleting user:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
     }

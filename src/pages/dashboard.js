@@ -13,6 +13,7 @@ import ESGToolkit from "@/components/ESGToolkit";
 import Newsletter from "@/components/Newsletter";
 import WorkingGroupDocumentation from "@/components/WorkingGroupDocumentation";
 import Link from 'next/link';
+import { Icon } from '@iconify/react';
 
 const Dashboard = () => {
     const router = useRouter();
@@ -24,10 +25,20 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (!user) return;
+        
         // Check if first time, or missing required info
         const needsFirstTimeSetup = user.is_first_time || !user.first_name || !user.last_name || !user.password;
         if (needsFirstTimeSetup) {
             router.replace('/first-time-setup');
+            return;
+        }
+
+        // Show pending approval notification if user is not approved
+        if (!user.is_approved) {
+            toast.error('Your account is pending approval. You can view the dashboard but cannot access content until approved.', {
+                duration: 6000,
+                position: 'top-center',
+            });
         }
     }, [user, router]);
 
@@ -35,6 +46,8 @@ const Dashboard = () => {
         // Optionally show a loading spinner or nothing while redirecting
         return null;
     }
+
+    const isPendingApproval = !user.is_approved;
 
     const firstName = user?.first_name || 'Guest';
 

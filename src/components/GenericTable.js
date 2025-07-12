@@ -26,6 +26,7 @@ function useTable(data, initialPageSize = 10) {
       result = result.filter(row => {
         if (statusFilter === "approved") return row.is_approved === true;
         if (statusFilter === "pending") return row.is_approved === false || row.is_approved === null;
+        if (statusFilter === "rejected") return row.approval_status === 'rejected';
         return true;
       });
     }
@@ -275,6 +276,11 @@ export function GenericTable({
           {actions.map((action, i) => {
             if (!action || typeof action.onClick !== 'function') return null;
             
+            // Check if action should be shown for this row
+            if (action.show && typeof action.show === 'function' && !action.show(row)) {
+              return null;
+            }
+            
             const label = typeof action.label === 'function' ? action.label(row) : action.label;
             const icon = typeof action.icon === 'function' ? action.icon(row) : action.icon;
             
@@ -366,6 +372,7 @@ export function GenericTable({
                     <option value="all">All</option>
                     <option value="approved">Approved</option>
                     <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
                   </select>
                 </div>
                 {/* Date Filter Button */}
