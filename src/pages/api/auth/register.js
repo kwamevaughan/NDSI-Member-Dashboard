@@ -47,7 +47,7 @@ export default async function handler(req, res) {
             throw fetchError;
         }
 
-        // Register user
+        // Register user with pending approval status
         const hashedPassword = await bcrypt.hash(password, 10);
         const { data, error } = await supabaseAdmin
             .from('users')
@@ -57,6 +57,8 @@ export default async function handler(req, res) {
                 full_name: full_name || null,
                 organization_name: organization_name || null,
                 role_job_title: role_job_title || null,
+                is_approved: false, // New users need approval
+                approval_status: 'pending', // pending, approved, rejected
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             })
@@ -68,9 +70,13 @@ export default async function handler(req, res) {
         }
 
         // Respond to client immediately after user creation
-        res.status(201).json({ message: 'User created successfully', user: data });
+        res.status(201).json({ 
+            message: 'Registration successful! Your account is pending approval. You will receive an email notification once approved.', 
+            user: data,
+            requiresApproval: true
+        });
 
-        // Send welcome email asynchronously (do not await)
+        // Send pending approval email asynchronously (do not await)
         (async () => {
             try {
                 const transporter = nodemailer.createTransport({
@@ -87,13 +93,12 @@ export default async function handler(req, res) {
                 const protocol = req.headers['x-forwarded-proto'] || 'http';
                 const host = req.headers['x-forwarded-host'] || req.headers.host;
                 const baseUrl = `${protocol}://${host}`;
-                const loginLink = `${baseUrl}/`;
 
                 const mailOptions = {
                     from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
                     to: normalizedEmail,
-                    subject: 'Welcome to NDSI!',
-                    text: `Hello ${displayName},\n\nWelcome to NDSI! We're thrilled to have you join us. Your account has been successfully created. Log in to explore resources, training, and more:\n\n${loginLink}\n\nBest,\nThe NDSI Team`,
+                    subject: 'NDSI Registration - Pending Approval',
+                    text: `Hello ${displayName},\n\nThank you for registering with NDSI! Your account is currently pending approval. You will receive another email once your account has been approved and you can access the member dashboard.\n\nBest,\nThe NDSI Team`,
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
                             <div style="text-align: center; margin-bottom: 20px;">
@@ -102,10 +107,13 @@ export default async function handler(req, res) {
                             <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Hello ${displayName},</h2>
                                 <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                                    Welcome to NDSI! We're thrilled to have you join us. Your account has been successfully created. Log in now to explore resources, training, and key strategic documents:
+                                    Thank you for registering with NDSI! Your account is currently pending approval.
                                 </p>
-                                <div style="text-align: center; margin-bottom: 25px;">
-                                    <a href="${loginLink}" style="background-color: #28A8E0; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block;">Log In</a>
+                                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                    <p style="color: #856404; font-size: 14px; margin: 0;">
+                                        <strong>Status:</strong> Pending Approval<br>
+                                        You will receive another email once your account has been approved and you can access the member dashboard.
+                                    </p>
                                 </div>
                                 <p style="color: #666666; font-size: 14px; line-height: 1.5;">
                                     If you have any questions, feel free to reach out to us at ${process.env.EMAIL_USER}.
@@ -123,13 +131,17 @@ export default async function handler(req, res) {
                 };
 
                 await transporter.sendMail(mailOptions);
-                console.log('Welcome email sent successfully:');
+                console.log('Pending approval email sent successfully');
             } catch (emailError) {
-                console.error('Welcome email error:', emailError);
+                console.error('Pending approval email error:', emailError);
             }
         })();
 
-        return res.status(201).json({ message: 'User created successfully', user: data });
+        return res.status(201).json({ 
+            message: 'Registration successful! Your account is pending approval. You will receive an email notification once approved.', 
+            user: data,
+            requiresApproval: true
+        });
     } catch (error) {
         console.error('Registration error:', error);
         return res.status(500).json({ error: 'Internal server error' });
