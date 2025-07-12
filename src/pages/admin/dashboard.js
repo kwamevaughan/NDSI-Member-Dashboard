@@ -426,7 +426,6 @@ export default function AdminDashboard() {
                   <div className="ml-4">
                     <div className="text-sm font-medium text-gray-900">
                       {row.full_name ||
-                        `${row.first_name || ""} ${row.last_name || ""}`.trim() ||
                         "No name provided"}
                     </div>
                   </div>
@@ -528,7 +527,6 @@ export default function AdminDashboard() {
                 Are you sure you want to reject{" "}
                 <span className="font-semibold text-gray-900">
                   {userToReject?.full_name || 
-                   `${userToReject?.first_name || ""} ${userToReject?.last_name || ""}`.trim() ||
                    userToReject?.email}
                 </span>
                 ?
@@ -596,7 +594,7 @@ export default function AdminDashboard() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">
-                          {user.full_name || `${user.first_name || ""} ${user.last_name || ""}`.trim() || "No name provided"}
+                          {user.full_name || "No name provided"}
                         </p>
                         <p className="text-sm text-gray-600">{user.email}</p>
                         {user.organization_name && (
@@ -642,7 +640,7 @@ export default function AdminDashboard() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">
-                          {user.full_name || `${user.first_name || ""} ${user.last_name || ""}`.trim() || "No name provided"}
+                          {user.full_name || "No name provided"}
                         </p>
                         <p className="text-sm text-gray-600">{user.email}</p>
                         {user.organization_name && (
@@ -689,7 +687,6 @@ export default function AdminDashboard() {
                 Are you sure you want to permanently delete{" "}
                 <span className="font-semibold text-gray-900">
                   {userToDelete?.full_name || 
-                   `${userToDelete?.first_name || ""} ${userToDelete?.last_name || ""}`.trim() ||
                    userToDelete?.email}
                 </span>
                 ?

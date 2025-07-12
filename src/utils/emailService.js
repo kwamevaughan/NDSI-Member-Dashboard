@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendApprovalEmail(user, action, reason = null) {
     try {
-        const displayName = user.full_name || user.first_name || 'User';
+        const displayName = user.full_name || 'User';
         const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
         const host = process.env.NEXT_PUBLIC_SITE_URL || 'localhost:3000';
         const baseUrl = `${protocol}://${host}`;
@@ -107,7 +107,7 @@ export async function sendApprovalEmail(user, action, reason = null) {
 
 export async function sendDeletionEmail(user) {
     try {
-        const displayName = user.full_name || user.first_name || 'User';
+        const displayName = user.full_name || 'User';
         
         const subject = 'NDSI Account Deleted';
         const text = `Hello ${displayName},\n\nWe regret to inform you that your NDSI account has been permanently deleted by an administrator.\n\nIf you believe this was an error or have any questions, please contact us immediately.\n\nBest,\nThe NDSI Team`;

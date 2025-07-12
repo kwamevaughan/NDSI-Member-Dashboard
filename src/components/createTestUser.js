@@ -6,8 +6,7 @@ async function createTestUser() {
     const { error } = await supabase.from('users').insert({
         email: 'test@example.com',
         password: hashedPassword,
-        first_name: 'Test',
-        last_name: 'User',
+        full_name: 'Test User',
     });
     console.log(error || 'User created');
 }

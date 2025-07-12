@@ -83,7 +83,7 @@ export default function Home() {
         
         // Check if user is pending approval
         if (result.isPendingApproval) {
-          const welcomeMessage = `Welcome ${result.user.first_name || "User"}! Your account is pending approval.`;
+          const welcomeMessage = `Welcome ${result.user.full_name || "User"}! Your account is pending approval.`;
           toast.success(welcomeMessage);
           localStorage.setItem("rememberMe", rememberMe);
           setTimeout(() => {
@@ -91,7 +91,7 @@ export default function Home() {
           }, 100);
         } else {
           const welcomeMessage = `Authenticated, Welcome ${
-            result.user.first_name || "User"
+            result.user.full_name || "User"
           }`;
           toast.success(welcomeMessage);
           localStorage.setItem("rememberMe", rememberMe);

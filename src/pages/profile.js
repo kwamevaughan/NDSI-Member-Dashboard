@@ -17,8 +17,6 @@ const ProfilePage = () => {
     const { user, token, setUser } = useUser();
 
     // Profile state
-    const [first_name, setFirstName] = useState(user?.first_name || '');
-    const [last_name, setLastName] = useState(user?.last_name || '');
     const [organization_name, setOrganizationName] = useState(user?.organization_name || '');
     const [role_job_title, setRoleJobTitle] = useState(user?.role_job_title || '');
     const [full_name, setFullName] = useState(user?.full_name || '');
@@ -46,7 +44,7 @@ const ProfilePage = () => {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ first_name, last_name, organization_name, role_job_title, full_name }),
+                body: JSON.stringify({ organization_name, role_job_title, full_name }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to update profile');
@@ -130,24 +128,14 @@ const ProfilePage = () => {
                                             <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
-                                                value={first_name}
-                                                onChange={e => setFirstName(e.target.value)}
+                                                value={full_name}
+                                                onChange={e => setFullName(e.target.value)}
                                                 className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
-                                                placeholder="First Name"
+                                                placeholder="Full Name"
                                                 required
                                             />
                                         </div>
-                                        <div className="relative">
-                                            <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
-                                            <input
-                                                type="text"
-                                                value={last_name}
-                                                onChange={e => setLastName(e.target.value)}
-                                                className={`w-full pl-10 p-2 rounded focus:outline-none transition-all border ${mode === 'dark' ? 'bg-[#232a36] border-[#2c3440] text-white placeholder-gray-400' : 'border-[#28A8E0] text-black placeholder-gray-500'}`}
-                                                placeholder="Last Name"
-                                                required
-                                            />
-                                        </div>
+                                        
                                         <div className="relative md:col-span-2">
                                             <FaEnvelope className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input

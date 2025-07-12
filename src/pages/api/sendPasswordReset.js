@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     try {
         const { data: user, error: userError } = await supabaseAdmin
             .from('users')
-            .select('email, first_name')
+            .select('email, full_name')
             .eq('email', normalizedEmail)
             .single();
 
@@ -57,12 +57,12 @@ export default async function handler(req, res) {
             // Removed debug: true and logger: true
         });
 
-        const firstName = user.first_name || 'User';
+        const fullName = user.full_name || 'User';
         const mailOptions = {
             from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
             to: normalizedEmail,
             subject: 'Reset Your NDSI Password',
-            text: `Hello ${firstName},\n\nWe received a request to reset your NDSI account password. Click the link below to set a new one:\n\n${resetLink}\n\nThis link expires in 1 hour. If you didn’t request this, feel free to ignore this email.\n\nWarm regards,\nThe NDSI Team`,
+            text: `Hello ${fullName},\n\nWe received a request to reset your NDSI account password. Click the link below to set a new one:\n\n${resetLink}\n\nThis link expires in 1 hour. If you didn’t request this, feel free to ignore this email.\n\nWarm regards,\nThe NDSI Team`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
                     <div style="text-align: center; margin-bottom: 20px;">
