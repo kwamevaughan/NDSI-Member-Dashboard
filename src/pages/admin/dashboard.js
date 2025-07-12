@@ -19,6 +19,10 @@ export default function AdminDashboard() {
   const [showRejectedModal, setShowRejectedModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [activeTab, setActiveTab] = useState('users'); // 'users' or 'admins'
+  const [adminUsers, setAdminUsers] = useState([]);
   const [stats, setStats] = useState({
     approvedToday: 0,
     rejectedToday: 0,
@@ -39,6 +43,7 @@ export default function AdminDashboard() {
       const user = JSON.parse(adminUserData);
       setAdminUser(user);
       fetchPendingUsers(adminToken);
+      fetchAdminUsers(adminToken);
     } catch (error) {
       console.error("Error parsing admin user data:", error);
       router.push("/admin/login");
@@ -72,6 +77,29 @@ export default function AdminDashboard() {
       toast.error("Failed to load pending users");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAdminUsers = async (token) => {
+    try {
+      const response = await fetch("/api/admin/admins", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          return; // Don't redirect, just skip admin users
+        }
+        throw new Error("Failed to fetch admin users");
+      }
+
+      const data = await response.json();
+      setAdminUsers(data.admins || []);
+    } catch (error) {
+      console.error("Error fetching admin users:", error);
+      // Don't show error toast for admin users fetch
     }
   };
 
@@ -161,7 +189,8 @@ export default function AdminDashboard() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete user");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete user");
       }
 
       const data = await response.json();
@@ -182,6 +211,53 @@ export default function AdminDashboard() {
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
     setUserToDelete(null);
+  };
+
+  const handleBulkDelete = async (selectedIds) => {
+    if (!selectedIds || selectedIds.length === 0) return;
+
+    setProcessingUser('bulk');
+    const adminToken = localStorage.getItem("admin_token");
+
+    try {
+      const response = await fetch("/api/admin/users/bulk-delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          userIds: selectedIds,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete users");
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+
+      // Refresh the users list and recalculate stats
+      fetchPendingUsers(adminToken);
+    } catch (error) {
+      console.error("Error deleting users:", error);
+      toast.error("Failed to delete users");
+    } finally {
+      setProcessingUser(null);
+      setShowBulkDeleteModal(false);
+      setSelectedUsers([]);
+    }
+  };
+
+  const handleBulkDeleteClick = () => {
+    setShowBulkDeleteModal(true);
+  };
+
+  const handleBulkDeleteCancel = () => {
+    setShowBulkDeleteModal(false);
+    setSelectedUsers([]);
   };
 
   const calculateStats = (userData) => {
@@ -406,11 +482,60 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Users Management Card */}
-        <GenericTable
+        {/* Tab Navigation */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'users'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Icon icon="mdi:account-group" className="mr-2 h-4 w-4" />
+                User Management
+              </button>
+              <button
+                onClick={() => setActiveTab('admins')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'admins'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Icon icon="mdi:shield-account" className="mr-2 h-4 w-4" />
+                Admin Management
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <>
+            <div className="mb-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <Icon icon="mdi:information" className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">User Management</p>
+                    <p>This table shows only regular users. Admin accounts are managed separately for security.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <GenericTable
           data={users}
-          title="User Management"
-          emptyMessage="No users found."
+          title="Regular Users"
+          emptyMessage="No regular users found."
+          onDelete={(user) => handleDeleteClick(user)}
+          onBulkDelete={(selectedIds, selectedItems) => {
+            setSelectedUsers(selectedItems);
+            handleBulkDeleteClick();
+          }}
           columns={[
             {
               accessor: "full_name",
@@ -510,9 +635,68 @@ export default function AdminDashboard() {
             },
           ]}
           searchable={true}
-          selectable={false}
+          selectable={true}
           enableDateFilter={true}
         />
+          </>
+        )}
+
+        {/* Admins Tab */}
+        {activeTab === 'admins' && (
+          <div className="space-y-6">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <Icon icon="mdi:alert" className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
+                <div className="text-sm text-yellow-800">
+                  <p className="font-medium mb-1">Admin Management</p>
+                  <p>Admin accounts have elevated privileges and should be managed with extreme caution. Only super administrators can modify admin accounts.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Administrator Accounts</h3>
+                <p className="text-sm text-gray-600 mt-1">Current admin users in the system</p>
+              </div>
+              <div className="p-6">
+                {adminUsers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Icon icon="mdi:shield-account" className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No admin users found or you don&apos;t have permission to view them.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {adminUsers.map((admin) => (
+                      <div key={admin.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-4">
+                          <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                            <Icon icon="mdi:shield-account" className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {admin.full_name || "No name provided"}
+                            </p>
+                            <p className="text-sm text-gray-600">{admin.email}</p>
+                            <p className="text-xs text-gray-500">Admin since {formatDate(admin.created_at)}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            Administrator
+                          </span>
+                          {admin.id === adminUser?.id && (
+                            <p className="text-xs text-gray-500 mt-1">(You)</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Rejection Reason Modal */}
         <SimpleModal
@@ -665,6 +849,65 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
+          </div>
+        </SimpleModal>
+
+        {/* Bulk Delete Confirmation Modal */}
+        <SimpleModal
+          isOpen={showBulkDeleteModal}
+          onClose={handleBulkDeleteCancel}
+          title="Bulk Delete Users"
+          width="max-w-md"
+        >
+          <div className="space-y-6">
+            <div className="">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <Icon icon="mdi:delete-multiple" className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+                Delete Multiple Users
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 text-center">
+                Are you sure you want to permanently delete <span className="font-semibold text-gray-900">{selectedUsers.length}</span> selected user{selectedUsers.length !== 1 ? 's' : ''}?
+              </p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex">
+                  <Icon icon="mdi:alert-circle" className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+                  <div className="text-sm text-red-700">
+                    <p className="font-medium">This action cannot be undone.</p>
+                    <p className="mt-1">
+                      All selected user accounts and associated data will be permanently removed from the system.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={handleBulkDeleteCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleBulkDelete(selectedUsers.map(user => user.id))}
+                disabled={processingUser === 'bulk'}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {processingUser === 'bulk' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:delete-multiple" className="mr-2 h-4 w-4" />
+                    Delete {selectedUsers.length} User{selectedUsers.length !== 1 ? 's' : ''}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </SimpleModal>
 

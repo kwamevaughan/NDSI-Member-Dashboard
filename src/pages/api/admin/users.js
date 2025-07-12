@@ -43,6 +43,7 @@ export default async function handler(req, res) {
             const { data: users, error } = await supabaseAdmin
                 .from('users')
                 .select('*')
+                .eq('is_admin', false)  // Only show non-admin users
                 .order('created_at', { ascending: false });
 
             if (error) {
