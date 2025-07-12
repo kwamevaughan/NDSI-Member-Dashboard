@@ -236,7 +236,7 @@ export function GenericTable({
             type="checkbox"
             checked={table.selected.includes(row.id)}
             onChange={() => table.toggleSelect(row.id)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-ndsi-blue bg-gray-100 border-gray-300 rounded focus:ring-ndsi-blue focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           />
         </td>
       )}
@@ -307,7 +307,7 @@ export function GenericTable({
           {onEdit && (
             <button
               onClick={() => onEdit(row)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 transition-colors"
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-ndsi-blue-light dark:hover:bg-blue-900/50 text-ndsi-blue dark:text-blue-400 transition-colors"
               title="Edit"
             >
               <Icon icon="cuida:edit-outline" className="w-4 h-4" />
@@ -398,7 +398,7 @@ export function GenericTable({
                     {showDatePicker && ReactDOM.createPortal(
                       <div
                         ref={datePickerRef}
-                        className="z-[9999] fixed bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4"
+                        className="z-[9999] absolute bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4"
                         style={{ top: popoverPosition.top, left: popoverPosition.left }}
                       >
                         <DateRange
@@ -639,7 +639,7 @@ export function GenericTable({
                     onClick={() => table.handlePage(pageNum)}
                     className={`px-3 py-2 text-sm rounded-lg transition-colors ${
                       table.page === pageNum
-                        ? "bg-blue-900 text-white shadow-sm"
+                        ? "bg-ndsi-blue text-white shadow-sm"
                         : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     }`}
                   >

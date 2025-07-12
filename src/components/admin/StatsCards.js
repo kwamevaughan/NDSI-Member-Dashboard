@@ -8,7 +8,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         <div className="p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-12 w-12 rounded-xl bg-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="h-12 w-12 rounded-xl bg-ndsi-blue flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Icon icon="mdi:account-group" className="h-6 w-6 text-white" />
               </div>
             </div>
@@ -32,7 +32,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         <div className="p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-12 w-12 rounded-xl bg-green-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="h-12 w-12 rounded-xl bg-ndsi-green flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Icon icon="mdi:check" className="h-6 w-6 text-white" />
               </div>
             </div>
@@ -57,7 +57,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         <div className="p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-12 w-12 rounded-xl bg-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="h-12 w-12 rounded-xl bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Icon icon="mdi:close" className="h-6 w-6 text-white" />
               </div>
             </div>

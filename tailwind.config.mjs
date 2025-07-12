@@ -11,6 +11,8 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        "ndsi-blue": "#26a9e1",
+        "ndsi-green": "#6cc044",
       },
     },
   },

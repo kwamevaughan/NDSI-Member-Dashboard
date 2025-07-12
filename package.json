@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "bulk-approve": "node scripts/bulk-approve-users.js"
   },
   "dependencies": {
     "@iconify/iconify": "^3.1.1",
