@@ -23,15 +23,29 @@ export default function AdminDashboard() {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [activeTab, setActiveTab] = useState('users'); // 'users' or 'admins'
   const [adminUsers, setAdminUsers] = useState([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
+  const [showEditAdminModal, setShowEditAdminModal] = useState(false);
+  const [showDeleteAdminModal, setShowDeleteAdminModal] = useState(false);
+  const [adminToEdit, setAdminToEdit] = useState(null);
+  const [adminToDelete, setAdminToDelete] = useState(null);
   const [newAdminData, setNewAdminData] = useState({
     full_name: '',
     email: '',
     organization_name: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    is_super_admin: false
+  });
+  const [editAdminData, setEditAdminData] = useState({
+    full_name: '',
+    email: '',
+    organization_name: '',
+    is_super_admin: false
   });
   const [addAdminLoading, setAddAdminLoading] = useState(false);
+  const [editAdminLoading, setEditAdminLoading] = useState(false);
+  const [deleteAdminLoading, setDeleteAdminLoading] = useState(false);
   const [stats, setStats] = useState({
     approvedToday: 0,
     rejectedToday: 0,
@@ -106,6 +120,10 @@ export default function AdminDashboard() {
 
       const data = await response.json();
       setAdminUsers(data.admins || []);
+      
+      // Check if current user is super admin
+      const currentUser = data.admins?.find(admin => admin.id === adminUser?.id);
+      setIsSuperAdmin(currentUser?.is_super_admin || false);
     } catch (error) {
       console.error("Error fetching admin users:", error);
       // Don't show error toast for admin users fetch
@@ -345,8 +363,138 @@ export default function AdminDashboard() {
       email: '',
       organization_name: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      is_super_admin: false
     });
+  };
+
+  const handleEditAdmin = async () => {
+    if (!editAdminData.full_name.trim()) {
+      toast.error('Full name is required');
+      return;
+    }
+    if (!editAdminData.email.trim()) {
+      toast.error('Email is required');
+      return;
+    }
+
+    setEditAdminLoading(true);
+    const adminToken = localStorage.getItem("admin_token");
+
+    try {
+      const response = await fetch("/api/admin/admins", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          adminId: adminToEdit.id,
+          full_name: editAdminData.full_name.trim(),
+          email: editAdminData.email.trim().toLowerCase(),
+          organization_name: editAdminData.organization_name.trim(),
+          is_super_admin: editAdminData.is_super_admin,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update admin");
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+
+      // Reset form and close modal
+      setEditAdminData({
+        full_name: '',
+        email: '',
+        organization_name: '',
+        is_super_admin: false
+      });
+      setShowEditAdminModal(false);
+      setAdminToEdit(null);
+
+      // Refresh admin users list
+      fetchAdminUsers(adminToken);
+    } catch (error) {
+      console.error("Error updating admin:", error);
+      toast.error(error.message);
+    } finally {
+      setEditAdminLoading(false);
+    }
+  };
+
+  const handleEditAdminCancel = () => {
+    setShowEditAdminModal(false);
+    setAdminToEdit(null);
+    setEditAdminData({
+      full_name: '',
+      email: '',
+      organization_name: '',
+      is_super_admin: false
+    });
+  };
+
+  const handleEditAdminClick = (admin) => {
+    setAdminToEdit(admin);
+    setEditAdminData({
+      full_name: admin.full_name || '',
+      email: admin.email || '',
+      organization_name: admin.organization_name || '',
+      is_super_admin: admin.is_super_admin || false
+    });
+    setShowEditAdminModal(true);
+  };
+
+  const handleDeleteAdmin = async () => {
+    if (!adminToDelete) return;
+
+    setDeleteAdminLoading(true);
+    const adminToken = localStorage.getItem("admin_token");
+
+    try {
+      const response = await fetch("/api/admin/admins", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          adminId: adminToDelete.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete admin");
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+
+      // Close modal and reset
+      setShowDeleteAdminModal(false);
+      setAdminToDelete(null);
+
+      // Refresh admin users list
+      fetchAdminUsers(adminToken);
+    } catch (error) {
+      console.error("Error deleting admin:", error);
+      toast.error(error.message);
+    } finally {
+      setDeleteAdminLoading(false);
+    }
+  };
+
+  const handleDeleteAdminClick = (admin) => {
+    setAdminToDelete(admin);
+    setShowDeleteAdminModal(true);
+  };
+
+  const handleDeleteAdminCancel = () => {
+    setShowDeleteAdminModal(false);
+    setAdminToDelete(null);
   };
 
   const calculateStats = (userData) => {
@@ -738,7 +886,12 @@ export default function AdminDashboard() {
                 <Icon icon="mdi:alert" className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
                 <div className="text-sm text-yellow-800">
                   <p className="font-medium mb-1">Admin Management</p>
-                  <p>Admin accounts have elevated privileges and should be managed with extreme caution. Only super administrators can modify admin accounts.</p>
+                  <p>
+                    {isSuperAdmin 
+                      ? "As a Super Administrator, you can create, edit, and delete administrator accounts. Use these privileges with extreme caution."
+                      : "Admin accounts have elevated privileges. Only Super Administrators can modify admin accounts."
+                    }
+                  </p>
                 </div>
               </div>
             </div>
@@ -749,13 +902,15 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-medium text-gray-900">Administrator Accounts</h3>
                   <p className="text-sm text-gray-600 mt-1">Current admin users in the system</p>
                 </div>
-                <button
-                  onClick={() => setShowAddAdminModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  <Icon icon="mdi:plus" className="h-4 w-4" />
-                  Add New Admin
-                </button>
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => setShowAddAdminModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    <Icon icon="mdi:plus" className="h-4 w-4" />
+                    Add New Admin
+                  </button>
+                )}
               </div>
               <div className="p-6">
                 {adminUsers.length === 0 ? (
@@ -780,12 +935,39 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Administrator
-                          </span>
-                          {admin.id === adminUser?.id && (
-                            <p className="text-xs text-gray-500 mt-1">(You)</p>
-                          )}
+                          <div className="flex flex-col items-end gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                Administrator
+                              </span>
+                              {admin.is_super_admin && (
+                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                  Super Admin
+                                </span>
+                              )}
+                            </div>
+                            {admin.id === adminUser?.id && (
+                              <p className="text-xs text-gray-500">(You)</p>
+                            )}
+                            {isSuperAdmin && admin.id !== adminUser?.id && (
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => handleEditAdminClick(admin)}
+                                  className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
+                                  title="Edit Admin"
+                                >
+                                  <Icon icon="mdi:pencil" className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteAdminClick(admin)}
+                                  className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                                  title="Delete Admin"
+                                >
+                                  <Icon icon="mdi:delete" className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1156,6 +1338,19 @@ export default function AdminDashboard() {
                   placeholder="Confirm password"
                 />
               </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_super_admin"
+                  checked={newAdminData.is_super_admin}
+                  onChange={(e) => setNewAdminData({...newAdminData, is_super_admin: e.target.checked})}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="is_super_admin" className="ml-2 block text-sm text-gray-700">
+                  Grant Super Admin privileges
+                </label>
+              </div>
             </div>
             
             <div className="flex justify-end space-x-3">
@@ -1179,6 +1374,169 @@ export default function AdminDashboard() {
                   <>
                     <Icon icon="mdi:plus" className="mr-2 h-4 w-4" />
                     Create Admin
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </SimpleModal>
+
+        {/* Edit Admin Modal */}
+        <SimpleModal
+          isOpen={showEditAdminModal}
+          onClose={handleEditAdminCancel}
+          title="Edit Administrator"
+          width="max-w-md"
+        >
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <Icon icon="mdi:alert-circle" className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                <div className="text-sm text-blue-800">
+                  <p className="font-medium mb-1">Edit Administrator</p>
+                  <p>You can modify the administrator&apos;s details and privileges.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={editAdminData.full_name}
+                  onChange={(e) => setEditAdminData({...editAdminData, full_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  value={editAdminData.email}
+                  onChange={(e) => setEditAdminData({...editAdminData, email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Organization (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={editAdminData.organization_name}
+                  onChange={(e) => setEditAdminData({...editAdminData, organization_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter organization name"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="edit_is_super_admin"
+                  checked={editAdminData.is_super_admin}
+                  onChange={(e) => setEditAdminData({...editAdminData, is_super_admin: e.target.checked})}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="edit_is_super_admin" className="ml-2 block text-sm text-gray-700">
+                  Super Admin privileges
+                </label>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleEditAdminCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditAdmin}
+                disabled={editAdminLoading}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {editAdminLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:pencil" className="mr-2 h-4 w-4" />
+                    Update Admin
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </SimpleModal>
+
+        {/* Delete Admin Modal */}
+        <SimpleModal
+          isOpen={showDeleteAdminModal}
+          onClose={handleDeleteAdminCancel}
+          title="Delete Administrator"
+          width="max-w-md"
+        >
+          <div className="space-y-6">
+            <div className="">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <Icon icon="mdi:delete" className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+                Delete Administrator Account
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 text-center">
+                Are you sure you want to permanently delete{" "}
+                <span className="font-semibold text-gray-900">
+                  {adminToDelete?.full_name || adminToDelete?.email}
+                </span>
+                ?
+              </p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex">
+                  <Icon icon="mdi:alert-circle" className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+                  <div className="text-sm text-red-700">
+                    <p className="font-medium">This action cannot be undone.</p>
+                    <p className="mt-1">
+                      The administrator&apos;s account and all associated data will be permanently removed from the system.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={handleDeleteAdminCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAdmin}
+                disabled={deleteAdminLoading}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {deleteAdminLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:delete" className="mr-2 h-4 w-4" />
+                    Delete Admin
                   </>
                 )}
               </button>
