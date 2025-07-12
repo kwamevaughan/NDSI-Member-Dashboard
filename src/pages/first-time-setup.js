@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { FaUser, FaBuilding, FaBriefcase, FaUserCircle, FaLock, FaKey } from 'react-icons/fa';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function FirstTimeSetup() {
   // Get user info from localStorage
@@ -93,7 +94,7 @@ export default function FirstTimeSetup() {
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl border border-[#e0e0e0]">
         <div className="flex flex-col items-center mb-6">
           <Link href="/">
-            <img src="/assets/images/logo.svg" alt="NDSI Logo" width={120} height={40} className="mb-2" />
+            <Image src="/assets/images/logo.svg" alt="NDSI Logo" width={120} height={40} className="mb-2" />
           </Link>
           <h2 className="text-3xl font-bold text-[#28A8E0] mb-1 text-center">First Time Setup</h2>
           <p className="text-gray-600 text-center mb-2">Welcome! Please update your password and personal information to continue.</p>
