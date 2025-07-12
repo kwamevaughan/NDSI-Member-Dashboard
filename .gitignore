@@ -39,3 +39,7 @@ build/
 # Editor history
 .history/
 .history
+
+ADMIN_SETUP.md
+create-admin.js
+make-admin.js

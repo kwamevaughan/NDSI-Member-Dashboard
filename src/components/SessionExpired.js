@@ -8,8 +8,8 @@ const SessionExpired = ({ isSessionExpired }) => {
     const router = useRouter();
 
     useEffect(() => {
-        // If already on login page, don't start countdown
-        if (router.pathname === '/') return;
+        // If already on login page or admin login page, don't start countdown
+        if (router.pathname === '/' || router.pathname === '/admin/login') return;
 
         // Proceed with countdown only if session has expired
         if (isSessionExpired) {

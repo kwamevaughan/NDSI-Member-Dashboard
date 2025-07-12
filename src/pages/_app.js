@@ -69,14 +69,27 @@ const UserComponent = ({ mode, isSessionExpired, setIsSessionExpired, router, Co
     useEffect(() => {
         if (isLoading) return;
 
-        const excludedPaths = ['/', '/reset-password'];
-        if (!excludedPaths.includes(router.pathname)) {
-            if (!token) {
-                setIsSessionExpired(true);
-                router.push('/');
-            } else {
-                setIsSessionExpired(false);
-            }
+        const excludedPaths = ['/', '/reset-password', '/admin/login'];
+        const adminPaths = ['/admin/dashboard'];
+        
+        // Don't check authentication for excluded paths
+        if (excludedPaths.includes(router.pathname)) {
+            setIsSessionExpired(false);
+            return;
+        }
+        
+        // For admin paths, let the admin pages handle their own authentication
+        if (adminPaths.includes(router.pathname)) {
+            setIsSessionExpired(false);
+            return;
+        }
+        
+        // For all other paths, check regular user authentication
+        if (!token) {
+            setIsSessionExpired(true);
+            router.push('/');
+        } else {
+            setIsSessionExpired(false);
         }
     }, [router.pathname, token, isLoading, setIsSessionExpired]);
 
@@ -84,7 +97,7 @@ const UserComponent = ({ mode, isSessionExpired, setIsSessionExpired, router, Co
         return <div>Loading...</div>;
     }
 
-    if (isSessionExpired && router.pathname !== '/') {
+    if (isSessionExpired && router.pathname !== '/' && router.pathname !== '/admin/login') {
         return <SessionExpired isSessionExpired={isSessionExpired} />;
     }
 

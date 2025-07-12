@@ -91,8 +91,16 @@ export default function Home() {
       }
     } catch (error) {
       toast.dismiss(toastId);
-      setError(error.message);
-      toast.error(`Login failed: ${error.message}`);
+      
+      // Handle approval pending error specifically
+      if (error.message.includes('pending approval')) {
+        setError('Your account is pending approval. You will receive an email notification once approved.');
+        toast.error('Account pending approval. Please check your email for updates.');
+      } else {
+        setError(error.message);
+        toast.error(`Login failed: ${error.message}`);
+      }
+      
       setCaptchaToken(null);
       if (recaptchaRef.current) recaptchaRef.current.reset();
     }
@@ -260,6 +268,15 @@ export default function Home() {
                   <span className="text-[#28A8E0] underline hover:text-gray-900">
                     {isRegistering ? "Back to Login" : "Sign Up Here"}
                   </span>
+                </Link>
+              </div>
+              
+              <div className="mt-4 text-center">
+                <Link
+                  href="/admin/login"
+                  className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  Admin Login
                 </Link>
               </div>
             </div>
