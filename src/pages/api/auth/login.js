@@ -48,8 +48,16 @@ export default async function handler(req, res) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
+        // Check if user is approved (unless they are an admin)
+        if (!user.is_admin && !user.is_approved) {
+            return res.status(403).json({ 
+                error: 'Your account is pending approval. You will receive an email notification once approved.',
+                requiresApproval: true
+            });
+        }
+
         const token = jwt.sign(
-            { id: user.id, email: user.email },
+            { id: user.id, email: user.email, is_admin: user.is_admin || false },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
