@@ -288,7 +288,7 @@ export default function Home() {
           </div>
 
           <div
-            className="md:block lg:w-2/3 bg-cover bg-center transition-all duration-700 ease-in-out h-full relative"
+            className="md:block hidden lg:w-2/3 bg-cover bg-center transition-all duration-700 ease-in-out h-full relative"
             style={{ backgroundImage: `url('/assets/images/form-bg.png')` }}
           >
             {quotes.length > 0 && (
