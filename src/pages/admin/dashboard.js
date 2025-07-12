@@ -17,6 +17,8 @@ export default function AdminDashboard() {
   const [userToReject, setUserToReject] = useState(null);
   const [showApprovedModal, setShowApprovedModal] = useState(false);
   const [showRejectedModal, setShowRejectedModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [stats, setStats] = useState({
     approvedToday: 0,
     rejectedToday: 0,
@@ -135,12 +137,15 @@ export default function AdminDashboard() {
     setRejectionReason("");
   };
 
-  const handleDelete = async (user) => {
-    if (!confirm(`Are you sure you want to permanently delete ${user.full_name || user.email}? This action cannot be undone.`)) {
-      return;
-    }
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
+  };
 
-    setProcessingUser(user.id);
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    setProcessingUser(userToDelete.id);
     const adminToken = localStorage.getItem("admin_token");
 
     try {
@@ -151,7 +156,7 @@ export default function AdminDashboard() {
           Authorization: `Bearer ${adminToken}`,
         },
         body: JSON.stringify({
-          userId: user.id,
+          userId: userToDelete.id,
         }),
       });
 
@@ -169,7 +174,14 @@ export default function AdminDashboard() {
       toast.error("Failed to delete user");
     } finally {
       setProcessingUser(null);
+      setShowDeleteModal(false);
+      setUserToDelete(null);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setUserToDelete(null);
   };
 
   const calculateStats = (userData) => {
@@ -493,7 +505,7 @@ export default function AdminDashboard() {
               className: "hover:bg-red-100 text-red-600",
               onClick: (row) => {
                 if (processingUser !== row.id) {
-                  handleDelete(row);
+                  handleDeleteClick(row);
                 }
               },
             },
@@ -655,6 +667,71 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
+          </div>
+        </SimpleModal>
+
+        {/* Delete Confirmation Modal */}
+        <SimpleModal
+          isOpen={showDeleteModal}
+          onClose={handleDeleteCancel}
+          title="Delete User"
+          width="max-w-md"
+        >
+          <div className="space-y-6">
+            <div className="">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <Icon icon="mdi:delete" className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+                Delete User Account
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 text-center">
+                Are you sure you want to permanently delete{" "}
+                <span className="font-semibold text-gray-900">
+                  {userToDelete?.full_name || 
+                   `${userToDelete?.first_name || ""} ${userToDelete?.last_name || ""}`.trim() ||
+                   userToDelete?.email}
+                </span>
+                ?
+              </p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex">
+                  <Icon icon="mdi:alert-circle" className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+                  <div className="text-sm text-red-700">
+                    <p className="font-medium">This action cannot be undone.</p>
+                    <p className="mt-1">
+                      The user&apos;s account and all associated data will be permanently removed from the system.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={processingUser === userToDelete?.id}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {processingUser === userToDelete?.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:delete" className="mr-2 h-4 w-4" />
+                    Delete User
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </SimpleModal>
       </main>
