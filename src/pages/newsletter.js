@@ -21,6 +21,21 @@ const NewsletterPage = () => {
     const { handleSignOut } = useSignOut();
     const { user } = useUser();
 
+    // Check if user is pending approval
+    useEffect(() => {
+        if (user && !user.is_approved) {
+            toast.error('Your account is pending approval. Content will be available once your account is approved.', {
+                duration: 4000,
+                position: 'top-center',
+            });
+            router.replace('/dashboard');
+        }
+    }, [user, router]);
+
+    // Don't render if user is pending approval
+    if (user && !user.is_approved) {
+        return null;
+    }
 
     return (
       <div

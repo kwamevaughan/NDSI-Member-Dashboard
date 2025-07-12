@@ -28,6 +28,17 @@ const StrategicDocumentsPage = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedDoc, setSelectedDoc] = useState(null);
 
+    // Check if user is pending approval
+    useEffect(() => {
+        if (user && !user.is_approved) {
+            toast.error('Your account is pending approval. Content will be available once your account is approved.', {
+                duration: 4000,
+                position: 'top-center',
+            });
+            router.replace('/dashboard');
+        }
+    }, [user, router]);
+
     useEffect(() => {
         const fetchDocs = async () => {
             setLoading(true);
@@ -69,6 +80,11 @@ const StrategicDocumentsPage = () => {
         const matchesSearch = doc.title.toLowerCase().includes(search.toLowerCase());
         return matchesType && matchesYear && matchesSearch;
     });
+
+    // Don't render if user is pending approval
+    if (user && !user.is_approved) {
+        return null;
+    }
 
     return (
       <div
