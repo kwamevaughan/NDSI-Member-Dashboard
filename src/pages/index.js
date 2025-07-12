@@ -78,29 +78,32 @@ export default function Home() {
       const result = await login(loginEmail, loginPassword, captchaToken);
       if (result && result.token) {
         toast.dismiss(toastId);
-        const welcomeMessage = `Authenticated, Welcome ${
-          result.user.first_name || "User"
-        }`;
-        toast.success(welcomeMessage);
-        localStorage.setItem("rememberMe", rememberMe);
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 100);
+        
+        // Check if user is pending approval
+        if (result.isPendingApproval) {
+          const welcomeMessage = `Welcome ${result.user.first_name || "User"}! Your account is pending approval.`;
+          toast.success(welcomeMessage);
+          localStorage.setItem("rememberMe", rememberMe);
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 100);
+        } else {
+          const welcomeMessage = `Authenticated, Welcome ${
+            result.user.first_name || "User"
+          }`;
+          toast.success(welcomeMessage);
+          localStorage.setItem("rememberMe", rememberMe);
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 100);
+        }
       } else {
         throw new Error("No token received from login");
       }
     } catch (error) {
       toast.dismiss(toastId);
-      
-      // Handle approval pending error specifically
-      if (error.message.includes('pending approval')) {
-        setError('Your account is pending approval. You will receive an email notification once approved.');
-        toast.error('Account pending approval. Please check your email for updates.');
-      } else {
-        setError(error.message);
-        toast.error(`Login failed: ${error.message}`);
-      }
-      
+      setError(error.message);
+      toast.error(`Login failed: ${error.message}`);
       setCaptchaToken(null);
       if (recaptchaRef.current) recaptchaRef.current.reset();
     }

@@ -49,12 +49,8 @@ export default async function handler(req, res) {
         }
 
         // Check if user is approved (unless they are an admin)
-        if (!user.is_admin && !user.is_approved) {
-            return res.status(403).json({ 
-                error: 'Your account is pending approval. You will receive an email notification once approved.',
-                requiresApproval: true
-            });
-        }
+        // Allow unapproved users to log in but mark them as pending
+        const isPendingApproval = !user.is_admin && !user.is_approved;
 
         const token = jwt.sign(
             { id: user.id, email: user.email, is_admin: user.is_admin || false },
@@ -79,7 +75,12 @@ export default async function handler(req, res) {
                 .eq('id', user.id);
         }
 
-        return res.status(200).json({ token, user, enforcePasswordChange });
+        return res.status(200).json({ 
+            token, 
+            user, 
+            enforcePasswordChange,
+            isPendingApproval 
+        });
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ error: 'Internal server error' });

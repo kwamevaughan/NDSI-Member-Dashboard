@@ -87,6 +87,23 @@ const Dashboard = () => {
                   : "bg-[#ececec] text-black"
               } w-full min-h-screen`}
             >
+              {/* Pending Approval Banner */}
+              {isPendingApproval && (
+                <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Icon icon="mdi:clock-outline" className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">
+                        Account Pending Approval
+                      </h3>
+                      <p className="text-yellow-700 dark:text-yellow-300">
+                        Your account is currently under review. You can preview the dashboard below, but content access will be enabled once your account is approved.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-6 ">
                 <div>
                   <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
@@ -115,23 +132,80 @@ const Dashboard = () => {
                 </p>
               </div>
 
-              <div className="grid pt-14 pb-14 gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 h-full">
-                <Link href="/strategic-documents" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                  <StrategicDocuments mode={mode} />
-                </Link>
-                <Link href="/training-materials" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                  <TrainingMaterials mode={mode} />
-                </Link>
-                <Link href="/esg-toolkit" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                  <ESGToolkit mode={mode} />
-                </Link>
-                <Link href="/newsletter" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                  <Newsletter mode={mode} />
-                </Link>
+              <div className={`grid pt-14 pb-14 gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 h-full ${isPendingApproval ? 'pointer-events-none opacity-50' : ''}`}>
+                {isPendingApproval ? (
+                  // Disabled preview cards
+                  <>
+                    <div className="w-full flex-grow transition-all duration-300 block relative">
+                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
+                        <div className="text-center">
+                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
+                        </div>
+                      </div>
+                      <StrategicDocuments mode={mode} />
+                    </div>
+                    <div className="w-full flex-grow transition-all duration-300 block relative">
+                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
+                        <div className="text-center">
+                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
+                        </div>
+                      </div>
+                      <TrainingMaterials mode={mode} />
+                    </div>
+                    <div className="w-full flex-grow transition-all duration-300 block relative">
+                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
+                        <div className="text-center">
+                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
+                        </div>
+                      </div>
+                      <ESGToolkit mode={mode} />
+                    </div>
+                    <div className="w-full flex-grow transition-all duration-300 block relative">
+                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
+                        <div className="text-center">
+                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
+                        </div>
+                      </div>
+                      <Newsletter mode={mode} />
+                    </div>
+                  </>
+                ) : (
+                  // Normal clickable links
+                  <>
+                    <Link href="/strategic-documents" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
+                      <StrategicDocuments mode={mode} />
+                    </Link>
+                    <Link href="/training-materials" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
+                      <TrainingMaterials mode={mode} />
+                    </Link>
+                    <Link href="/esg-toolkit" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
+                      <ESGToolkit mode={mode} />
+                    </Link>
+                    <Link href="/newsletter" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
+                      <Newsletter mode={mode} />
+                    </Link>
+                  </>
+                )}
               </div>
 
-              <div className="grid pb-14 gap-8 grid-cols-1 h-full">
-                <WorkingGroupDocumentation mode={mode} />
+              <div className={`grid pb-14 gap-8 grid-cols-1 h-full ${isPendingApproval ? 'pointer-events-none opacity-50' : ''}`}>
+                {isPendingApproval ? (
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
+                      <div className="text-center">
+                        <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
+                      </div>
+                    </div>
+                    <WorkingGroupDocumentation mode={mode} />
+                  </div>
+                ) : (
+                  <WorkingGroupDocumentation mode={mode} />
+                )}
               </div>
             </main>
           </div>
