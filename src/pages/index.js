@@ -56,7 +56,9 @@ export default function Home() {
   }, []);
 
   const handleFormSwitch = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
     setIsRegistering(!isRegistering);
     setError("");
     setLoginEmail("");
@@ -266,7 +268,7 @@ export default function Home() {
                 <Link
                   href="#"
                   className="hover:text-gray-900 underline"
-                  onClick={handleFormSwitch}
+                  onClick={(e) => handleFormSwitch(e)}
                 >
                   <span className="text-[#28A8E0] underline hover:text-gray-900">
                     {isRegistering ? "Back to Login" : "Sign Up Here"}

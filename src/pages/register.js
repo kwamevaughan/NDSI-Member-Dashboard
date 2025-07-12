@@ -61,20 +61,25 @@ export default function Register({ closeRegister, notify, setError, router, reca
 
             toast.dismiss(toastId);
             
-            // Check if user requires approval
-            if (data.requiresApproval) {
-                toast.success('Registration successful! Your account is pending approval. You will receive an email notification once approved.');
-                closeRegister(); // Close the registration modal
-                return;
-            }
-            
-            // If no approval required, proceed with auto-login
-            const loginResult = await login(email, password, null);
+            // Registration successful - proceed with auto-login
+            // For auto-login after registration, we don't need reCAPTCHA
+            const loginResult = await login(email, password, null, true); // true = auto-login
             if (loginResult && loginResult.token) {
-                const welcomeMessage = `Authenticated, Welcome ${fullName || 'User'}`;
-                toast.success(welcomeMessage);
+                if (loginResult.isPendingApproval) {
+                    const welcomeMessage = `Welcome ${fullName || 'User'}! Your account is pending approval.`;
+                    toast.success(welcomeMessage);
+                } else {
+                    const welcomeMessage = `Authenticated, Welcome ${fullName || 'User'}`;
+                    toast.success(welcomeMessage);
+                }
+                
+                // Redirect to appropriate dashboard
                 setTimeout(() => {
-                    router.push('/dashboard');
+                    if (loginResult.user && loginResult.user.is_admin) {
+                        router.push('/admin/dashboard');
+                    } else {
+                        router.push('/dashboard');
+                    }
                 }, 100);
             } else {
                 throw new Error('Auto-login failed after registration');

@@ -59,6 +59,7 @@ export default async function handler(req, res) {
                 role_job_title: role_job_title || null,
                 is_approved: false, // New users need approval
                 approval_status: 'pending', // pending, approved, rejected
+                is_first_time: false, // User has already provided required info during registration
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             })
@@ -68,13 +69,6 @@ export default async function handler(req, res) {
         if (error) {
             throw error;
         }
-
-        // Respond to client immediately after user creation
-        res.status(201).json({ 
-            message: 'Registration successful! Your account is pending approval. You will receive an email notification once approved.', 
-            user: data,
-            requiresApproval: true
-        });
 
         // Send pending approval email asynchronously (do not await)
         (async () => {
@@ -137,6 +131,7 @@ export default async function handler(req, res) {
             }
         })();
 
+        // Respond to client after user creation
         return res.status(201).json({ 
             message: 'Registration successful! Your account is pending approval. You will receive an email notification once approved.', 
             user: data,

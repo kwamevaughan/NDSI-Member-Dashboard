@@ -42,11 +42,11 @@ export function UserProvider({ children }) {
         }
     }, []);
 
-    const login = async (email, password, recaptchaToken) => {
+    const login = async (email, password, recaptchaToken, isAutoLogin = false) => {
         const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, recaptchaToken }),
+            body: JSON.stringify({ email, password, recaptchaToken, isAutoLogin }),
         });
 
         const data = await response.json();

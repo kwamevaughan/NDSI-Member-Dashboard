@@ -5,19 +5,23 @@ import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
+    console.log('Login API called with method:', req.method);
+    
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email, password, recaptchaToken } = req.body;
+    const { email, password, recaptchaToken, isAutoLogin } = req.body;
     const normalizedEmail = email.toLowerCase();
+    
+    console.log('Login attempt for:', normalizedEmail, 'hasPassword:', !!password, 'hasRecaptcha:', !!recaptchaToken);
 
     if (!normalizedEmail || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Only verify reCAPTCHA if token is provided
-    if (recaptchaToken) {
+    // Only verify reCAPTCHA if token is provided and not an auto-login
+    if (recaptchaToken && !isAutoLogin) {
         const recaptchaResponse = await fetch(
             `https://www.google.com/recaptcha/api/siteverify`,
             {
@@ -30,6 +34,10 @@ export default async function handler(req, res) {
         if (!recaptchaData.success) {
             return res.status(401).json({ error: 'reCAPTCHA verification failed' });
         }
+    } else if (!recaptchaToken && !isAutoLogin) {
+        return res.status(401).json({ error: 'reCAPTCHA verification required' });
+    } else if (isAutoLogin) {
+        console.log('Auto-login detected - skipping reCAPTCHA verification');
     }
 
     try {
@@ -51,6 +59,15 @@ export default async function handler(req, res) {
         // Check if user is approved (unless they are an admin)
         // Allow unapproved users to log in but mark them as pending
         const isPendingApproval = !user.is_admin && !user.is_approved;
+        
+        console.log('User found:', { 
+            id: user.id, 
+            email: user.email, 
+            is_admin: user.is_admin, 
+            is_approved: user.is_approved,
+            approval_status: user.approval_status,
+            isPendingApproval 
+        });
 
         const token = jwt.sign(
             { id: user.id, email: user.email, is_admin: user.is_admin || false },

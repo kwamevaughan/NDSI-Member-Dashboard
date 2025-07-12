@@ -26,13 +26,6 @@ const Dashboard = () => {
     useEffect(() => {
         if (!user) return;
         
-        // Check if first time, or missing required info
-        const needsFirstTimeSetup = user.is_first_time || !user.first_name || !user.last_name || !user.password;
-        if (needsFirstTimeSetup) {
-            router.replace('/first-time-setup');
-            return;
-        }
-
         // Show pending approval notification if user is not approved
         if (!user.is_approved) {
             toast.error('Your account is pending approval. You can view the dashboard but cannot access content until approved.', {
@@ -42,14 +35,12 @@ const Dashboard = () => {
         }
     }, [user, router]);
 
-    if (!user || user.is_first_time || !user.first_name || !user.last_name || !user.password) {
+    if (!user) {
         // Optionally show a loading spinner or nothing while redirecting
         return null;
     }
 
     const isPendingApproval = !user.is_approved;
-
-    const firstName = user?.first_name || 'Guest';
 
     return (
       <div
@@ -124,7 +115,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <h2 className="text-4xl font-semibold text-[#28A8E0] mb-4">
-                  Welcome {user.full_name} to NDSI!
+                  Welcome {user.full_name || 'Guest'} to NDSI!
                 </h2>
                 <p className="mb-4">
                   Explore resources, training, and key strategic documents to
