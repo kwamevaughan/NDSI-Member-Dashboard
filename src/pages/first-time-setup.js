@@ -128,21 +128,25 @@ export default function FirstTimeSetup() {
               className="mb-2"
             />
           </Link>
-          <h2 className="text-3xl font-bold text-[#28A8E0] mb-1 text-center">
-            First Time Setup
-          </h2>
-          <p className="text-gray-600 text-center mb-2">
-            Welcome! Please update your password and personal information to
-            continue.
-          </p>
-          <div className="bg-[#f7f7f7] rounded-lg px-4 py-2 text-sm text-gray-700 mb-2 text-center max-w-md">
-            <span className="font-semibold text-[#28A8E0]">Why?</span> For your
-            security and to personalize your experience, we require you to set a
-            new password and complete your profile.
-          </div>
+          {!success && (
+            <>
+              <h2 className="text-3xl font-bold text-[#28A8E0] mb-1 text-center">
+                First Time Setup
+              </h2>
+              <p className="text-gray-600 text-center mb-2">
+                Welcome! Please update your password and personal information to
+                continue.
+              </p>
+              <div className="bg-[#f7f7f7] rounded-lg px-4 py-2 text-sm text-gray-700 mb-2 text-center max-w-md">
+                <span className="font-semibold text-[#28A8E0]">Why?</span> For your
+                security and to personalize your experience, we require you to set a
+                new password and complete your profile.
+              </div>
+            </>
+          )}
         </div>
         {success ? (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-">
             <div className="text-[#28A8E0] text-2xl font-bold mb-2">
               Setup Complete!
             </div>
