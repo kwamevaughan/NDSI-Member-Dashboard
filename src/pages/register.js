@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from 'lib/supabase';
 import { toast } from 'react-hot-toast';
-import { FaRegEnvelope, FaEye, FaEyeSlash, FaUser, FaPhone } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useUser } from '@/context/UserContext';
 
@@ -167,9 +167,9 @@ export default function Register({ closeRegister, notify, setError, router, reca
                         onClick={togglePasswordVisibility}
                     >
                         {showPassword ? (
-                            <FaEyeSlash className="text-gray-500 h-5 w-5" />
+                            <Icon icon="mdi:eye-off" className="text-gray-500 h-5 w-5" />
                         ) : (
-                            <FaEye className="text-gray-500 h-5 w-5" />
+                            <Icon icon="mdi:eye" className="text-gray-500 h-5 w-5" />
                         )}
                     </span>
                     <input
@@ -191,9 +191,9 @@ export default function Register({ closeRegister, notify, setError, router, reca
                         onClick={toggleConfirmPasswordVisibility}
                     >
                         {showConfirmPassword ? (
-                            <FaEyeSlash className="text-gray-500 h-5 w-5" />
+                            <Icon icon="mdi:eye-off" className="text-gray-500 h-5 w-5" />
                         ) : (
-                            <FaEye className="text-gray-500 h-5 w-5" />
+                            <Icon icon="mdi:eye" className="text-gray-500 h-5 w-5" />
                         )}
                     </span>
                     <input

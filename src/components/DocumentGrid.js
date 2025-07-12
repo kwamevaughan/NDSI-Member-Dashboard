@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaFilePdf, FaFileWord } from "react-icons/fa";
+import { Icon } from '@iconify/react';
 import SimpleModal from "@/components/SimpleModal";
 import {
   listFilesInFolder,
@@ -195,9 +195,9 @@ const DocumentGrid = ({
             >
               <div className="mb-4">
                 {doc.type === "pdf" ? (
-                  <FaFilePdf className="text-5xl text-red-500" />
+                  <Icon icon="mdi:file-pdf" className="text-5xl text-red-500" />
                 ) : (
-                  <FaFileWord className="text-5xl text-blue-500" />
+                  <Icon icon="mdi:file-word" className="text-5xl text-blue-500" />
                 )}
               </div>
               <div className="text-center flex-1">

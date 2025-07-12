@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Image from 'next/image';
+import { Icon } from '@iconify/react';
 
 export default function ResetPassword() {
     const [password, setPassword] = useState('');
@@ -61,7 +60,7 @@ export default function ResetPassword() {
             <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
                 <div className="mb-6 flex justify-center">
                     <Link href="/">
-                        <Image src="/assets/images/logo.svg" alt="NDSI Logo" width={200} height={50} />
+                        <Icon icon="mdi:home" className="h-10 w-10" />
                     </Link>
                 </div>
                 <h2 className="text-3xl font-semibold mb-4 text-[#28A8E0] text-center">Reset Your Password</h2>
@@ -90,9 +89,9 @@ export default function ResetPassword() {
                                     onClick={togglePasswordVisibility}
                                 >
                                     {showPassword ? (
-                                        <FaEyeSlash className="text-gray-500 h-5 w-5" />
+                                        <Icon icon="mdi:eye-off" className="text-gray-500 h-5 w-5" />
                                     ) : (
-                                        <FaEye className="text-gray-500 h-5 w-5" />
+                                        <Icon icon="mdi:eye" className="text-gray-500 h-5 w-5" />
                                     )}
                                 </span>
                             </div>
@@ -113,9 +112,9 @@ export default function ResetPassword() {
                                     onClick={toggleConfirmPasswordVisibility}
                                 >
                                     {showConfirmPassword ? (
-                                        <FaEyeSlash className="text-gray-500 h-5 w-5" />
+                                        <Icon icon="mdi:eye-off" className="text-gray-500 h-5 w-5" />
                                     ) : (
-                                        <FaEye className="text-gray-500 h-5 w-5" />
+                                        <Icon icon="mdi:eye" className="text-gray-500 h-5 w-5" />
                                     )}
                                 </span>
                             </div>

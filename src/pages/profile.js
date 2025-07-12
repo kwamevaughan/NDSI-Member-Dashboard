@@ -7,7 +7,7 @@ import useTheme from '@/hooks/useTheme';
 import useSidebar from '@/hooks/useSidebar';
 import { useUser } from '@/context/UserContext';
 import useSignOut from '@/hooks/useSignOut';
-import { FaUser, FaBuilding, FaBriefcase, FaUserCircle, FaLock, FaKey, FaEnvelope } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 
 const ProfilePage = () => {
     const router = useRouter();
@@ -122,10 +122,10 @@ const ProfilePage = () => {
                             {/* Profile Card */}
                             <div className={`rounded-lg shadow-lg p-8 border mx-auto max-w-2xl ${mode === 'dark' ? 'bg-[#181f2a] border-[#232a36] text-white' : 'bg-white border-[#e0e0e0] text-black'}`}>
                                 <form onSubmit={handleProfileSubmit}>
-                                    <h3 className="text-2xl font-bold text-[#28A8E0] mb-6 flex items-center gap-2"><FaUserCircle /> Profile Information</h3>
+                                    <h3 className="text-2xl font-bold text-[#28A8E0] mb-6 flex items-center gap-2"><Icon icon="mdi:account" /> Profile Information</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         <div className="relative">
-                                            <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:account" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={full_name}
@@ -137,7 +137,7 @@ const ProfilePage = () => {
                                         </div>
                                         
                                         <div className="relative md:col-span-2">
-                                            <FaEnvelope className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:email" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="email"
                                                 value={user?.email || ''}
@@ -147,7 +147,7 @@ const ProfilePage = () => {
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaBuilding className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:building" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={organization_name}
@@ -157,7 +157,7 @@ const ProfilePage = () => {
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaBriefcase className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:briefcase" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={role_job_title}
@@ -167,7 +167,7 @@ const ProfilePage = () => {
                                             />
                                         </div>
                                         <div className="relative md:col-span-2">
-                                            <FaUserCircle className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:account" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="text"
                                                 value={full_name}
@@ -191,10 +191,10 @@ const ProfilePage = () => {
                             {/* Password Card */}
                             <div className={`rounded-lg shadow-lg p-8 border mx-auto max-w-2xl ${mode === 'dark' ? 'bg-[#181f2a] border-[#232a36] text-white' : 'bg-white border-[#e0e0e0] text-black'}`}>
                                 <form onSubmit={handlePasswordSubmit}>
-                                    <h3 className="text-2xl font-bold text-[#28A8E0] mb-6 flex items-center gap-2"><FaLock /> Change Password</h3>
+                                    <h3 className="text-2xl font-bold text-[#28A8E0] mb-6 flex items-center gap-2"><Icon icon="mdi:lock" /> Change Password</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         <div className="relative">
-                                            <FaKey className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:key" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="password"
                                                 value={currentPassword}
@@ -205,7 +205,7 @@ const ProfilePage = () => {
                                             />
                                         </div>
                                         <div className="relative">
-                                            <FaLock className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                            <Icon icon="mdi:lock" className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${mode === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
                                             <input
                                                 type="password"
                                                 value={newPassword}

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
-import { FaRegEnvelope, FaEye, FaEyeSlash, FaLock } from 'react-icons/fa';
+import { Icon } from '@iconify/react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -114,7 +114,7 @@ export default function AdminLogin() {
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaRegEnvelope className="h-5 w-5 text-gray-400" />
+                                    <Icon icon="mdi:email" className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input
                                     id="email"
@@ -136,7 +136,7 @@ export default function AdminLogin() {
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaLock className="h-5 w-5 text-gray-400" />
+                                    <Icon icon="mdi:lock" className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input
                                     id="password"
@@ -155,9 +155,9 @@ export default function AdminLogin() {
                                     onClick={() => setShowPassword(!showPassword)}
                                 >
                                     {showPassword ? (
-                                        <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                        <Icon icon="mdi:eye-off" className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                                     ) : (
-                                        <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                        <Icon icon="mdi:eye" className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                                     )}
                                 </button>
                             </div>
@@ -185,7 +185,7 @@ export default function AdminLogin() {
                     <div className="mt-6 text-center">
                         <Link 
                             href="/" 
-                            className="text-sm text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                            className="text-sm text-blue-600 hover:text-blue-500 transition-colors duration-200 underline"
                         >
                             ← Back to Member Login
                         </Link>
