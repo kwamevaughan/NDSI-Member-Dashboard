@@ -147,6 +147,7 @@ export function GenericTable({
   columns = [],
   onEdit,
   onDelete,
+  onBulkDelete,
   onReorder,
   onAddNew,
   addNewLabel = "Add New",
@@ -208,11 +209,18 @@ export function GenericTable({
   const table = useTable(filteredByDate);
 
   const handleBulkDelete = () => {
-    if (table.selected.length > 0 && onDelete) {
-      table.selected.forEach((id) => {
-        const row = data.find((item) => item.id === id);
-        if (row) onDelete(row);
-      });
+    if (table.selected.length > 0) {
+      if (onBulkDelete) {
+        // Use custom bulk delete handler
+        const selectedItems = data.filter(item => table.selected.includes(item.id));
+        onBulkDelete(table.selected, selectedItems);
+      } else if (onDelete) {
+        // Fallback to individual delete calls
+        table.selected.forEach((id) => {
+          const row = data.find((item) => item.id === id);
+          if (row) onDelete(row);
+        });
+      }
     }
   };
 
@@ -466,7 +474,7 @@ export function GenericTable({
               className="flex items-center gap-2 px-3 py-1.5 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
             >
               <Icon icon="mdi:delete" className="w-3 h-3" />
-              Delete Selected
+              <span>{table.selected.length} Users</span> Selected
             </button>
           </div>
         </div>
