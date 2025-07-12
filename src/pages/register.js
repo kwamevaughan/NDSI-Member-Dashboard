@@ -60,7 +60,15 @@ export default function Register({ closeRegister, notify, setError, router, reca
             }
 
             toast.dismiss(toastId);
-            // Skip reCAPTCHA for auto-login since it's already verified
+            
+            // Check if user requires approval
+            if (data.requiresApproval) {
+                toast.success('Registration successful! Your account is pending approval. You will receive an email notification once approved.');
+                closeRegister(); // Close the registration modal
+                return;
+            }
+            
+            // If no approval required, proceed with auto-login
             const loginResult = await login(email, password, null);
             if (loginResult && loginResult.token) {
                 const welcomeMessage = `Authenticated, Welcome ${fullName || 'User'}`;
