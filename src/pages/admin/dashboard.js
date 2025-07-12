@@ -501,14 +501,7 @@ export default function AdminDashboard() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Debug: Log a few users to see their structure
-    console.log('Sample users for debugging:', userData.slice(0, 3).map(user => ({
-      id: user.id,
-      email: user.email,
-      is_approved: user.is_approved,
-      approval_status: user.approval_status,
-      rejection_reason: user.rejection_reason
-    })));
+
 
     const approvedToday = userData.filter(user => {
       if (!user.updated_at || !user.is_approved) return false;
@@ -518,10 +511,10 @@ export default function AdminDashboard() {
     }).length;
 
     const rejectedToday = userData.filter(user => {
-      if (!user.updated_at || user.is_approved !== false) return false;
+      if (!user.updated_at || user.approval_status !== 'rejected') return false;
       const updatedDate = new Date(user.updated_at);
       updatedDate.setHours(0, 0, 0, 0);
-      return updatedDate.getTime() === today.getTime() && user.is_approved === false;
+      return updatedDate.getTime() === today.getTime();
     }).length;
 
     const totalPending = userData.filter(user => 
@@ -552,10 +545,10 @@ export default function AdminDashboard() {
     today.setHours(0, 0, 0, 0);
     
     return users.filter(user => {
-      if (!user.updated_at || user.is_approved !== false) return false;
+      if (!user.updated_at || user.approval_status !== 'rejected') return false;
       const updatedDate = new Date(user.updated_at);
       updatedDate.setHours(0, 0, 0, 0);
-      return updatedDate.getTime() === today.getTime() && user.approval_status === 'rejected';
+      return updatedDate.getTime() === today.getTime();
     });
   };
 
@@ -660,7 +653,7 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                     Pending Approvals
                   </p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">
+                  <p className="text-3xl font-medium text-slate-800 mt-1">
                     {stats.totalPending}
                   </p>
                 </div>
@@ -684,7 +677,7 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                     Approved Today
                   </p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">{stats.approvedToday}</p>
+                  <p className="text-3xl font-medium text-slate-800 mt-1">{stats.approvedToday}</p>
                 </div>
                 <div className="flex-shrink-0">
                   <Icon icon="mdi:chevron-right" className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
@@ -709,7 +702,7 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                     Rejected Today
                   </p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">{stats.rejectedToday}</p>
+                  <p className="text-3xl font-medium text-slate-800 mt-1">{stats.rejectedToday}</p>
                 </div>
                 <div className="flex-shrink-0">
                   <Icon icon="mdi:chevron-right" className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
