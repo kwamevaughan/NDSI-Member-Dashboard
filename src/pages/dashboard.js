@@ -23,6 +23,35 @@ const Dashboard = () => {
     const { handleSignOut } = useSignOut();
     const { user } = useUser();
 
+    // Handle card click for pending approval users
+    const handleCardClick = () => {
+        toast.error('Your account is pending approval. Content will be available once your account is approved.', {
+            duration: 4000,
+            position: 'top-center',
+        });
+    };
+
+    // Wrapper component for cards
+    const CardWrapper = ({ children, href, isPendingApproval }) => {
+        if (isPendingApproval) {
+            return (
+                <div 
+                    className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block cursor-pointer" 
+                    onClick={handleCardClick}
+                    style={{textDecoration: 'none'}}
+                >
+                    {children}
+                </div>
+            );
+        }
+        
+        return (
+            <Link href={href} className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
+                {children}
+            </Link>
+        );
+    };
+
     useEffect(() => {
         if (!user) return;
         
@@ -123,80 +152,25 @@ const Dashboard = () => {
                 </p>
               </div>
 
-              <div className={`grid pt-14 pb-14 gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 h-full ${isPendingApproval ? 'pointer-events-none opacity-50' : ''}`}>
-                {isPendingApproval ? (
-                  // Disabled preview cards
-                  <>
-                    <div className="w-full flex-grow transition-all duration-300 block relative">
-                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
-                        <div className="text-center">
-                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
-                        </div>
-                      </div>
-                      <StrategicDocuments mode={mode} />
-                    </div>
-                    <div className="w-full flex-grow transition-all duration-300 block relative">
-                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
-                        <div className="text-center">
-                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
-                        </div>
-                      </div>
-                      <TrainingMaterials mode={mode} />
-                    </div>
-                    <div className="w-full flex-grow transition-all duration-300 block relative">
-                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
-                        <div className="text-center">
-                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
-                        </div>
-                      </div>
-                      <ESGToolkit mode={mode} />
-                    </div>
-                    <div className="w-full flex-grow transition-all duration-300 block relative">
-                      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
-                        <div className="text-center">
-                          <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
-                        </div>
-                      </div>
-                      <Newsletter mode={mode} />
-                    </div>
-                  </>
-                ) : (
-                  // Normal clickable links
-                  <>
-                    <Link href="/strategic-documents" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                      <StrategicDocuments mode={mode} />
-                    </Link>
-                    <Link href="/training-materials" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                      <TrainingMaterials mode={mode} />
-                    </Link>
-                    <Link href="/esg-toolkit" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                      <ESGToolkit mode={mode} />
-                    </Link>
-                    <Link href="/newsletter" className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
-                      <Newsletter mode={mode} />
-                    </Link>
-                  </>
-                )}
+              <div className="grid pt-14 pb-14 gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 h-full">
+                <CardWrapper href="/strategic-documents" isPendingApproval={isPendingApproval}>
+                  <StrategicDocuments mode={mode} isPendingApproval={isPendingApproval} />
+                </CardWrapper>
+                <CardWrapper href="/training-materials" isPendingApproval={isPendingApproval}>
+                  <TrainingMaterials mode={mode} isPendingApproval={isPendingApproval} />
+                </CardWrapper>
+                <CardWrapper href="/esg-toolkit" isPendingApproval={isPendingApproval}>
+                  <ESGToolkit mode={mode} isPendingApproval={isPendingApproval} />
+                </CardWrapper>
+                <CardWrapper href="/newsletter" isPendingApproval={isPendingApproval}>
+                  <Newsletter mode={mode} isPendingApproval={isPendingApproval} />
+                </CardWrapper>
               </div>
 
-              <div className={`grid pb-14 gap-8 grid-cols-1 h-full ${isPendingApproval ? 'pointer-events-none opacity-50' : ''}`}>
-                {isPendingApproval ? (
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center z-10">
-                      <div className="text-center">
-                        <Icon icon="mdi:lock" className="w-8 h-8 text-gray-500 dark:text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Content locked</p>
-                      </div>
-                    </div>
-                    <WorkingGroupDocumentation mode={mode} />
-                  </div>
-                ) : (
-                  <WorkingGroupDocumentation mode={mode} />
-                )}
+              <div className="grid pb-14 gap-8 grid-cols-1 h-full">
+                <CardWrapper href="/working-group-documentation" isPendingApproval={isPendingApproval}>
+                  <WorkingGroupDocumentation mode={mode} isPendingApproval={isPendingApproval} />
+                </CardWrapper>
               </div>
             </main>
           </div>

@@ -4,14 +4,27 @@ import { Icon } from '@iconify/react';
 import { listFilesInFolder } from '@/utils/imageKitService';
 import Link from 'next/link';
 import SimpleModal from './SimpleModal';
+import toast from 'react-hot-toast';
 
-const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) => {
+const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout, isPendingApproval }) => {
     const { user } = useUser();
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedDoc, setSelectedDoc] = useState(null);
+
+    const handleButtonClick = (e) => {
+        if (isPendingApproval) {
+            e.preventDefault();
+            e.stopPropagation();
+            toast.error('Your account is pending approval. Content will be available once your account is approved.', {
+                duration: 4000,
+                position: 'top-center',
+            });
+            return false;
+        }
+    };
 
     useEffect(() => {
         const fetchDocs = async () => {
@@ -86,18 +99,21 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                                     <td className="flex px-6 py-6 border-b" style={{borderColor: '#E2E2E2'}}>
                                         <div className="flex gap-4 w-full">
                                             <button
-                                                className="flex items-center transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white text-base font-normal px-4 py-2 rounded-full hover:translate-y-[-5px] w-1/2 justify-center"
-                                                onClick={() => { setSelectedDoc(doc); setModalOpen(true); }}
+                                                onClick={isPendingApproval ? handleButtonClick : () => { setSelectedDoc(doc); setModalOpen(true); }}
+                                                disabled={isPendingApproval}
+                                                className={`flex items-center transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white text-base font-normal px-4 py-2 rounded-full hover:translate-y-[-5px] w-1/2 justify-center
+                                                    ${isPendingApproval ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <Icon icon="mdi:eye-circle" className="text-2xl mr-2"/> View
                                             </button>
-                                            <a
-                                                href={doc.url}
-                                                download
-                                                className="flex items-center transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white text-base font-normal px-4 py-2 rounded-full hover:translate-y-[-5px] w-1/2 justify-center"
+                                            <button
+                                                onClick={isPendingApproval ? handleButtonClick : () => window.open(doc.url, '_blank')}
+                                                disabled={isPendingApproval}
+                                                className={`flex items-center transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white text-base font-normal px-4 py-2 rounded-full hover:translate-y-[-5px] w-1/2 justify-center
+                                                    ${isPendingApproval ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <Icon icon="akar-icons:download" className="text-2xl mr-2"/> Download
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -107,11 +123,21 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                     </table>
                 </div>
 
-                <Link href="/working-group-docs" legacyBehavior>
-                    <a className="transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-center rounded-full hover:translate-y-[-5px] mt-auto text-center block">
+                {isPendingApproval ? (
+                    <button
+                        onClick={handleButtonClick}
+                        disabled={isPendingApproval}
+                        className="transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-center rounded-full hover:translate-y-[-5px] mt-auto text-center block opacity-50 cursor-not-allowed"
+                    >
                         View All Documents
-                    </a>
-                </Link>
+                    </button>
+                ) : (
+                    <Link href="/working-group-docs" legacyBehavior>
+                        <a className="transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-center rounded-full hover:translate-y-[-5px] mt-auto text-center block">
+                            View All Documents
+                        </a>
+                    </Link>
+                )}
             </div>
             <SimpleModal
                 isOpen={modalOpen}

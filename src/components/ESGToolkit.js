@@ -1,9 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/context/UserContext';
 import { Icon } from '@iconify/react';
+import toast from 'react-hot-toast';
 
-const ESGToolkit = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }) => {
+const ESGToolkit = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout, isPendingApproval }) => {
     const { user } = useUser();
+
+    const handleButtonClick = (e) => {
+        if (isPendingApproval) {
+            e.preventDefault();
+            e.stopPropagation();
+            toast.error('Your account is pending approval. Content will be available once your account is approved.', {
+                duration: 4000,
+                position: 'top-center',
+            });
+            return false;
+        }
+    };
 
     return (
         <main
@@ -31,8 +44,11 @@ const ESGToolkit = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout }
                     </div>
 
                     <button
+                        onClick={handleButtonClick}
+                        disabled={isPendingApproval}
                         className={`transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-end rounded-full hover:translate-y-[-5px] 
-                            ${mode === 'dark' ? 'hover:bg-sky-400' : 'hover:bg-sky-600'}`}
+                            ${mode === 'dark' ? 'hover:bg-sky-400' : 'hover:bg-sky-600'}
+                            ${isPendingApproval ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         View Documents
                     </button>
