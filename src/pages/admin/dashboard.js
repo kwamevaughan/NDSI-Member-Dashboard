@@ -23,6 +23,15 @@ export default function AdminDashboard() {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [activeTab, setActiveTab] = useState('users'); // 'users' or 'admins'
   const [adminUsers, setAdminUsers] = useState([]);
+  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
+  const [newAdminData, setNewAdminData] = useState({
+    full_name: '',
+    email: '',
+    organization_name: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [addAdminLoading, setAddAdminLoading] = useState(false);
   const [stats, setStats] = useState({
     approvedToday: 0,
     rejectedToday: 0,
@@ -258,6 +267,86 @@ export default function AdminDashboard() {
   const handleBulkDeleteCancel = () => {
     setShowBulkDeleteModal(false);
     setSelectedUsers([]);
+  };
+
+  const handleAddAdmin = async () => {
+    // Validation
+    if (!newAdminData.full_name.trim()) {
+      toast.error('Full name is required');
+      return;
+    }
+    if (!newAdminData.email.trim()) {
+      toast.error('Email is required');
+      return;
+    }
+    if (!newAdminData.password) {
+      toast.error('Password is required');
+      return;
+    }
+    if (newAdminData.password !== newAdminData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (newAdminData.password.length < 8) {
+      toast.error('Password must be at least 8 characters long');
+      return;
+    }
+
+    setAddAdminLoading(true);
+    const adminToken = localStorage.getItem("admin_token");
+
+    try {
+      const response = await fetch("/api/admin/admins", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          full_name: newAdminData.full_name.trim(),
+          email: newAdminData.email.trim().toLowerCase(),
+          organization_name: newAdminData.organization_name.trim(),
+          password: newAdminData.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create admin");
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+
+      // Reset form and close modal
+      setNewAdminData({
+        full_name: '',
+        email: '',
+        organization_name: '',
+        password: '',
+        confirmPassword: ''
+      });
+      setShowAddAdminModal(false);
+
+      // Refresh admin users list
+      fetchAdminUsers(adminToken);
+    } catch (error) {
+      console.error("Error creating admin:", error);
+      toast.error(error.message);
+    } finally {
+      setAddAdminLoading(false);
+    }
+  };
+
+  const handleAddAdminCancel = () => {
+    setShowAddAdminModal(false);
+    setNewAdminData({
+      full_name: '',
+      email: '',
+      organization_name: '',
+      password: '',
+      confirmPassword: ''
+    });
   };
 
   const calculateStats = (userData) => {
@@ -655,9 +744,18 @@ export default function AdminDashboard() {
             </div>
 
             <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Administrator Accounts</h3>
-                <p className="text-sm text-gray-600 mt-1">Current admin users in the system</p>
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Administrator Accounts</h3>
+                  <p className="text-sm text-gray-600 mt-1">Current admin users in the system</p>
+                </div>
+                <button
+                  onClick={() => setShowAddAdminModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  <Icon icon="mdi:plus" className="h-4 w-4" />
+                  Add New Admin
+                </button>
               </div>
               <div className="p-6">
                 {adminUsers.length === 0 ? (
@@ -968,6 +1066,119 @@ export default function AdminDashboard() {
                   <>
                     <Icon icon="mdi:delete" className="mr-2 h-4 w-4" />
                     Delete User
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </SimpleModal>
+
+        {/* Add Admin Modal */}
+        <SimpleModal
+          isOpen={showAddAdminModal}
+          onClose={handleAddAdminCancel}
+          title="Add New Administrator"
+          width="max-w-4xl"
+        >
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <Icon icon="mdi:alert-circle" className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                <div className="text-sm text-blue-800">
+                  <p className="font-medium mb-1">Important</p>
+                  <p>Administrators have full access to the system. Only add trusted users as administrators.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={newAdminData.full_name}
+                  onChange={(e) => setNewAdminData({...newAdminData, full_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  value={newAdminData.email}
+                  onChange={(e) => setNewAdminData({...newAdminData, email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Organization (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={newAdminData.organization_name}
+                  onChange={(e) => setNewAdminData({...newAdminData, organization_name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter organization name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  value={newAdminData.password}
+                  onChange={(e) => setNewAdminData({...newAdminData, password: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter password (min 8 characters)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  value={newAdminData.confirmPassword}
+                  onChange={(e) => setNewAdminData({...newAdminData, confirmPassword: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Confirm password"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleAddAdminCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddAdmin}
+                disabled={addAdminLoading}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {addAdminLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:plus" className="mr-2 h-4 w-4" />
+                    Create Admin
                   </>
                 )}
               </button>

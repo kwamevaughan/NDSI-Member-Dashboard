@@ -155,4 +155,69 @@ export async function sendDeletionEmail(user) {
         console.error('Error sending deletion email:', error);
         throw error;
     }
+}
+
+export async function sendAdminWelcomeEmail(user, password) {
+    try {
+        const displayName = user.full_name || 'Administrator';
+        const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+        const host = process.env.NEXT_PUBLIC_SITE_URL || 'localhost:3000';
+        const baseUrl = `${protocol}://${host}`;
+        const adminLoginLink = `${baseUrl}/admin/login`;
+        
+        const subject = 'NDSI Administrator Account Created - Welcome!';
+        const text = `Hello ${displayName},\n\nWelcome to the NDSI team! Your administrator account has been created successfully.\n\nLogin Details:\nEmail: ${user.email}\nPassword: ${password}\n\nPlease log in at: ${adminLoginLink}\n\nImportant: Please change your password after your first login for security.\n\nBest regards,\nThe NDSI Team`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
+                </div>
+                <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Welcome ${displayName}!</h2>
+                    <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                        Welcome to the NDSI team! Your administrator account has been created successfully.
+                    </p>
+                    <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="color: #0c5460; font-size: 14px; margin: 0;">
+                            <strong>Account Type:</strong> Administrator 🔐<br>
+                            <strong>Email:</strong> ${user.email}<br>
+                            <strong>Password:</strong> ${password}
+                        </p>
+                    </div>
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="color: #856404; font-size: 14px; margin: 0;">
+                            <strong>⚠️ Important:</strong> Please change your password after your first login for security.
+                        </p>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <a href="${adminLoginLink}" style="background-color: #28A8E0; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; display: inline-block;">Access Admin Dashboard</a>
+                    </div>
+                    <p style="color: #666666; font-size: 14px; line-height: 1.5;">
+                        As an administrator, you have access to user management, approval processes, and system administration features.
+                    </p>
+                    <p style="color: #666666; font-size: 14px; line-height: 1.5; margin-top: 20px;">
+                        Best regards,<br />
+                        <span style="color: #8DC63F; font-weight: bold;">The NDSI Team</span>
+                    </p>
+                </div>
+                <div style="text-align: center; margin-top: 20px; border-top: 1px solid #d9d9d9; padding-top: 15px;">
+                    <p style="color: #999999; font-size: 12px;">© ${new Date().getFullYear()} NDSI. All rights reserved.</p>
+                </div>
+            </div>
+        `;
+
+        const mailOptions = {
+            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: subject,
+            text: text,
+            html: html,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Admin welcome email sent successfully to ${user.email}`);
+    } catch (error) {
+        console.error('Error sending admin welcome email:', error);
+        throw error;
+    }
 } 
