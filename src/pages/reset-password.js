@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function ResetPassword() {
     const [password, setPassword] = useState('');
@@ -60,7 +61,7 @@ export default function ResetPassword() {
             <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
                 <div className="mb-6 flex justify-center">
                     <Link href="/">
-                        <img src="/assets/images/logo.svg" alt="NDSI Logo" width={200} height={50} />
+                        <Image src="/assets/images/logo.svg" alt="NDSI Logo" width={200} height={50} />
                     </Link>
                 </div>
                 <h2 className="text-3xl font-semibold mb-4 text-[#28A8E0] text-center">Reset Your Password</h2>
