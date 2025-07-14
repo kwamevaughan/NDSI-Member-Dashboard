@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     // Send notification emails if enabled
     if (settings?.notify_on_reject && updated && updated.length > 0) {
       try {
-        const { sendApprovalEmail } = await import('../../utils/emailService');
+        const { sendApprovalEmail } = await import('../../../../utils/emailService');
         for (const user of updated) {
           await sendApprovalEmail(user, 'reject', reason);
         }
