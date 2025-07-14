@@ -7,9 +7,10 @@ import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import ReactDOM from 'react-dom';
 import { toast } from 'react-hot-toast';
+import ExportModal from "./ExportModal";
 
 // Enhanced useTable hook
-function useTable(data, initialPageSize = 10) {
+function useTable(data, initialPageSize = 20) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [sortKey, setSortKey] = useState(null);
@@ -117,31 +118,6 @@ function useTable(data, initialPageSize = 10) {
   };
 }
 
-// Simple CSV Export function
-const exportToCSV = (data, filename) => {
-  if (!data || data.length === 0) return;
-  
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => 
-      headers.map(header => {
-        const value = row[header];
-        return typeof value === 'string' && value.includes(',') 
-          ? `"${value}"` 
-          : value || '';
-      }).join(',')
-    )
-  ].join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  window.URL.revokeObjectURL(url);
-};
 
 export function GenericTable({
   data = [],
@@ -178,6 +154,14 @@ export function GenericTable({
   const datePickerRef = useRef();
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef();
+  const [showExportModal, setShowExportModal] = useState(false);
+  // Detect mode (light/dark)
+  const [mode, setMode] = useState('light');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setMode(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+  }, []);
 
   // Close popover on outside click
   useEffect(() => {
@@ -399,7 +383,7 @@ export function GenericTable({
                 <div>
                   <select
                     value={table.statusFilter}
-                    onChange={e => table.setStatusFilter(e.target.value)}
+                    onChange={(e) => table.setStatusFilter(e.target.value)}
                     className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   >
                     <option value="all">All</option>
@@ -417,11 +401,13 @@ export function GenericTable({
                     className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Refresh data"
                   >
-                    <Icon 
-                      icon={isRefreshing ? "mdi:loading" : "mdi:refresh"} 
-                      className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} 
+                    <Icon
+                      icon={isRefreshing ? "mdi:loading" : "mdi:refresh"}
+                      className={`w-4 h-4 ${
+                        isRefreshing ? "animate-spin" : ""
+                      }`}
                     />
-                    {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                    {isRefreshing ? "Refreshing..." : "Refresh"}
                   </button>
                 )}
                 {/* Date Filter Button */}
@@ -436,56 +422,70 @@ export function GenericTable({
                       <Icon icon="mdi:calendar-range" className="w-4 h-4" />
                       Filter by Date
                     </button>
-                    {showDatePicker && ReactDOM.createPortal(
-                      <div
-                        ref={datePickerRef}
-                        className="z-[9999] absolute bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4"
-                        style={{ top: popoverPosition.top, left: popoverPosition.left }}
-                      >
-                        <DateRange
-                          ranges={dateRange}
-                          onChange={(ranges) => setDateRange([ranges.selection])}
-                          moveRangeOnFirstSelection={false}
-                          showDateDisplay={true}
-                          editableDateInputs={true}
-                          maxDate={new Date()}
-                        />
-                        <div className="flex justify-end mt-2 gap-2">
-                          <button
-                            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100"
-                            onClick={() => {
-                              setDateRange([{ startDate: null, endDate: null, key: 'selection' }]);
-                              setShowDatePicker(false);
-                            }}
-                          >
-                            Clear
-                          </button>
-                          <button
-                            className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-                            onClick={() => setShowDatePicker(false)}
-                          >
-                            Apply
-                          </button>
-                        </div>
-                        {(dateRange[0].startDate && dateRange[0].endDate) && (
-                          <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
-                            Showing from {format(dateRange[0].startDate, 'yyyy-MM-dd')} to {format(dateRange[0].endDate, 'yyyy-MM-dd')}
+                    {showDatePicker &&
+                      ReactDOM.createPortal(
+                        <div
+                          ref={datePickerRef}
+                          className="z-[9999] absolute bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4"
+                          style={{
+                            top: popoverPosition.top,
+                            left: popoverPosition.left,
+                          }}
+                        >
+                          <DateRange
+                            ranges={dateRange}
+                            onChange={(ranges) =>
+                              setDateRange([ranges.selection])
+                            }
+                            moveRangeOnFirstSelection={false}
+                            showDateDisplay={true}
+                            editableDateInputs={true}
+                            maxDate={new Date()}
+                          />
+                          <div className="flex justify-end mt-2 gap-2">
+                            <button
+                              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100"
+                              onClick={() => {
+                                setDateRange([
+                                  {
+                                    startDate: null,
+                                    endDate: null,
+                                    key: "selection",
+                                  },
+                                ]);
+                                setShowDatePicker(false);
+                              }}
+                            >
+                              Clear
+                            </button>
+                            <button
+                              className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                              onClick={() => setShowDatePicker(false)}
+                            >
+                              Apply
+                            </button>
                           </div>
-                        )}
-                      </div>,
-                      document.body
-                    )}
+                          {dateRange[0].startDate && dateRange[0].endDate && (
+                            <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
+                              Showing from{" "}
+                              {format(dateRange[0].startDate, "yyyy-MM-dd")} to{" "}
+                              {format(dateRange[0].endDate, "yyyy-MM-dd")}
+                            </div>
+                          )}
+                        </div>,
+                        document.body
+                      )}
                   </div>
                 )}
               </div>
               {/* Export, Import, and Add New on the right */}
               <div className="flex items-center gap-3 ml-auto">
                 <button
-                  onClick={() => exportToCSV(safeData, `${title?.replace(/\s+/g, "_") || "data"}.csv`)}
+                  onClick={() => setShowExportModal(true)}
                   className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Icon icon="mdi:download" className="w-4 h-4" />
-                  Export CSV
+                  Export Data
                 </button>
                 {onAddNew && (
                   <button
@@ -522,7 +522,7 @@ export function GenericTable({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto max-h-96 overflow-y-auto">
+      <div className="overflow-x-auto h-[600px] max-h-full md:max-h-screen overflow-y-auto">
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
             <tr>
@@ -558,7 +558,11 @@ export function GenericTable({
                   <div className="flex items-center gap-2">
                     {col.header
                       .split(" ")
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() +
+                          word.slice(1).toLowerCase()
+                      )
                       .join(" ")}
                     {col.sortable && (
                       <div className="flex flex-col">
@@ -591,41 +595,36 @@ export function GenericTable({
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {table.paged.length === 0
-              ? (
-                <tr>
-                  <td
-                    colSpan={
-                      columns.length +
-                      (selectable ? 1 : 0) +
-                      1
-                    }
-                    className="px-4 py-12 text-center"
-                  >
-                    <div className="text-gray-500 dark:text-gray-400">
-                      <div className="flex justify-center text-4xl mb-3 ">
-                        <Icon icon="mdi:table-search" className="w-10 h-10" />
-                      </div>
-                      <div className="text-sm font-medium">{emptyMessage}</div>
+            {table.paged.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0) + 1}
+                  className="px-4 py-12 text-center"
+                >
+                  <div className="text-gray-500 dark:text-gray-400">
+                    <div className="flex justify-center text-4xl mb-3 ">
+                      <Icon icon="mdi:table-search" className="w-10 h-10" />
                     </div>
-                  </td>
-                </tr>
-              )
-              : table.paged.map((row, index) => {
-                  const defaultRow = (
-                    <tr
-                      key={row.id || index}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                    >
-                      {renderRowCells(row, index)}
-                    </tr>
-                  );
-                  // If customRowRender is provided, use it to render extra content (e.g. expanded row)
-                  return customRowRender
-                    ? customRowRender(row, index, defaultRow)
-                    : defaultRow;
-                })
-            }
+                    <div className="text-sm font-medium">{emptyMessage}</div>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              table.paged.map((row, index) => {
+                const defaultRow = (
+                  <tr
+                    key={row.id || index}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  >
+                    {renderRowCells(row, index)}
+                  </tr>
+                );
+                // If customRowRender is provided, use it to render extra content (e.g. expanded row)
+                return customRowRender
+                  ? customRowRender(row, index, defaultRow)
+                  : defaultRow;
+              })
+            )}
           </tbody>
         </table>
       </div>
@@ -701,6 +700,14 @@ export function GenericTable({
           </div>
         </div>
       </div>
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        users={safeData}
+        mode={mode}
+        type="applicants"
+      />
     </div>
   );
 }

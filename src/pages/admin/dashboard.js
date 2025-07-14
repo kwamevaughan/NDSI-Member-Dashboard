@@ -213,8 +213,8 @@ export default function AdminDashboard() {
             
             <GenericTable
               data={userManagement.users}
-              title="Regular Users"
-              emptyMessage="No regular users found."
+              // title="NDSI Members"
+              emptyMessage="No matching users found. Please try again."
               onRefresh={userManagement.fetchPendingUsers}
               onBulkDelete={(selectedIds, selectedItems) => {
                 setSelectedUsers(selectedItems);
