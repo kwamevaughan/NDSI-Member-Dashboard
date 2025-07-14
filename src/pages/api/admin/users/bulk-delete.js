@@ -67,7 +67,7 @@ export default async function handler(req, res) {
         // Send deletion notification emails asynchronously
         (async () => {
             try {
-                const transporter = nodemailer.createTransporter({
+                const transporter = nodemailer.createTransport({
                     host: process.env.EMAIL_HOST,
                     port: parseInt(process.env.EMAIL_PORT, 10),
                     secure: process.env.EMAIL_SECURE === 'true',
