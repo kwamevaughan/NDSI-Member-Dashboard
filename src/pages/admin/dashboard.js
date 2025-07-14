@@ -155,41 +155,41 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-              <AdminHeader users={userManagement.users} />
+      <AdminHeader users={userManagement.users} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Stats Cards */}
-        <StatsCards 
+        <StatsCards
           stats={userManagement.stats}
           onApprovedClick={() => setShowApprovedModal(true)}
           onRejectedClick={() => setShowRejectedModal(true)}
-              />
+        />
 
         {/* Tab Navigation */}
         <div className="mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               <button
-                onClick={() => setActiveTab('users')}
+                onClick={() => setActiveTab("users")}
                 className={`flex py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'users'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "users"
+                    ? "border-ndsi-blue text-ndsi-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
-                <Icon icon="mdi:account-group" className="mr-2 h-4 w-4" />
+                <Icon icon="prime:users" className="mr-2 h-6 w-6" />
                 User Management
               </button>
               <button
-                onClick={() => setActiveTab('admins')}
+                onClick={() => setActiveTab("admins")}
                 className={`flex py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'admins'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "admins"
+                    ? "border-ndsi-blue text-ndsi-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
-                <Icon icon="mdi:shield-account" className="mr-2 h-4 w-4" />
+                <Icon icon="mdi:shield-account" className="mr-2 h-6 w-6" />
                 Admin Management
               </button>
             </nav>
@@ -197,20 +197,26 @@ export default function AdminDashboard() {
         </div>
 
         {/* Users Tab */}
-        {activeTab === 'users' && (
+        {activeTab === "users" && (
           <>
             <div className="mb-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
-                  <Icon icon="mdi:information" className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                  <Icon
+                    icon="tabler:users"
+                    className="h-8 w-8 text-ndsi-blue mt-0.5 mr-3 flex-shrink-0"
+                  />
                   <div className="text-sm text-blue-800">
                     <p className="font-medium mb-1">User Management</p>
-                    <p>This table shows only regular users. Admin accounts are managed separately for security.</p>
+                    <p>
+                      This table shows only regular users. Admin accounts are
+                      managed separately for security.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <GenericTable
               data={userManagement.users}
               // title="NDSI Members"
@@ -229,7 +235,10 @@ export default function AdminDashboard() {
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-ndsi-blue flex items-center justify-center">
-                          <Icon icon="mdi:account" className="h-5 w-5 text-white" />
+                          <Icon
+                            icon="mdi:account"
+                            className="h-5 w-5 text-white"
+                          />
                         </div>
                       </div>
                       <div className="ml-4">
@@ -261,7 +270,7 @@ export default function AdminDashboard() {
                   accessor: "status",
                   header: "Status",
                   render: (row) => {
-                    if (row.approval_status === 'rejected') {
+                    if (row.approval_status === "rejected") {
                       return (
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                           Rejected
@@ -291,30 +300,50 @@ export default function AdminDashboard() {
                   onClick: (row) => handleViewUser(row),
                 },
                 {
-                  label: (row) => userManagement.processingUser === row.id ? "Processing..." : "Approve",
-                  icon: (row) => userManagement.processingUser === row.id ? "mdi:loading" : "mdi:check",
+                  label: (row) =>
+                    userManagement.processingUser === row.id
+                      ? "Processing..."
+                      : "Approve",
+                  icon: (row) =>
+                    userManagement.processingUser === row.id
+                      ? "mdi:loading"
+                      : "mdi:check",
                   className: "hover:bg-green-100 text-green-600",
                   onClick: (row) => {
                     if (userManagement.processingUser !== row.id) {
                       userManagement.handleApproval(row.id, "approve");
                     }
                   },
-                  show: (row) => row.is_approved === false || row.is_approved === null,
+                  show: (row) =>
+                    row.is_approved === false || row.is_approved === null,
                 },
                 {
-                  label: (row) => userManagement.processingUser === row.id ? "Processing..." : "Reject",
-                  icon: (row) => userManagement.processingUser === row.id ? "mdi:loading" : "mdi:close",
+                  label: (row) =>
+                    userManagement.processingUser === row.id
+                      ? "Processing..."
+                      : "Reject",
+                  icon: (row) =>
+                    userManagement.processingUser === row.id
+                      ? "mdi:loading"
+                      : "mdi:close",
                   className: "hover:bg-red-100 text-red-600",
                   onClick: (row) => {
                     if (userManagement.processingUser !== row.id) {
                       handleRejectClick(row);
                     }
                   },
-                  show: (row) => row.is_approved === false || row.is_approved === null,
+                  show: (row) =>
+                    row.is_approved === false || row.is_approved === null,
                 },
                 {
-                  label: (row) => userManagement.processingUser === row.id ? "Processing..." : "Delete",
-                  icon: (row) => userManagement.processingUser === row.id ? "mdi:loading" : "mdi:delete",
+                  label: (row) =>
+                    userManagement.processingUser === row.id
+                      ? "Processing..."
+                      : "Delete",
+                  icon: (row) =>
+                    userManagement.processingUser === row.id
+                      ? "mdi:loading"
+                      : "mdi:delete",
                   className: "hover:bg-red-100 text-red-600",
                   onClick: (row) => {
                     if (userManagement.processingUser !== row.id) {
@@ -331,18 +360,20 @@ export default function AdminDashboard() {
         )}
 
         {/* Admins Tab */}
-        {activeTab === 'admins' && (
+        {activeTab === "admins" && (
           <div className="space-y-6">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start">
-                <Icon icon="mdi:alert" className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
+                <Icon
+                  icon="mdi:alert"
+                  className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0"
+                />
                 <div className="text-sm text-yellow-800">
                   <p className="font-medium mb-1">Admin Management</p>
                   <p>
-                    {adminManagement.isSuperAdmin 
+                    {adminManagement.isSuperAdmin
                       ? "As a Super Administrator, you can create, edit, and delete administrator accounts. Use these privileges with extreme caution."
-                      : "Admin accounts have elevated privileges. Only Super Administrators can modify admin accounts."
-                    }
+                      : "Admin accounts have elevated privileges. Only Super Administrators can modify admin accounts."}
                   </p>
                 </div>
               </div>
@@ -351,8 +382,12 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-lg shadow">
               <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900">Administrator Accounts</h3>
-                  <p className="text-sm text-gray-600 mt-1">Current admin users in the system</p>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Administrator Accounts
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Current admin users in the system
+                  </p>
                 </div>
                 {adminManagement.isSuperAdmin && (
                   <button
@@ -367,23 +402,39 @@ export default function AdminDashboard() {
               <div className="p-6">
                 {adminManagement.adminUsers.length === 0 ? (
                   <div className="text-center py-8">
-                    <Icon icon="mdi:shield-account" className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">No admin users found or you don&apos;t have permission to view them.</p>
+                    <Icon
+                      icon="mdi:shield-account"
+                      className="h-16 w-16 text-gray-400 mx-auto mb-4"
+                    />
+                    <p className="text-gray-600">
+                      No admin users found or you don&apos;t have permission to
+                      view them.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {adminManagement.adminUsers.map((admin) => (
-                      <div key={admin.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                      <div
+                        key={admin.id}
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
+                      >
                         <div className="flex items-center space-x-4">
                           <div className="h-10 w-10 rounded-full bg-ndsi-blue flex items-center justify-center">
-                            <Icon icon="mdi:shield-account" className="h-5 w-5 text-white" />
+                            <Icon
+                              icon="mdi:shield-account"
+                              className="h-5 w-5 text-white"
+                            />
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">
                               {admin.full_name || "No name provided"}
                             </p>
-                            <p className="text-sm text-gray-600">{admin.email}</p>
-                            <p className="text-xs text-gray-500">Admin since {formatDate(admin.created_at)}</p>
+                            <p className="text-sm text-gray-600">
+                              {admin.email}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Admin since {formatDate(admin.created_at)}
+                            </p>
                           </div>
                         </div>
                         <div className="text-right">
@@ -401,24 +452,33 @@ export default function AdminDashboard() {
                             {admin.id === adminUser?.id && (
                               <p className="text-xs text-gray-500">(You)</p>
                             )}
-                            {adminManagement.isSuperAdmin && admin.id !== adminUser?.id && (
-                              <div className="flex items-center gap-1">
-                                <button
-                                  onClick={() => handleEditAdminClick(admin)}
-                                  className="p-1 text-ndsi-blue hover:text-ndsi-green hover:bg-ndsi-blue rounded"
-                                  title="Edit Admin"
-                                >
-                                  <Icon icon="mdi:pencil" className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteAdminClick(admin)}
-                                  className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-                                  title="Delete Admin"
-                                >
-                                  <Icon icon="mdi:delete" className="h-4 w-4" />
-                                </button>
-                              </div>
-                            )}
+                            {adminManagement.isSuperAdmin &&
+                              admin.id !== adminUser?.id && (
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => handleEditAdminClick(admin)}
+                                    className="p-1 text-ndsi-blue hover:text-ndsi-green hover:bg-ndsi-blue rounded"
+                                    title="Edit Admin"
+                                  >
+                                    <Icon
+                                      icon="mdi:pencil"
+                                      className="h-4 w-4"
+                                    />
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteAdminClick(admin)
+                                    }
+                                    className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                                    title="Delete Admin"
+                                  >
+                                    <Icon
+                                      icon="mdi:delete"
+                                      className="h-4 w-4"
+                                    />
+                                  </button>
+                                </div>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -465,7 +525,7 @@ export default function AdminDashboard() {
                 rows={4}
               />
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowRejectionModal(false)}
@@ -504,16 +564,27 @@ export default function AdminDashboard() {
           <div className="space-y-4">
             {userManagement.getApprovedUsers().length === 0 ? (
               <div className="text-center py-8">
-                <Icon icon="mdi:check-circle" className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                <p className="text-gray-600">No users have been approved today.</p>
+                <Icon
+                  icon="mdi:check-circle"
+                  className="h-16 w-16 text-green-500 mx-auto mb-4"
+                />
+                <p className="text-gray-600">
+                  No users have been approved today.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {userManagement.getApprovedUsers().map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200"
+                  >
                     <div className="flex items-center space-x-4">
                       <div className="h-10 w-10 rounded-full bg-ndsi-green flex items-center justify-center">
-                        <Icon icon="mdi:account" className="h-5 w-5 text-white" />
+                        <Icon
+                          icon="mdi:account"
+                          className="h-5 w-5 text-white"
+                        />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">
@@ -521,7 +592,9 @@ export default function AdminDashboard() {
                         </p>
                         <p className="text-sm text-gray-600">{user.email}</p>
                         {user.organization_name && (
-                          <p className="text-xs text-gray-500">{user.organization_name}</p>
+                          <p className="text-xs text-gray-500">
+                            {user.organization_name}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -550,16 +623,27 @@ export default function AdminDashboard() {
           <div className="space-y-4">
             {userManagement.getRejectedUsers().length === 0 ? (
               <div className="text-center py-8">
-                <Icon icon="mdi:close-circle" className="h-16 w-16 text-red-500 mx-auto mb-4" />
-                <p className="text-gray-600">No users have been rejected today.</p>
+                <Icon
+                  icon="mdi:close-circle"
+                  className="h-16 w-16 text-red-500 mx-auto mb-4"
+                />
+                <p className="text-gray-600">
+                  No users have been rejected today.
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {userManagement.getRejectedUsers().map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200"
+                  >
                     <div className="flex items-center space-x-4">
                       <div className="h-10 w-10 rounded-full bg-red-600 flex items-center justify-center">
-                        <Icon icon="mdi:account" className="h-5 w-5 text-white" />
+                        <Icon
+                          icon="mdi:account"
+                          className="h-5 w-5 text-white"
+                        />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">
@@ -567,7 +651,9 @@ export default function AdminDashboard() {
                         </p>
                         <p className="text-sm text-gray-600">{user.email}</p>
                         {user.organization_name && (
-                          <p className="text-xs text-gray-500">{user.organization_name}</p>
+                          <p className="text-xs text-gray-500">
+                            {user.organization_name}
+                          </p>
                         )}
                         {user.rejection_reason && (
                           <p className="text-xs text-red-600 mt-1">
@@ -615,17 +701,21 @@ export default function AdminDashboard() {
               </p>
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex">
-                  <Icon icon="mdi:alert-circle" className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+                  <Icon
+                    icon="mdi:alert-circle"
+                    className="h-5 w-5 text-red-400 mr-2 mt-0.5"
+                  />
                   <div className="text-sm text-red-700">
                     <p className="font-medium">This action cannot be undone.</p>
                     <p className="mt-1">
-                      The user&apos;s account and all associated data will be permanently removed from the system.
+                      The user&apos;s account and all associated data will be
+                      permanently removed from the system.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-center space-x-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -664,27 +754,38 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             <div className="">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <Icon icon="mdi:delete-multiple" className="h-6 w-6 text-red-600" />
+                <Icon
+                  icon="mdi:delete-multiple"
+                  className="h-6 w-6 text-red-600"
+                />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
                 Delete Multiple Users
               </h3>
               <p className="text-sm text-gray-600 mb-4 text-center">
-                Are you sure you want to permanently delete <span className="font-semibold text-gray-900">{selectedUsers.length}</span> selected user{selectedUsers.length !== 1 ? 's' : ''}?
+                Are you sure you want to permanently delete{" "}
+                <span className="font-semibold text-gray-900">
+                  {selectedUsers.length}
+                </span>{" "}
+                selected user{selectedUsers.length !== 1 ? "s" : ""}?
               </p>
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex">
-                  <Icon icon="mdi:alert-circle" className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+                  <Icon
+                    icon="mdi:alert-circle"
+                    className="h-5 w-5 text-red-400 mr-2 mt-0.5"
+                  />
                   <div className="text-sm text-red-700">
                     <p className="font-medium">This action cannot be undone.</p>
                     <p className="mt-1">
-                      All selected user accounts and associated data will be permanently removed from the system.
+                      All selected user accounts and associated data will be
+                      permanently removed from the system.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-center space-x-3">
               <button
                 onClick={() => setShowBulkDeleteModal(false)}
@@ -693,11 +794,13 @@ export default function AdminDashboard() {
                 Cancel
               </button>
               <button
-                onClick={() => handleBulkDelete(selectedUsers.map(user => user.id))}
-                disabled={userManagement.processingUser === 'bulk'}
+                onClick={() =>
+                  handleBulkDelete(selectedUsers.map((user) => user.id))
+                }
+                disabled={userManagement.processingUser === "bulk"}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
               >
-                {userManagement.processingUser === 'bulk' ? (
+                {userManagement.processingUser === "bulk" ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
                     Processing...
@@ -705,7 +808,8 @@ export default function AdminDashboard() {
                 ) : (
                   <>
                     <Icon icon="mdi:delete-multiple" className="mr-2 h-4 w-4" />
-                    Delete {selectedUsers.length} User{selectedUsers.length !== 1 ? 's' : ''}
+                    Delete {selectedUsers.length} User
+                    {selectedUsers.length !== 1 ? "s" : ""}
                   </>
                 )}
               </button>
@@ -723,10 +827,16 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start">
-                <Icon icon="mdi:alert-circle" className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                <Icon
+                  icon="mdi:alert-circle"
+                  className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0"
+                />
                 <div className="text-sm text-blue-800">
                   <p className="font-medium mb-1">Edit Administrator</p>
-                  <p>You can modify the administrator&apos;s details and privileges.</p>
+                  <p>
+                    You can modify the administrator&apos;s details and
+                    privileges.
+                  </p>
                 </div>
               </div>
             </div>
@@ -739,7 +849,12 @@ export default function AdminDashboard() {
                 <input
                   type="text"
                   value={editAdminData.full_name}
-                  onChange={(e) => setEditAdminData({...editAdminData, full_name: e.target.value})}
+                  onChange={(e) =>
+                    setEditAdminData({
+                      ...editAdminData,
+                      full_name: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter full name"
                 />
@@ -752,7 +867,12 @@ export default function AdminDashboard() {
                 <input
                   type="email"
                   value={editAdminData.email}
-                  onChange={(e) => setEditAdminData({...editAdminData, email: e.target.value})}
+                  onChange={(e) =>
+                    setEditAdminData({
+                      ...editAdminData,
+                      email: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter email address"
                 />
@@ -765,7 +885,12 @@ export default function AdminDashboard() {
                 <input
                   type="text"
                   value={editAdminData.organization_name}
-                  onChange={(e) => setEditAdminData({...editAdminData, organization_name: e.target.value})}
+                  onChange={(e) =>
+                    setEditAdminData({
+                      ...editAdminData,
+                      organization_name: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter organization name"
                 />
@@ -776,15 +901,23 @@ export default function AdminDashboard() {
                   type="checkbox"
                   id="edit_is_super_admin"
                   checked={editAdminData.is_super_admin}
-                  onChange={(e) => setEditAdminData({...editAdminData, is_super_admin: e.target.checked})}
+                  onChange={(e) =>
+                    setEditAdminData({
+                      ...editAdminData,
+                      is_super_admin: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="edit_is_super_admin" className="ml-2 block text-sm text-gray-700">
+                <label
+                  htmlFor="edit_is_super_admin"
+                  className="ml-2 block text-sm text-gray-700"
+                >
                   Super Admin privileges
                 </label>
               </div>
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowEditAdminModal(false)}
@@ -837,17 +970,21 @@ export default function AdminDashboard() {
               </p>
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex">
-                  <Icon icon="mdi:alert-circle" className="h-5 w-5 text-red-400 mr-2 mt-0.5" />
+                  <Icon
+                    icon="mdi:alert-circle"
+                    className="h-5 w-5 text-red-400 mr-2 mt-0.5"
+                  />
                   <div className="text-sm text-red-700">
                     <p className="font-medium">This action cannot be undone.</p>
                     <p className="mt-1">
-                      The administrator&apos;s account and all associated data will be permanently removed from the system.
+                      The administrator&apos;s account and all associated data
+                      will be permanently removed from the system.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-center space-x-3">
               <button
                 onClick={() => setShowDeleteAdminModal(false)}
@@ -896,7 +1033,7 @@ export default function AdminDashboard() {
                   </h3>
                   <p className="text-gray-600">{selectedUser.email}</p>
                   <div className="mt-2">
-                    {selectedUser.approval_status === 'rejected' ? (
+                    {selectedUser.approval_status === "rejected" ? (
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                         Rejected
                       </span>
@@ -922,20 +1059,34 @@ export default function AdminDashboard() {
                   </h4>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Full Name</label>
-                      <p className="text-gray-900">{selectedUser.full_name || "Not provided"}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Full Name
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedUser.full_name || "Not provided"}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Email Address</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Email Address
+                      </label>
                       <p className="text-gray-900">{selectedUser.email}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Organization</label>
-                      <p className="text-gray-900">{selectedUser.organization_name || "Not provided"}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Organization
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedUser.organization_name || "Not provided"}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Job Title</label>
-                      <p className="text-gray-900">{selectedUser.role_job_title || "Not provided"}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Job Title
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedUser.role_job_title || "Not provided"}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -946,49 +1097,79 @@ export default function AdminDashboard() {
                     Account Information
                   </h4>
                   <div className="space-y-3">
-                    
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Registration Date</label>
-                      <p className="text-gray-900">{formatDate(selectedUser.created_at)}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Registration Date
+                      </label>
+                      <p className="text-gray-900">
+                        {formatDate(selectedUser.created_at)}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Last Updated</label>
-                      <p className="text-gray-900">{selectedUser.updated_at ? formatDate(selectedUser.updated_at) : "Never"}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Last Updated
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedUser.updated_at
+                          ? formatDate(selectedUser.updated_at)
+                          : "Never"}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Last Login</label>
-                      <p className="text-gray-900">{selectedUser.last_login_at ? formatDate(selectedUser.last_login_at) : "Never"}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Last Login
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedUser.last_login_at
+                          ? formatDate(selectedUser.last_login_at)
+                          : "Never"}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">First Time Setup</label>
-                      <p className="text-gray-900">{selectedUser.is_first_time ? "Yes" : "No"}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        First Time Setup
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedUser.is_first_time ? "Yes" : "No"}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Approval Information */}
-              {(selectedUser.approval_status === 'rejected' || selectedUser.is_approved === true) && (
+              {(selectedUser.approval_status === "rejected" ||
+                selectedUser.is_approved === true) && (
                 <div className="space-y-4">
                   <h4 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
                     Approval Information
                   </h4>
                   <div className="space-y-3">
-                                         {selectedUser.approved_by_name && (
-                       <div>
-                         <label className="text-sm font-medium text-gray-500">Approved By</label>
-                         <p className="text-gray-900">{selectedUser.approved_by_name}</p>
-                       </div>
-                     )}
+                    {selectedUser.approved_by_name && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">
+                          Approved By
+                        </label>
+                        <p className="text-gray-900">
+                          {selectedUser.approved_by_name}
+                        </p>
+                      </div>
+                    )}
                     {selectedUser.approved_at && (
                       <div>
-                        <label className="text-sm font-medium text-gray-500">Approved At</label>
-                        <p className="text-gray-900">{formatDate(selectedUser.approved_at)}</p>
+                        <label className="text-sm font-medium text-gray-500">
+                          Approved At
+                        </label>
+                        <p className="text-gray-900">
+                          {formatDate(selectedUser.approved_at)}
+                        </p>
                       </div>
                     )}
                     {selectedUser.rejection_reason && (
                       <div>
-                        <label className="text-sm font-medium text-gray-500">Rejection Reason</label>
+                        <label className="text-sm font-medium text-gray-500">
+                          Rejection Reason
+                        </label>
                         <p className="text-gray-900 bg-red-50 border border-red-200 rounded-lg p-3 text-red-800">
                           {selectedUser.rejection_reason}
                         </p>
@@ -1006,12 +1187,16 @@ export default function AdminDashboard() {
                 >
                   Close
                 </button>
-                {selectedUser.is_approved === false || selectedUser.is_approved === null ? (
+                {selectedUser.is_approved === false ||
+                selectedUser.is_approved === null ? (
                   <>
                     <button
                       onClick={() => {
                         setShowUserDetailsModal(false);
-                        userManagement.handleApproval(selectedUser.id, "approve");
+                        userManagement.handleApproval(
+                          selectedUser.id,
+                          "approve"
+                        );
                       }}
                       className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors flex items-center"
                     >

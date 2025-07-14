@@ -9,7 +9,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 rounded-xl bg-ndsi-blue flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Icon icon="mdi:account-group" className="h-5 w-5 text-white" />
+                <Icon icon="tabler:users" className="h-5 w-5 text-white" />
               </div>
             </div>
             <div className="ml-4 flex-1">
@@ -24,7 +24,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         </div>
       </div>
 
-      <div 
+      <div
         className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 cursor-pointer"
         onClick={onApprovedClick}
       >
@@ -40,16 +40,21 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
               <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                 Approved Today
               </p>
-              <p className="text-3xl font-medium text-slate-800 mt-1">{stats.approvedToday}</p>
+              <p className="text-3xl font-medium text-slate-800 mt-1">
+                {stats.approvedToday}
+              </p>
             </div>
             <div className="flex-shrink-0">
-              <Icon icon="mdi:chevron-right" className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+              <Icon
+                icon="mdi:chevron-right"
+                className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div 
+      <div
         className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50 cursor-pointer"
         onClick={onRejectedClick}
       >
@@ -57,7 +62,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         <div className="p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-xl bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="h-10 w-10 rounded-xl bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Icon icon="mdi:close" className="h-5 w-5 text-white" />
               </div>
             </div>
@@ -65,10 +70,15 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
               <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">
                 Rejected Today
               </p>
-              <p className="text-3xl font-medium text-slate-800 mt-1">{stats.rejectedToday}</p>
+              <p className="text-3xl font-medium text-slate-800 mt-1">
+                {stats.rejectedToday}
+              </p>
             </div>
             <div className="flex-shrink-0">
-              <Icon icon="mdi:chevron-right" className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+              <Icon
+                icon="mdi:chevron-right"
+                className="h-5 w-5 text-slate-400 group-hover:text-slate-600 transition-colors"
+              />
             </div>
           </div>
         </div>
