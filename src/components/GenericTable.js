@@ -129,6 +129,8 @@ export function GenericTable({
   onEdit,
   onDelete,
   onBulkDelete,
+  onBulkApprove,
+  onBulkReject,
   onReorder,
   onAddNew,
   addNewLabel = "Add New",
@@ -226,6 +228,18 @@ export function GenericTable({
       setSelectAllMode(false);
     }
   };
+
+  // Determine eligibility for bulk approve/reject
+  const selectedRows = data.filter(item => table.selected.includes(item.id));
+  const canBulkApprove = onBulkApprove && selectedRows.length > 0 && selectedRows.every(row => row.is_approved === false || row.is_approved === null);
+  // Allow bulk reject for any user not already rejected
+  const canBulkReject = onBulkReject && selectedRows.length > 0 && selectedRows.some(row => row.approval_status !== 'rejected');
+
+  // Helper to get eligible user IDs for bulk reject
+  const getBulkRejectIds = () => table.selected.filter(id => {
+    const row = data.find(item => item.id === id);
+    return row && row.approval_status !== 'rejected';
+  });
 
   // Helper to render a table row's cells
   const renderRowCells = (row, index) => {
@@ -621,6 +635,24 @@ export function GenericTable({
                   } selected on this page.`}
             </span>
             <div className="flex gap-2 items-center">
+              {canBulkApprove && (
+                <button
+                  onClick={() => onBulkApprove(table.selected)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-md hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                >
+                  <Icon icon="mdi:check" className="w-4 h-4" />
+                  Approve
+                </button>
+              )}
+              {canBulkReject && (
+                <button
+                  onClick={() => onBulkReject(getBulkRejectIds())}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                >
+                  <Icon icon="mdi:close" className="w-4 h-4" />
+                  Reject
+                </button>
+              )}
               {(onBulkDelete || onDelete) && table.selected.length > 0 && (
                 <button
                   onClick={handleBulkDelete}

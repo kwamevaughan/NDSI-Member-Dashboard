@@ -43,6 +43,10 @@ export default function AdminDashboard() {
     is_super_admin: false
   });
   const [isSessionExpired, setIsSessionExpired] = useState(false);
+  const [showBulkApproveModal, setShowBulkApproveModal] = useState(false);
+  const [showBulkRejectModal, setShowBulkRejectModal] = useState(false);
+  const [bulkRejectReason, setBulkRejectReason] = useState("");
+  const [bulkActionUserIds, setBulkActionUserIds] = useState([]);
 
   // Initialize hooks
   const userManagement = useUserManagement(getAdminToken, () => setIsSessionExpired(true));
@@ -92,6 +96,27 @@ export default function AdminDashboard() {
 
   const handleBulkDeleteClick = () => {
     setShowBulkDeleteModal(true);
+  };
+
+  const handleBulkApprove = (selectedIds) => {
+    setBulkActionUserIds(selectedIds);
+    setShowBulkApproveModal(true);
+  };
+  const confirmBulkApprove = async () => {
+    await userManagement.handleBulkApprove(bulkActionUserIds);
+    setShowBulkApproveModal(false);
+    setBulkActionUserIds([]);
+  };
+  const handleBulkReject = (selectedIds) => {
+    setBulkActionUserIds(selectedIds);
+    setBulkRejectReason("");
+    setShowBulkRejectModal(true);
+  };
+  const confirmBulkReject = async () => {
+    await userManagement.handleBulkReject(bulkActionUserIds, bulkRejectReason);
+    setShowBulkRejectModal(false);
+    setBulkActionUserIds([]);
+    setBulkRejectReason("");
   };
 
   // Admin management handlers
@@ -159,6 +184,11 @@ export default function AdminDashboard() {
       </div>
     );
   }
+
+  const anyBulkRejectApproved = bulkActionUserIds.length > 0 && bulkActionUserIds.some(id => {
+    const user = userManagement.users.find(u => u.id === id);
+    return user && user.is_approved === true;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -229,7 +259,7 @@ export default function AdminDashboard() {
                     <p className="font-medium mb-1">User Management</p>
                     <p>
                       This table shows only NDSI members. Admin accounts are
-                      managed separately for security.
+                      managed separately for security
                     </p>
                   </div>
                 </div>
@@ -245,6 +275,8 @@ export default function AdminDashboard() {
                 setSelectedUsers(selectedItems);
                 handleBulkDeleteClick();
               }}
+              onBulkApprove={handleBulkApprove}
+              onBulkReject={handleBulkReject}
               onImport={async (importedRows) => {
                 const token = getAdminToken();
                 try {
@@ -427,18 +459,16 @@ export default function AdminDashboard() {
         {/* Admins Tab */}
         {activeTab === "admins" && (
           <div className="space-y-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-ndsi-blue-50 border border-ndsi-blue-200 rounded-lg p-4">
               <div className="flex items-start">
                 <Icon
-                  icon="mdi:alert"
-                  className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0"
+                  icon="mdi:shield-account"
+                  className="h-8 w-8 text-ndsi-blue mt-0.5 mr-3 flex-shrink-0"
                 />
-                <div className="text-sm text-yellow-800">
+                <div className="text-sm text-ndsi-blue">
                   <p className="font-medium mb-1">Admin Management</p>
                   <p>
-                    {adminManagement.isSuperAdmin
-                      ? "As a Super Administrator, you can create, edit, and delete administrator accounts. Use these privileges with extreme caution."
-                      : "Admin accounts have elevated privileges. Only Super Administrators can modify admin accounts."}
+                    Manage administrator accounts and their permissions
                   </p>
                 </div>
               </div>
@@ -1299,6 +1329,132 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </SimpleModal>
+
+        {/* Bulk Approve Confirmation Modal */}
+        <SimpleModal
+          isOpen={showBulkApproveModal}
+          onClose={() => setShowBulkApproveModal(false)}
+          title="Bulk Approve Users"
+          width="max-w-md"
+        >
+          <div className="space-y-6">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+              <Icon
+                icon="mdi:check-multiple"
+                className="h-6 w-6 text-green-600"
+              />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+              Approve Multiple Users
+            </h3>
+            <p className="text-sm text-gray-600 mb-4 text-center">
+              Are you sure you want to approve{" "}
+              <span className="font-semibold text-gray-900">
+                {bulkActionUserIds.length}
+              </span>{" "}
+              selected user{bulkActionUserIds.length !== 1 ? "s" : ""}?
+            </p>
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={() => setShowBulkApproveModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmBulkApprove}
+                disabled={userManagement.processingUser === "bulk"}
+                className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {userManagement.processingUser === "bulk" ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:check-multiple" className="mr-2 h-4 w-4" />
+                    Approve {bulkActionUserIds.length} User
+                    {bulkActionUserIds.length !== 1 ? "s" : ""}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </SimpleModal>
+
+        {/* Bulk Reject Modal */}
+        <SimpleModal
+          isOpen={showBulkRejectModal}
+          onClose={() => setShowBulkRejectModal(false)}
+          title="Bulk Reject Users"
+          width="max-w-md"
+        >
+          <div className="space-y-6">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <Icon
+                icon="mdi:close-multiple"
+                className="h-6 w-6 text-red-600"
+              />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">
+              Reject Multiple Users
+            </h3>
+            <p className="text-sm text-gray-600 mb-4 text-center">
+              Are you sure you want to reject{" "}
+              <span className="font-semibold text-gray-900">
+                {bulkActionUserIds.length}
+              </span>{" "}
+              selected user{bulkActionUserIds.length !== 1 ? "s" : ""}?
+            </p>
+            {anyBulkRejectApproved && (
+              <div className="bg-red-50 border border-red-300 text-red-700 rounded-lg p-3 text-sm flex items-center gap-2">
+                <Icon icon="mdi:alert" className="w-5 h-5 text-red-500" />
+                <span>
+                  <b>Warning:</b> Some selected users are already{" "}
+                  <b>approved</b>. This action will move them from{" "}
+                  <b>approved</b> to <b>rejected</b>.
+                </span>
+              </div>
+            )}
+            <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+              Reason for rejection (optional)
+            </label>
+            <textarea
+              value={bulkRejectReason}
+              onChange={(e) => setBulkRejectReason(e.target.value)}
+              placeholder="Please provide a reason for rejection..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ndsi-blue focus:border-ndsi-blue resize-none"
+              rows={4}
+            />
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={() => setShowBulkRejectModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmBulkReject}
+                disabled={userManagement.processingUser === "bulk"}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                {userManagement.processingUser === "bulk" ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:close-multiple" className="mr-2 h-4 w-4" />
+                    Reject {bulkActionUserIds.length} User
+                    {bulkActionUserIds.length !== 1 ? "s" : ""}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </SimpleModal>
       </main>
     </div>

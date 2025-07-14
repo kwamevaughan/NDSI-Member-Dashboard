@@ -159,6 +159,64 @@ export function useUserManagement(getAdminToken, onSessionExpired) {
     }
   };
 
+  const handleBulkApprove = async (selectedIds) => {
+    if (!selectedIds || selectedIds.length === 0) return;
+    setProcessingUser('bulk');
+    const token = getAdminToken();
+    try {
+      const response = await fetch("/api/admin/users/bulk-approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userIds: selectedIds }),
+      });
+      await handleApiError(response);
+      const data = await response.json();
+      toast.success(data.message);
+      await fetchPendingUsers();
+    } catch (error) {
+      console.error("Error bulk approving users:", error);
+      if (error.message === "Authentication failed") {
+        // Already handled
+      } else {
+        toast.error(error.message || "Failed to bulk approve users");
+      }
+    } finally {
+      setProcessingUser(null);
+    }
+  };
+
+  const handleBulkReject = async (selectedIds, reason) => {
+    if (!selectedIds || selectedIds.length === 0) return;
+    setProcessingUser('bulk');
+    const token = getAdminToken();
+    try {
+      const response = await fetch("/api/admin/users/bulk-reject", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userIds: selectedIds, reason }),
+      });
+      await handleApiError(response);
+      const data = await response.json();
+      toast.success(data.message);
+      await fetchPendingUsers();
+    } catch (error) {
+      console.error("Error bulk rejecting users:", error);
+      if (error.message === "Authentication failed") {
+        // Already handled
+      } else {
+        toast.error(error.message || "Failed to bulk reject users");
+      }
+    } finally {
+      setProcessingUser(null);
+    }
+  };
+
   const calculateStats = (userData) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -220,6 +278,8 @@ export function useUserManagement(getAdminToken, onSessionExpired) {
     handleApproval,
     handleDeleteUser,
     handleBulkDelete,
+    handleBulkApprove,
+    handleBulkReject,
     getApprovedUsers,
     getRejectedUsers,
   };
