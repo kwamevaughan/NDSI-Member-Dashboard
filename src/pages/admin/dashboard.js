@@ -10,6 +10,7 @@ import { formatDate } from "../../utils/dateUtils";
 import StatsCards from "../../components/admin/StatsCards";
 import AddAdminModal from "../../components/admin/AddAdminModal";
 import SessionExpired from "../../components/SessionExpired";
+import GeneralSettings from '../../components/admin/GeneralSettings';
 
 import AdminHeader from "../../layouts/adminHeader";
 import { toast } from "react-hot-toast";
@@ -199,6 +200,17 @@ export default function AdminDashboard() {
                 <Icon icon="mdi:shield-account" className="mr-2 h-6 w-6" />
                 Admin Management
               </button>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`flex py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "settings"
+                    ? "border-ndsi-blue text-ndsi-blue"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <Icon icon="mdi:cog" className="mr-2 h-6 w-6" />
+                General Settings
+              </button>
             </nav>
           </div>
         </div>
@@ -236,31 +248,40 @@ export default function AdminDashboard() {
               onImport={async (importedRows) => {
                 const token = getAdminToken();
                 try {
-                  const response = await fetch('/api/admin/users/bulk-upload', {
-                    method: 'POST',
+                  const response = await fetch("/api/admin/users/bulk-upload", {
+                    method: "POST",
                     headers: {
-                      'Content-Type': 'application/json',
+                      "Content-Type": "application/json",
                       Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({ users: importedRows }),
                   });
                   const data = await response.json();
                   if (!response.ok) {
-                    throw new Error(data.error || 'Failed to import users');
+                    throw new Error(data.error || "Failed to import users");
                   }
-                  const successCount = data.results.filter(r => r.success).length;
+                  const successCount = data.results.filter(
+                    (r) => r.success
+                  ).length;
                   const failCount = data.results.length - successCount;
                   if (successCount > 0) {
-                    toast.success(`${successCount} user(s) imported successfully!`);
+                    toast.success(
+                      `${successCount} user(s) imported successfully!`
+                    );
                   }
                   if (failCount > 0) {
-                    toast.error(`${failCount} user(s) failed to import. Check your file and try again.`);
+                    toast.error(
+                      `${failCount} user(s) failed to import. Check your file and try again.`
+                    );
                     // Log failed results for debugging
-                    console.log('Failed imports:', data.results.filter(r => !r.success));
+                    console.log(
+                      "Failed imports:",
+                      data.results.filter((r) => !r.success)
+                    );
                   }
                   await userManagement.fetchPendingUsers();
                 } catch (err) {
-                  toast.error(err.message || 'Failed to import users');
+                  toast.error(err.message || "Failed to import users");
                   throw err;
                 }
               }}
@@ -532,6 +553,11 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === "settings" && (
+          <GeneralSettings getAdminToken={getAdminToken} />
         )}
 
         {/* Modals */}

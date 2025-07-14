@@ -64,62 +64,71 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'Failed to delete users' });
         }
 
-        // Send deletion notification emails asynchronously
-        (async () => {
-            try {
-                const transporter = nodemailer.createTransport({
-                    host: process.env.EMAIL_HOST,
-                    port: parseInt(process.env.EMAIL_PORT, 10),
-                    secure: process.env.EMAIL_SECURE === 'true',
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS,
-                    },
-                });
+        // Check notification setting
+        const { data: settings } = await supabaseAdmin
+            .from('settings')
+            .select('notify_on_delete')
+            .eq('id', 1)
+            .single();
 
-                for (const user of usersToDelete) {
-                    const mailOptions = {
-                        from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
-                        to: user.email,
-                        subject: 'NDSI Account Deletion Notice',
-                        text: `Hello ${user.full_name || 'User'},\n\nYour NDSI account has been permanently deleted by an administrator. If you believe this was done in error, please contact us immediately.\n\nBest regards,\nThe NDSI Team`,
-                        html: `
-                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
-                                <div style="text-align: center; margin-bottom: 20px;">
-                                    <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
-                                </div>
-                                <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                    <h2 style="color: #dc2626; font-size: 24px; margin-bottom: 15px;">Account Deletion Notice</h2>
-                                    <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
-                                        Hello ${user.full_name || 'User'},
-                                    </p>
-                                    <div style="background-color: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                                        <p style="color: #dc2626; font-size: 14px; margin: 0;">
-                                            <strong>Important:</strong> Your NDSI account has been permanently deleted by an administrator.
+        // Send deletion notification emails asynchronously if enabled
+        if (settings?.notify_on_delete) {
+            (async () => {
+                try {
+                    const transporter = nodemailer.createTransport({
+                        host: process.env.EMAIL_HOST,
+                        port: parseInt(process.env.EMAIL_PORT, 10),
+                        secure: process.env.EMAIL_SECURE === 'true',
+                        auth: {
+                            user: process.env.EMAIL_USER,
+                            pass: process.env.EMAIL_PASS,
+                        },
+                    });
+
+                    for (const user of usersToDelete) {
+                        const mailOptions = {
+                            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+                            to: user.email,
+                            subject: 'NDSI Account Deletion Notice',
+                            text: `Hello ${user.full_name || 'User'},\n\nYour NDSI account has been permanently deleted by an administrator. If you believe this was done in error, please contact us immediately.\n\nBest regards,\nThe NDSI Team`,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
+                                    <div style="text-align: center; margin-bottom: 20px;">
+                                        <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
+                                    </div>
+                                    <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <h2 style="color: #dc2626; font-size: 24px; margin-bottom: 15px;">Account Deletion Notice</h2>
+                                        <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                                            Hello ${user.full_name || 'User'},
+                                        </p>
+                                        <div style="background-color: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                            <p style="color: #dc2626; font-size: 14px; margin: 0;">
+                                                <strong>Important:</strong> Your NDSI account has been permanently deleted by an administrator.
+                                            </p>
+                                        </div>
+                                        <p style="color: #666666; font-size: 14px; line-height: 1.5;">
+                                            If you believe this was done in error, please contact us immediately at ${process.env.EMAIL_USER}.
+                                        </p>
+                                        <p style="color: #666666; font-size: 14px; line-height: 1.5; margin-top: 20px;">
+                                            Best regards,<br />
+                                            <span style="color: #8DC63F; font-weight: bold;">The NDSI Team</span>
                                         </p>
                                     </div>
-                                    <p style="color: #666666; font-size: 14px; line-height: 1.5;">
-                                        If you believe this was done in error, please contact us immediately at ${process.env.EMAIL_USER}.
-                                    </p>
-                                    <p style="color: #666666; font-size: 14px; line-height: 1.5; margin-top: 20px;">
-                                        Best regards,<br />
-                                        <span style="color: #8DC63F; font-weight: bold;">The NDSI Team</span>
-                                    </p>
+                                    <div style="text-align: center; margin-top: 20px; border-top: 1px solid #d9d9d9; padding-top: 15px;">
+                                        <p style="color: #999999; font-size: 12px;">© ${new Date().getFullYear()} NDSI. All rights reserved.</p>
+                                    </div>
                                 </div>
-                                <div style="text-align: center; margin-top: 20px; border-top: 1px solid #d9d9d9; padding-top: 15px;">
-                                    <p style="color: #999999; font-size: 12px;">© ${new Date().getFullYear()} NDSI. All rights reserved.</p>
-                                </div>
-                            </div>
-                        `,
-                    };
+                            `,
+                        };
 
-                    await transporter.sendMail(mailOptions);
+                        await transporter.sendMail(mailOptions);
+                    }
+                    console.log('Deletion notification emails sent successfully');
+                } catch (emailError) {
+                    console.error('Deletion notification email error:', emailError);
                 }
-                console.log('Deletion notification emails sent successfully');
-            } catch (emailError) {
-                console.error('Deletion notification email error:', emailError);
-            }
-        })();
+            })();
+        }
 
         return res.status(200).json({ 
             message: `Successfully deleted ${userIds.length} user${userIds.length !== 1 ? 's' : ''}`,

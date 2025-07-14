@@ -112,10 +112,21 @@ export default async function handler(req, res) {
                 throw error;
             }
 
-            // Send email notification to user
+            // Check notification settings
+            const { data: settings } = await supabaseAdmin
+                .from('settings')
+                .select('notify_on_approve, notify_on_reject')
+                .eq('id', 1)
+                .single();
+
+            // Send email notification to user if enabled
             if (user) {
                 const { sendApprovalEmail } = await import('../../../utils/emailService');
-                await sendApprovalEmail(user, action, reason);
+                if (action === 'approve' && settings?.notify_on_approve) {
+                    await sendApprovalEmail(user, action, reason);
+                } else if (action === 'reject' && settings?.notify_on_reject) {
+                    await sendApprovalEmail(user, action, reason);
+                }
             }
 
             return res.status(200).json({ 
@@ -163,13 +174,22 @@ export default async function handler(req, res) {
                 throw deleteError;
             }
 
-            // Send email notification to user about deletion
-            try {
-                const { sendDeletionEmail } = await import('../../../utils/emailService');
-                await sendDeletionEmail(user);
-            } catch (emailError) {
-                console.error('Error sending deletion email:', emailError);
-                // Don't fail the deletion if email fails
+            // Check notification setting
+            const { data: settings } = await supabaseAdmin
+                .from('settings')
+                .select('notify_on_delete')
+                .eq('id', 1)
+                .single();
+
+            // Send email notification to user about deletion if enabled
+            if (settings?.notify_on_delete) {
+                try {
+                    const { sendDeletionEmail } = await import('../../../utils/emailService');
+                    await sendDeletionEmail(user);
+                } catch (emailError) {
+                    console.error('Error sending deletion email:', emailError);
+                    // Don't fail the deletion if email fails
+                }
             }
 
             return res.status(200).json({ 
