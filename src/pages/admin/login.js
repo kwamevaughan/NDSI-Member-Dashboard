@@ -185,7 +185,7 @@ export default function AdminLogin() {
                     <div className="mt-6 text-center">
                         <Link 
                             href="/" 
-                            className="text-sm text-blue-600 hover:text-blue-500 transition-colors duration-200 underline"
+                            className="text-sm text-ndsi-blue hover:text-ndsi-green transition-colors duration-200 underline"
                         >
                             ← Back to Member Login
                         </Link>
