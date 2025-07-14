@@ -12,6 +12,7 @@ import AddAdminModal from "../../components/admin/AddAdminModal";
 import SessionExpired from "../../components/SessionExpired";
 
 import AdminHeader from "../../layouts/adminHeader";
+import { toast } from "react-hot-toast";
 
 export default function AdminDashboard() {
   const { adminUser, loading: authLoading, logout, getAdminToken } = useAdminAuth();
@@ -232,6 +233,37 @@ export default function AdminDashboard() {
                 setSelectedUsers(selectedItems);
                 handleBulkDeleteClick();
               }}
+              onImport={async (importedRows) => {
+                const token = getAdminToken();
+                try {
+                  const response = await fetch('/api/admin/users/bulk-upload', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ users: importedRows }),
+                  });
+                  const data = await response.json();
+                  if (!response.ok) {
+                    throw new Error(data.error || 'Failed to import users');
+                  }
+                  const successCount = data.results.filter(r => r.success).length;
+                  const failCount = data.results.length - successCount;
+                  if (successCount > 0) {
+                    toast.success(`${successCount} user(s) imported successfully!`);
+                  }
+                  if (failCount > 0) {
+                    toast.error(`${failCount} user(s) failed to import. Check your file and try again.`);
+                    // Log failed results for debugging
+                    console.log('Failed imports:', data.results.filter(r => !r.success));
+                  }
+                  await userManagement.fetchPendingUsers();
+                } catch (err) {
+                  toast.error(err.message || 'Failed to import users');
+                  throw err;
+                }
+              }}
               columns={[
                 {
                   accessor: "full_name",
@@ -265,6 +297,12 @@ export default function AdminDashboard() {
                   header: "Organization",
                   sortable: true,
                   render: (row) => row.organization_name || "—",
+                },
+                {
+                  accessor: "role_job_title",
+                  header: "Job Title",
+                  sortable: true,
+                  render: (row) => row.role_job_title || "—",
                 },
                 {
                   accessor: "created_at",

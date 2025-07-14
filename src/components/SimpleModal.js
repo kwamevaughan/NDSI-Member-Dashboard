@@ -95,7 +95,7 @@ const SimpleModal = ({
               </div>
 
               <div className="relative flex justify-between items-center">
-                <h2 className="text-2xl font-semibold text-white tracking-tight">
+                <h2 className="text-2xl capitalize font-semibold text-white tracking-tight">
                   {title}
                 </h2>
                 <div className="flex items-center gap-4">

@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 import ExportModal from "./ExportModal";
 import SimpleModal from "./SimpleModal";
 import Papa from "papaparse";
+import * as XLSX from "xlsx";
 
 // Enhanced useTable hook
 function useTable(data, initialPageSize = 20) {
@@ -374,24 +375,56 @@ export function GenericTable({
     setImportError("");
     setImportedRows([]);
     setImportPreview([]);
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        const rows = results.data;
-        const required = columns.map((c) => c.accessor);
-        const missing = required.filter((col) => !results.meta.fields.includes(col));
-        if (missing.length > 0) {
-          setImportError(`Missing required columns: ${missing.join(", ")}`);
-          return;
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith('.csv')) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const rows = results.data;
+          const required = columns.map((c) => c.accessor);
+          const missing = required.filter((col) => !results.meta.fields.includes(col));
+          if (missing.length > 0) {
+            setImportError(`Missing required columns: ${missing.join(", ")}`);
+            return;
+          }
+          setImportedRows(rows);
+          setImportPreview(rows.slice(0, 5));
+        },
+        error: (err) => {
+          setImportError("Failed to parse CSV: " + err.message);
+        },
+      });
+    } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          if (!rows.length) {
+            setImportError("No data found in the XLSX file.");
+            return;
+          }
+          const required = columns.map((c) => c.accessor);
+          const missing = required.filter((col) => !(col in rows[0]));
+          if (missing.length > 0) {
+            setImportError(`Missing required columns: ${missing.join(", ")}`);
+            return;
+          }
+          setImportedRows(rows);
+          setImportPreview(rows.slice(0, 5));
+        } catch (err) {
+          setImportError("Failed to parse XLSX: " + err.message);
         }
-        setImportedRows(rows);
-        setImportPreview(rows.slice(0, 5));
-      },
-      error: (err) => {
-        setImportError("Failed to parse CSV: " + err.message);
-      },
-    });
+      };
+      reader.onerror = () => setImportError("Failed to read XLSX file.");
+      reader.readAsArrayBuffer(file);
+    } else {
+      setImportError("Unsupported file format. Please upload a CSV or XLSX file.");
+    }
   };
 
   const handleImport = async () => {
@@ -510,7 +543,7 @@ export function GenericTable({
                           />
                           <div className="flex justify-end mt-2 gap-2">
                             <button
-                              className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100"
+                              className="px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100"
                               onClick={() => {
                                 setDateRange([
                                   {
@@ -525,7 +558,7 @@ export function GenericTable({
                               Clear
                             </button>
                             <button
-                              className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                              className="px-3 py-1 rounded-lg bg-ndsi-blue text-white hover:bg-ndsi-green"
                               onClick={() => setShowDatePicker(false)}
                             >
                               Apply
@@ -583,7 +616,9 @@ export function GenericTable({
             <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
               {selectAllMode
                 ? `All ${filteredByDate.length} users selected.`
-                : `${table.selected.length} item${table.selected.length !== 1 ? "s" : ""} selected on this page.`}
+                : `${table.selected.length} item${
+                    table.selected.length !== 1 ? "s" : ""
+                  } selected on this page.`}
             </span>
             <div className="flex gap-2 items-center">
               {(onBulkDelete || onDelete) && table.selected.length > 0 && (
@@ -595,17 +630,19 @@ export function GenericTable({
                   Delete
                 </button>
               )}
-              {!selectAllMode && table.selected.length === table.paged.length && table.selected.length < filteredByDate.length && (
-                <button
-                  className="text-xs px-3 py-1 rounded bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors"
-                  onClick={() => {
-                    table.setSelected(filteredByDate.map((row) => row.id));
-                    setSelectAllMode(true);
-                  }}
-                >
-                  Select all {filteredByDate.length} users
-                </button>
-              )}
+              {!selectAllMode &&
+                table.selected.length === table.paged.length &&
+                table.selected.length < filteredByDate.length && (
+                  <button
+                    className="text-xs px-3 py-1 rounded bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors"
+                    onClick={() => {
+                      table.setSelected(filteredByDate.map((row) => row.id));
+                      setSelectAllMode(true);
+                    }}
+                  >
+                    Select all {filteredByDate.length} users
+                  </button>
+                )}
               {selectAllMode && (
                 <button
                   className="text-xs px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -633,7 +670,10 @@ export function GenericTable({
                     type="checkbox"
                     checked={
                       table.paged.length > 0 &&
-                      (selectAllMode || table.paged.every((row) => table.selected.includes(row.id)))
+                      (selectAllMode ||
+                        table.paged.every((row) =>
+                          table.selected.includes(row.id)
+                        ))
                     }
                     indeterminate={
                       !selectAllMode &&
@@ -821,24 +861,27 @@ export function GenericTable({
           setImportPreview([]);
           setIsDragActive(false);
         }}
-        title="Import Data"
+        title="Upload CSV / XLSX file to import user data"
         width="max-w-4xl"
       >
         <div className="space-y-6">
           {/* Header Description */}
-          <div className="text-center">
+          {/* <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-ndsi-blue rounded-full mb-4">
               <Icon icon="mdi:file-text" className="w-8 h-8 text-white" />
             </div>
             <p className="text-gray-600 dark:text-gray-300 text-lg">
               Upload your CSV file to import data
             </p>
-          </div>
+          </div> */}
 
           {/* Required Columns */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/50">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Icon icon="mdi:check-circle" className="w-5 h-5 text-green-500" />
+              <Icon
+                icon="mdi:check-circle"
+                className="w-5 h-5 text-green-500"
+              />
               Required Columns
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -864,9 +907,12 @@ export function GenericTable({
           {/* File Upload Instructions */}
           <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
             <div className="flex items-start gap-3">
-              <Icon icon="mdi:alert-circle" className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <Icon
+                icon="mdi:alert-circle"
+                className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0"
+              />
               <div className="text-sm text-amber-800 dark:text-amber-200 space-y-1">
-                <p>• File must be in CSV format with comma-separated values</p>
+                <p>• File must be in CSV or XLSX format with comma-separated values</p>
                 <p>
                   • First row should contain column headers exactly as listed
                   above
@@ -914,7 +960,7 @@ export function GenericTable({
                 <p className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                   {isDragActive
                     ? "Drop your file here"
-                    : "Drag & drop your CSV file"}
+                    : "Drag & drop CSV / XLSX / XLS file"}
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   or click to browse
@@ -923,7 +969,7 @@ export function GenericTable({
 
               <input
                 type="file"
-                accept=".csv"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 onChange={(e) => {
                   const file = e.target.files[0];
@@ -936,7 +982,10 @@ export function GenericTable({
           {/* Error Display */}
           {importError && (
             <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-              <Icon icon="mdi:alert-circle" className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <Icon
+                icon="mdi:alert-circle"
+                className="w-5 h-5 text-red-500 flex-shrink-0"
+              />
               <p className="text-red-700 dark:text-red-400 text-sm">
                 {importError}
               </p>
@@ -947,7 +996,10 @@ export function GenericTable({
           {importPreview.length > 0 && (
             <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 mb-4">
-                <Icon icon="mdi:eye" className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <Icon
+                  icon="mdi:eye"
+                  className="w-5 h-5 text-gray-600 dark:text-gray-400"
+                />
                 <h3 className="font-semibold text-gray-900 dark:text-white">
                   Preview (first 5 rows)
                 </h3>
@@ -999,7 +1051,7 @@ export function GenericTable({
             <button
               disabled={importedRows.length === 0 || importing}
               onClick={handleImport}
-              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl disabled:shadow-none"
+              className="px-6 py-2.5 bg-ndsi-blue hover:bg-ndsi-green disabled:bg-gray-400 text-white rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl disabled:shadow-none"
             >
               {importing ? (
                 <>
