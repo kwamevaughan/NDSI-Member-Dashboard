@@ -43,16 +43,12 @@ export default function AdminDashboard() {
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   // Initialize hooks
-  const userManagement = useUserManagement(getAdminToken);
+  const userManagement = useUserManagement(getAdminToken, () => setIsSessionExpired(true));
   const adminManagement = useAdminManagement(getAdminToken);
 
   useEffect(() => {
     if (adminUser && !authLoading) {
-      userManagement.fetchPendingUsers().catch((err) => {
-        if (err.message === "Authentication failed") {
-          setIsSessionExpired(true);
-        }
-      });
+      userManagement.fetchPendingUsers();
       adminManagement.fetchAdminUsers(adminUser);
     }
   }, [adminUser, authLoading]);

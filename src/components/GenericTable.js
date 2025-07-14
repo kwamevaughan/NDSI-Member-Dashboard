@@ -104,6 +104,7 @@ function useTable(data, initialPageSize = 20) {
     sortKey,
     sortDir,
     selected,
+    setSelected,
     searchTerm,
     setPage,
     setPageSize,
@@ -197,6 +198,7 @@ export function GenericTable({
 
   // Use filtered data for table
   const table = useTable(filteredByDate);
+  const [selectAllMode, setSelectAllMode] = useState(false);
 
   const handleBulkDelete = () => {
     if (table.selected.length > 0) {
@@ -211,6 +213,16 @@ export function GenericTable({
           if (row) onDelete(row);
         });
       }
+    }
+  };
+
+  const selectAll = () => {
+    if (selectAllMode || table.selected.length === table.paged.length) {
+      table.setSelected([]);
+      setSelectAllMode(false);
+    } else {
+      table.setSelected(table.paged.map((row) => row.id));
+      setSelectAllMode(false);
     }
   };
 
@@ -569,16 +581,43 @@ export function GenericTable({
         <div className="px-6 py-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-              {table.selected.length} item
-              {table.selected.length !== 1 ? "s" : ""} selected
+              {selectAllMode
+                ? `All ${filteredByDate.length} users selected.`
+                : `${table.selected.length} item${table.selected.length !== 1 ? "s" : ""} selected on this page.`}
             </span>
-            <button
-              onClick={handleBulkDelete}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-            >
-              <Icon icon="mdi:delete" className="w-3 h-3" />
-              <span>{table.selected.length} Users</span> Selected
-            </button>
+            <div className="flex gap-2 items-center">
+              {(onBulkDelete || onDelete) && table.selected.length > 0 && (
+                <button
+                  onClick={handleBulkDelete}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                >
+                  <Icon icon="mdi:delete" className="w-4 h-4" />
+                  Delete
+                </button>
+              )}
+              {!selectAllMode && table.selected.length === table.paged.length && table.selected.length < filteredByDate.length && (
+                <button
+                  className="text-xs px-3 py-1 rounded bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors"
+                  onClick={() => {
+                    table.setSelected(filteredByDate.map((row) => row.id));
+                    setSelectAllMode(true);
+                  }}
+                >
+                  Select all {filteredByDate.length} users
+                </button>
+              )}
+              {selectAllMode && (
+                <button
+                  className="text-xs px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  onClick={() => {
+                    table.setSelected([]);
+                    setSelectAllMode(false);
+                  }}
+                >
+                  Clear selection
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -594,11 +633,14 @@ export function GenericTable({
                     type="checkbox"
                     checked={
                       table.paged.length > 0 &&
-                      table.paged.every((row) =>
-                        table.selected.includes(row.id)
-                      )
+                      (selectAllMode || table.paged.every((row) => table.selected.includes(row.id)))
                     }
-                    onChange={table.selectAll}
+                    indeterminate={
+                      !selectAllMode &&
+                      table.selected.length > 0 &&
+                      table.selected.length < table.paged.length
+                    }
+                    onChange={selectAll}
                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                   />
                 </th>
