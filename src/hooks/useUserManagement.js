@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
-export function useUserManagement(getAdminToken) {
+export function useUserManagement(getAdminToken, onSessionExpired) {
   const [users, setUsers] = useState([]);
   const [processingUser, setProcessingUser] = useState(null);
   const [stats, setStats] = useState({
@@ -9,6 +9,26 @@ export function useUserManagement(getAdminToken) {
     rejectedToday: 0,
     totalPending: 0
   });
+
+  const handleApiError = async (response) => {
+    if (!response.ok) {
+      let errorData = {};
+      try {
+        errorData = await response.json();
+      } catch {}
+      if (
+        response.status === 401 ||
+        response.status === 403 ||
+        (errorData.error &&
+          (errorData.error.toLowerCase().includes('jwt expired') ||
+           errorData.error.toLowerCase().includes('authentication failed')))
+      ) {
+        if (onSessionExpired) onSessionExpired();
+        throw new Error('Authentication failed');
+      }
+      throw new Error(errorData.error || 'Request failed');
+    }
+  };
 
   const fetchPendingUsers = async () => {
     const token = getAdminToken();
@@ -18,13 +38,7 @@ export function useUserManagement(getAdminToken) {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          throw new Error("Authentication failed");
-        }
-        throw new Error("Failed to fetch users");
-      }
+      await handleApiError(response);
 
       const data = await response.json();
       const userData = data.users || [];
@@ -56,10 +70,7 @@ export function useUserManagement(getAdminToken) {
           reason,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to process user");
-      }
+      await handleApiError(response);
 
       const data = await response.json();
       toast.success(data.message);
@@ -68,7 +79,11 @@ export function useUserManagement(getAdminToken) {
       await fetchPendingUsers();
     } catch (error) {
       console.error("Error processing user:", error);
-      toast.error("Failed to process user");
+      if (error.message === "Authentication failed") {
+        // Already handled
+      } else {
+        toast.error("Failed to process user");
+      }
     } finally {
       setProcessingUser(null);
     }
@@ -89,11 +104,7 @@ export function useUserManagement(getAdminToken) {
           userId,
         }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete user");
-      }
+      await handleApiError(response);
 
       const data = await response.json();
       toast.success(data.message);
@@ -102,7 +113,11 @@ export function useUserManagement(getAdminToken) {
       await fetchPendingUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
-      toast.error(error.message);
+      if (error.message === "Authentication failed") {
+        // Already handled
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setProcessingUser(null);
     }
@@ -125,11 +140,7 @@ export function useUserManagement(getAdminToken) {
           userIds: selectedIds,
         }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete users");
-      }
+      await handleApiError(response);
 
       const data = await response.json();
       toast.success(data.message);
@@ -138,7 +149,11 @@ export function useUserManagement(getAdminToken) {
       await fetchPendingUsers();
     } catch (error) {
       console.error("Error deleting users:", error);
-      toast.error(error.message);
+      if (error.message === "Authentication failed") {
+        // Already handled
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setProcessingUser(null);
     }
