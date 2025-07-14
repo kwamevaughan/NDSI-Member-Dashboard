@@ -8,6 +8,8 @@ import 'react-date-range/dist/theme/default.css';
 import ReactDOM from 'react-dom';
 import { toast } from 'react-hot-toast';
 import ExportModal from "./ExportModal";
+import SimpleModal from "./SimpleModal";
+import Papa from "papaparse";
 
 // Enhanced useTable hook
 function useTable(data, initialPageSize = 20) {
@@ -155,6 +157,7 @@ export function GenericTable({
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef();
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   // Detect mode (light/dark)
   const [mode, setMode] = useState('light');
   useEffect(() => {
@@ -349,6 +352,57 @@ export function GenericTable({
     }
   };
 
+  const [importError, setImportError] = useState("");
+  const [importedRows, setImportedRows] = useState([]);
+  const [importing, setImporting] = useState(false);
+  const [importPreview, setImportPreview] = useState([]);
+  const [isDragActive, setIsDragActive] = useState(false);
+
+  const handleFileUpload = (file) => {
+    setImportError("");
+    setImportedRows([]);
+    setImportPreview([]);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const rows = results.data;
+        const required = columns.map((c) => c.accessor);
+        const missing = required.filter((col) => !results.meta.fields.includes(col));
+        if (missing.length > 0) {
+          setImportError(`Missing required columns: ${missing.join(", ")}`);
+          return;
+        }
+        setImportedRows(rows);
+        setImportPreview(rows.slice(0, 5));
+      },
+      error: (err) => {
+        setImportError("Failed to parse CSV: " + err.message);
+      },
+    });
+  };
+
+  const handleImport = async () => {
+    if (!importedRows.length) return;
+    setImporting(true);
+    setImportError("");
+    const toastId = toast.loading("Importing data...");
+    try {
+      if (onImport) {
+        await onImport(importedRows);
+      }
+      setShowImportModal(false);
+      setImportedRows([]);
+      setImportPreview([]);
+      toast.success("Data imported successfully!", { id: toastId });
+    } catch (err) {
+      setImportError(err.message || "Failed to import data");
+      toast.error(err.message || "Failed to import data", { id: toastId });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
@@ -481,16 +535,24 @@ export function GenericTable({
               {/* Export, Import, and Add New on the right */}
               <div className="flex items-center gap-3 ml-auto">
                 <button
+                  onClick={() => setShowImportModal(true)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <Icon icon="mdi:upload" className="w-4 h-4" />
+                  Import Data
+                </button>
+                <button
                   onClick={() => setShowExportModal(true)}
                   className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <Icon icon="mdi:download" className="w-4 h-4" />
                   Export Data
                 </button>
+
                 {onAddNew && (
                   <button
                     onClick={onAddNew}
-                    className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="flex items-center gap-2 px-4 py-2 text-sm bg-ndsi-blue text-white rounded-lg hover:bg-ndsi-blue-700 transition-colors focus:ring-2 focus:ring-ndsi-blue focus:ring-offset-2"
                   >
                     <Icon icon="mdi:plus" className="w-4 h-4" />
                     {addNewLabel}
@@ -706,8 +768,212 @@ export function GenericTable({
         onClose={() => setShowExportModal(false)}
         users={safeData}
         mode={mode}
-        type="applicants"
+        type="users"
       />
+      <SimpleModal
+        isOpen={showImportModal}
+        onClose={() => {
+          setShowImportModal(false);
+          setImportError("");
+          setImportedRows([]);
+          setImportPreview([]);
+          setIsDragActive(false);
+        }}
+        title="Import Data"
+        width="max-w-4xl"
+      >
+        <div className="space-y-6">
+          {/* Header Description */}
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-ndsi-blue rounded-full mb-4">
+              <Icon icon="mdi:file-text" className="w-8 h-8 text-white" />
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
+              Upload your CSV file to import data
+            </p>
+          </div>
+
+          {/* Required Columns */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/50">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Icon icon="mdi:check-circle" className="w-5 h-5 text-green-500" />
+              Required Columns
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {columns.map((col) => (
+                <div
+                  key={col.accessor}
+                  className="flex items-center gap-3 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {col.header}
+                  </span>
+                  {col.accessor !== col.header && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                      {col.accessor}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* File Upload Instructions */}
+          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+            <div className="flex items-start gap-3">
+              <Icon icon="mdi:alert-circle" className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-amber-800 dark:text-amber-200 space-y-1">
+                <p>• File must be in CSV format with comma-separated values</p>
+                <p>
+                  • First row should contain column headers exactly as listed
+                  above
+                </p>
+                <p>• All required fields must be present for each data row</p>
+                <p>• Maximum file size: 10MB</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Drag & Drop Area */}
+          <div
+            className={`relative border-2 border-dashed rounded-xl p-8 transition-all duration-300 ${
+              isDragActive
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/40 scale-105"
+                : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragActive(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              setIsDragActive(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragActive(false);
+              const file = e.dataTransfer.files[0];
+              if (file) handleFileUpload(file);
+            }}
+          >
+            <div className="text-center space-y-4">
+              <div
+                className={`inline-flex items-center justify-center w-16 h-16 rounded-full transition-all ${
+                  isDragActive
+                    ? "bg-blue-500 text-white scale-110"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500"
+                }`}
+              >
+                <Icon icon="mdi:upload" className="w-8 h-8" />
+              </div>
+
+              <div>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  {isDragActive
+                    ? "Drop your file here"
+                    : "Drag & drop your CSV file"}
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  or click to browse
+                </p>
+              </div>
+
+              <input
+                type="file"
+                accept=".csv"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) handleFileUpload(file);
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Error Display */}
+          {importError && (
+            <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <Icon icon="mdi:alert-circle" className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <p className="text-red-700 dark:text-red-400 text-sm">
+                {importError}
+              </p>
+            </div>
+          )}
+
+          {/* Preview Table */}
+          {importPreview.length > 0 && (
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 mb-4">
+                <Icon icon="mdi:eye" className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Preview (first 5 rows)
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-separate border-spacing-0">
+                  <thead>
+                    <tr>
+                      {columns.map((col) => (
+                        <th
+                          key={col.accessor}
+                          className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-700 first:rounded-tl-lg last:rounded-tr-lg border-b border-gray-200 dark:border-gray-600"
+                        >
+                          {col.header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {importPreview.map((row, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      >
+                        {columns.map((col) => (
+                          <td
+                            key={col.accessor}
+                            className="px-4 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                          >
+                            {row[col.accessor]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => setShowImportModal(false)}
+              className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={importedRows.length === 0 || importing}
+              onClick={handleImport}
+              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl disabled:shadow-none"
+            >
+              {importing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Icon icon="mdi:upload" className="w-4 h-4" />
+                  Import Data
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </SimpleModal>
     </div>
   );
 }

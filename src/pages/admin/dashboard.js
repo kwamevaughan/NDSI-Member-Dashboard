@@ -402,7 +402,7 @@ export default function AdminDashboard() {
                 {adminManagement.isSuperAdmin && (
                   <button
                     onClick={() => setShowAddAdminModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="flex items-center gap-2 px-4 py-2 text-sm bg-ndsi-blue hover:bg-ndsi-green text-white rounded-lg hover:bg-ndsi-blue-700 transition-colors focus:ring-2 focus:ring-ndsi-blue focus:ring-offset-2"
                   >
                     <Icon icon="mdi:plus" className="h-4 w-4" />
                     Add New Admin

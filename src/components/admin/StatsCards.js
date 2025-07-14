@@ -5,7 +5,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
-        <div className="p-4">
+        <div className="px-3 py-2">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 rounded-xl bg-ndsi-blue flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -29,7 +29,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         onClick={onApprovedClick}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
-        <div className="p-4">
+        <div className="px-3 py-2">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 rounded-xl bg-ndsi-green flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -59,7 +59,7 @@ export default function StatsCards({ stats, onApprovedClick, onRejectedClick }) 
         onClick={onRejectedClick}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
-        <div className="p-4">
+        <div className="px-3 py-2">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 rounded-xl bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">

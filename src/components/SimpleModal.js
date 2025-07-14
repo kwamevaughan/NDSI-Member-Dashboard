@@ -7,7 +7,7 @@ const SimpleModal = ({
   title, 
   children, 
   mode = "light",
-  width = "max-2xl",
+  width = "max-w-2xl",
   rightElement,
   hasUnsavedChanges = false 
 }) => {

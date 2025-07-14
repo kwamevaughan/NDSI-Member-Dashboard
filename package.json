@@ -23,6 +23,7 @@
     "jspdf-autotable": "^5.0.2",
     "next": "15.1.7",
     "nodemailer": "^6.10.0",
+    "papaparse": "^5.5.3",
     "react": "^19.0.0",
     "react-csv": "^2.2.2",
     "react-date-range": "^2.0.1",
