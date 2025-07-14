@@ -9,6 +9,7 @@ import { useAdminManagement } from "../../hooks/useAdminManagement";
 import { formatDate } from "../../utils/dateUtils";
 import StatsCards from "../../components/admin/StatsCards";
 import AddAdminModal from "../../components/admin/AddAdminModal";
+import SessionExpired from "../../components/SessionExpired";
 
 import AdminHeader from "../../layouts/adminHeader";
 
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
     organization_name: '',
     is_super_admin: false
   });
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   // Initialize hooks
   const userManagement = useUserManagement(getAdminToken);
@@ -46,7 +48,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (adminUser && !authLoading) {
-      userManagement.fetchPendingUsers();
+      userManagement.fetchPendingUsers().catch((err) => {
+        if (err.message === "Authentication failed") {
+          setIsSessionExpired(true);
+        }
+      });
       adminManagement.fetchAdminUsers(adminUser);
     }
   }, [adminUser, authLoading]);
@@ -136,6 +142,10 @@ export default function AdminDashboard() {
     setShowUserDetailsModal(true);
   };
 
+  if (isSessionExpired) {
+    return <SessionExpired isSessionExpired={isSessionExpired} />;
+  }
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
@@ -200,16 +210,16 @@ export default function AdminDashboard() {
         {activeTab === "users" && (
           <>
             <div className="mb-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-ndsi-blue-50 border border-ndsi-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <Icon
                     icon="tabler:users"
                     className="h-8 w-8 text-ndsi-blue mt-0.5 mr-3 flex-shrink-0"
                   />
-                  <div className="text-sm text-blue-800">
+                  <div className="text-sm text-ndsi-blue">
                     <p className="font-medium mb-1">User Management</p>
                     <p>
-                      This table shows only regular users. Admin accounts are
+                      This table shows only NDSI members. Admin accounts are
                       managed separately for security.
                     </p>
                   </div>
