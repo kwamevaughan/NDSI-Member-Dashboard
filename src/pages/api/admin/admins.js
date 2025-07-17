@@ -28,11 +28,11 @@ export default async function handler(req, res) {
     try {
         const { data: user, error } = await supabaseAdmin
             .from('users')
-            .select('is_admin, is_super_admin')
+            .select('role')
             .eq('id', adminUser.id)
             .single();
 
-        if (error || !user || !user.is_admin) {
+        if (error || !user || (user.role !== 'admin' && user.role !== 'super_admin')) {
             return res.status(403).json({ error: 'Admin access required' });
         }
         currentAdmin = user;
@@ -45,8 +45,8 @@ export default async function handler(req, res) {
         try {
             const { data: admins, error } = await supabaseAdmin
                 .from('users')
-                .select('id, email, full_name, created_at, is_admin, is_super_admin')
-                .eq('is_admin', true)
+                .select('id, email, full_name, created_at, role')
+                .in('role', ['admin','super_admin'])
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -62,12 +62,12 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
         // Only super admins can create new admins
-        if (!currentAdmin.is_super_admin) {
+        if (currentAdmin.role !== 'super_admin') {
             return res.status(403).json({ error: 'Super admin access required to create new administrators' });
         }
 
         // Create new admin user
-        const { full_name, email, organization_name, password, is_super_admin = false } = req.body;
+        const { full_name, email, organization_name, password, role = 'admin' } = req.body;
 
         // Validation
         if (!full_name || !email || !password) {
@@ -102,8 +102,7 @@ export default async function handler(req, res) {
                     email: email.toLowerCase().trim(),
                     organization_name: organization_name?.trim() || null,
                     password: password, // This will be hashed by Supabase
-                    is_admin: true,
-                    is_super_admin: is_super_admin,
+                    role: role, // 'admin' or 'super_admin'
                     is_approved: true, // Admins are automatically approved
                     approval_status: 'approved',
                     approved_by: adminUser.id,
@@ -144,11 +143,11 @@ export default async function handler(req, res) {
 
     if (req.method === 'PUT') {
         // Only super admins can modify admins
-        if (!currentAdmin.is_super_admin) {
+        if (currentAdmin.role !== 'super_admin') {
             return res.status(403).json({ error: 'Super admin access required to modify administrators' });
         }
 
-        const { adminId, full_name, email, organization_name, is_super_admin, password } = req.body;
+        const { adminId, full_name, email, organization_name, role, password } = req.body;
 
         if (!adminId) {
             return res.status(400).json({ error: 'Admin ID is required' });
@@ -164,7 +163,7 @@ export default async function handler(req, res) {
                 full_name: full_name?.trim(),
                 email: email?.toLowerCase().trim(),
                 organization_name: organization_name?.trim() || null,
-                is_super_admin: is_super_admin,
+                role: role, // 'admin' or 'super_admin'
                 updated_at: new Date().toISOString()
             };
 
@@ -181,7 +180,7 @@ export default async function handler(req, res) {
                 .from('users')
                 .update(updateData)
                 .eq('id', adminId)
-                .eq('is_admin', true) // Ensure we're only updating admin users
+                .in('role', ['admin','super_admin']) // Only update admin/super_admin
                 .select()
                 .single();
 
@@ -201,7 +200,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
         // Only super admins can delete admins
-        if (!currentAdmin.is_super_admin) {
+        if (currentAdmin.role !== 'super_admin') {
             return res.status(403).json({ error: 'Super admin access required to delete administrators' });
         }
 
@@ -222,7 +221,7 @@ export default async function handler(req, res) {
                 .from('users')
                 .select('*')
                 .eq('id', adminId)
-                .eq('is_admin', true)
+                .in('role', ['admin','super_admin'])
                 .single();
 
             if (fetchError || !adminToDelete) {

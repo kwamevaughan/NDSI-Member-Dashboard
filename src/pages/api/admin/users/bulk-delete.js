@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         const token = authHeader.substring(7);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        if (!decoded.is_admin) {
+        if (decoded.role !== 'admin' && decoded.role !== 'super_admin') {
             return res.status(403).json({ error: 'Admin access required' });
         }
 
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         // Get user details before deletion for email notifications
         const { data: usersToDelete, error: fetchError } = await supabaseAdmin
             .from('users')
-            .select('id, email, full_name, is_admin')
+            .select('id, email, full_name, role')
             .in('id', userIds);
 
         if (fetchError) {
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         }
 
         // Prevent deletion of admin users
-        const adminUsers = usersToDelete.filter(user => user.is_admin);
+        const adminUsers = usersToDelete.filter(user => user.role === 'admin' || user.role === 'super_admin');
         if (adminUsers.length > 0) {
             return res.status(400).json({ 
                 error: 'Cannot delete admin users. Please contact a super administrator.',

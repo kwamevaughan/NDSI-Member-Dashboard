@@ -58,19 +58,19 @@ export default async function handler(req, res) {
 
         // Check if user is approved (unless they are an admin)
         // Allow unapproved users to log in but mark them as pending
-        const isPendingApproval = !user.is_admin && !user.is_approved;
+        const isPendingApproval = user.role === 'user' && !user.is_approved;
         
         console.log('User found:', { 
             id: user.id, 
             email: user.email, 
-            is_admin: user.is_admin, 
+            role: user.role, 
             is_approved: user.is_approved,
             approval_status: user.approval_status,
             isPendingApproval 
         });
 
         const token = jwt.sign(
-            { id: user.id, email: user.email, is_admin: user.is_admin || false },
+            { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );

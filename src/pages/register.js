@@ -75,7 +75,7 @@ export default function Register({ closeRegister, notify, setError, router, reca
                 
                 // Redirect to appropriate dashboard
                 setTimeout(() => {
-                    if (loginResult.user && loginResult.user.is_admin) {
+                    if (loginResult.user && (loginResult.user.role === 'admin' || loginResult.user.role === 'super_admin')) {
                         router.push('/admin/dashboard');
                     } else {
                         router.push('/dashboard');

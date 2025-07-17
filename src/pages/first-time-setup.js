@@ -241,7 +241,7 @@ export default function FirstTimeSetup() {
               className="px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-2xl hover:from-blue-600 hover:to-green-600 transform hover:scale-105 transition-all duration-300 text-lg shadow-lg hover:shadow-xl"
               onClick={() => {
                 // Redirect based on user type
-                if (storedUser.is_admin) {
+                if (storedUser.role === 'admin' || storedUser.role === 'super_admin') {
                   router.replace("/admin/dashboard");
                 } else {
                   router.replace("/dashboard");

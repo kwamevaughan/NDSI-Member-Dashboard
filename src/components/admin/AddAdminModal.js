@@ -13,7 +13,7 @@ export default function AddAdminModal({ isOpen, onClose, onSubmit, loading }) {
     organization_name: "",
     password: "",
     confirmPassword: "",
-    is_super_admin: false,
+    role: "admin",
   });
 
   const handleSubmit = async () => {
@@ -46,7 +46,7 @@ export default function AddAdminModal({ isOpen, onClose, onSubmit, loading }) {
         organization_name: "",
         password: "",
         confirmPassword: "",
-        is_super_admin: false,
+        role: "admin",
       });
       onClose();
     }
@@ -59,7 +59,7 @@ export default function AddAdminModal({ isOpen, onClose, onSubmit, loading }) {
       organization_name: "",
       password: "",
       confirmPassword: "",
-      is_super_admin: false,
+      role: "admin",
     });
     onClose();
   };
@@ -196,22 +196,18 @@ export default function AddAdminModal({ isOpen, onClose, onSubmit, loading }) {
             </div>
           </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="is_super_admin"
-              checked={formData.is_super_admin}
-              onChange={(e) =>
-                setFormData({ ...formData, is_super_admin: e.target.checked })
-              }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="is_super_admin"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Grant Super Admin privileges
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Role
             </label>
+            <select
+              value={formData.role}
+              onChange={e => setFormData({ ...formData, role: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="admin">Administrator</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
           </div>
         </div>
 

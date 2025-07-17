@@ -26,10 +26,9 @@ export function useAdminManagement(getAdminToken, onRefresh) {
 
       const data = await response.json();
       setAdminUsers(data.admins || []);
-      
       // Check if current user is super admin
       const currentUser = data.admins?.find(admin => admin.id === adminUser?.id);
-      setIsSuperAdmin(currentUser?.is_super_admin || false);
+      setIsSuperAdmin(currentUser?.role === 'super_admin');
     } catch (error) {
       console.error("Error fetching admin users:", error);
       // Don't show error toast for admin users fetch
@@ -52,7 +51,7 @@ export function useAdminManagement(getAdminToken, onRefresh) {
           email: newAdminData.email.trim().toLowerCase(),
           organization_name: newAdminData.organization_name.trim(),
           password: newAdminData.password,
-          is_super_admin: newAdminData.is_super_admin,
+          role: newAdminData.role, // 'admin' or 'super_admin'
         }),
       });
 
@@ -87,7 +86,7 @@ export function useAdminManagement(getAdminToken, onRefresh) {
         full_name: editAdminData.full_name.trim(),
         email: editAdminData.email.trim().toLowerCase(),
         organization_name: editAdminData.organization_name.trim(),
-        is_super_admin: editAdminData.is_super_admin,
+        role: editAdminData.role, // 'admin' or 'super_admin'
       };
       if (editAdminData.password && editAdminData.password.length > 0) {
         body.password = editAdminData.password;

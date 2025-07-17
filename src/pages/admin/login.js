@@ -49,7 +49,7 @@ export default function AdminLogin() {
             }
 
             // Check if user is admin
-            if (!data.user.is_admin) {
+            if (data.user.role !== 'admin' && data.user.role !== 'super_admin') {
                 throw new Error('Access denied. Admin privileges required.');
             }
 

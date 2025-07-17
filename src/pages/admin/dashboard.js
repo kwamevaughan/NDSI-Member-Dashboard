@@ -36,12 +36,13 @@ export default function AdminDashboard() {
   const [adminToDelete, setAdminToDelete] = useState(null);
   const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  // Replace is_super_admin in state with role
   const [editAdminData, setEditAdminData] = useState({
     full_name: '',
     email: '',
     organization_name: '',
-    is_super_admin: false,
-    password: '', // <-- add this
+    role: 'admin',
+    password: '',
   });
   const [isSessionExpired, setIsSessionExpired] = useState(false);
   const [showBulkApproveModal, setShowBulkApproveModal] = useState(false);
@@ -134,8 +135,8 @@ export default function AdminDashboard() {
       full_name: admin.full_name || '',
       email: admin.email || '',
       organization_name: admin.organization_name || '',
-      is_super_admin: admin.is_super_admin || false,
-      password: '', // <-- reset password field
+      role: admin.role || 'admin',
+      password: '',
     });
     setShowEditAdminModal(true);
   };
@@ -147,7 +148,7 @@ export default function AdminDashboard() {
         full_name: editAdminData.full_name,
         email: editAdminData.email,
         organization_name: editAdminData.organization_name,
-        is_super_admin: editAdminData.is_super_admin,
+        role: editAdminData.role,
       };
       if (editAdminData.password) {
         payload.password = editAdminData.password;
@@ -551,7 +552,7 @@ export default function AdminDashboard() {
                               <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                 Administrator
                               </span>
-                              {admin.is_super_admin && (
+                              {admin.role === 'super_admin' && (
                                 <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
                                   Super Admin
                                 </span>
@@ -1036,25 +1037,18 @@ export default function AdminDashboard() {
                 </button>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="edit_is_super_admin"
-                  checked={editAdminData.is_super_admin}
-                  onChange={(e) =>
-                    setEditAdminData({
-                      ...editAdminData,
-                      is_super_admin: e.target.checked,
-                    })
-                  }
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="edit_is_super_admin"
-                  className="ml-2 block text-sm text-gray-700"
-                >
-                  Super Admin privileges
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role
                 </label>
+                <select
+                  value={editAdminData.role}
+                  onChange={e => setEditAdminData({ ...editAdminData, role: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="admin">Administrator</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
               </div>
             </div>
 

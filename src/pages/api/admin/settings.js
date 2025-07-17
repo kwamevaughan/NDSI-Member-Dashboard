@@ -25,10 +25,10 @@ export default async function handler(req, res) {
     try {
       const { data: user, error } = await supabaseAdmin
         .from('users')
-        .select('is_admin')
+        .select('role')
         .eq('id', adminUser.id)
         .single();
-      if (error || !user || !user.is_admin) {
+      if (error || !user || (user.role !== 'admin' && user.role !== 'super_admin')) {
         return res.status(403).json({ error: 'Admin access required' });
       }
     } catch (error) {
