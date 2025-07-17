@@ -15,9 +15,9 @@ function MyApp({ Component, pageProps }) {
         <Head>
           <title>NDSI Member Dashboard</title>
           <meta name="description" content="NDSI Member Dashboard - Access your member portal" />
-          <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-          <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
-          <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
+          <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+          <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+          <link rel="apple-touch-icon" href="/favicon.png" sizes="180x180" />
         </Head>
         <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
         <UserComponent Component={Component} pageProps={pageProps} />
