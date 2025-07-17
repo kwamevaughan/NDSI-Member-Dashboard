@@ -101,9 +101,9 @@ const DocumentGrid = ({
   return (
     <div className="space-y-8">
       <header>
-        <h2 className="text-3xl md:text-4xl font-semibold text-[#28A8E0] mb-4">
+        <h1 className="text-3xl md:text-4xl font-semibold text-[#28A8E0] mb-4">
           {title}
-        </h2>
+        </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {description}
         </p>

@@ -161,8 +161,12 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                   </span>
                 </div>
                 <Icon
-                  icon={dropdownOpen ? "bxs:up-arrow" : "bxs:down-arrow"} // Conditional icon based on dropdownOpen state
-                  className={`h-5 w-5 font-bold transform transition-transform duration-300 ${
+                  icon={
+                    dropdownOpen
+                      ? "icon-park-outline:up"
+                      : "icon-park-outline:down"
+                  } // Conditional icon based on dropdownOpen state
+                  className={`h-6 w-6 font-bold transform transition-transform duration-300 ${
                     mode === "dark" ? "text-white" : "text-[#403F41]"
                   }`}
                 />
@@ -179,7 +183,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                 >
                   <div className="p-8">
                     <p className="text-lg mb-6">User Profile</p>
-                    <div className="flex items-center gap-2 border-b pb-6 w-full transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
+                    <div className="flex items-center gap-2 border-b pb-2 w-full transition-all duration-500 ease-out transform hover:-translate-y-[10px]">
                       <div className="rounded-full overflow-hidden flex-shrink-0">
                         <Image
                           src={
@@ -199,7 +203,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="space-y-4 pt-6">
+                    <div className="pt-2">
                       <Link
                         href="/profile"
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

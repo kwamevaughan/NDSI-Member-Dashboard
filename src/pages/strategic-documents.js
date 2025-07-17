@@ -3,18 +3,17 @@ import { useRouter } from 'next/router';
 import Header from "@/layouts/header";
 import Sidebar from "@/layouts/sidebar";
 import toast from 'react-hot-toast';
-import useTheme from '@/hooks/useTheme';
 import useSidebar from '@/hooks/useSidebar';
 import { useUser } from '@/context/UserContext';
 import useSignOut from '@/hooks/useSignOut';
-import { FaFilePdf, FaFileWord } from 'react-icons/fa';
 import { listFilesInFolder } from '@/utils/imageKitService';
 import SimpleModal from '@/components/SimpleModal';
 import DocumentGrid from '@/components/DocumentGrid';
+import { useTheme } from '@/hooks/useTheme';
 
+// Accept mode and toggleMode as props
 const StrategicDocumentsPage = () => {
     const router = useRouter();
-    const { mode, toggleMode } = useTheme();
     const { isSidebarOpen, toggleSidebar } = useSidebar();
     const notify = (message) => toast(message);
     const { handleSignOut } = useSignOut();
@@ -27,6 +26,7 @@ const StrategicDocumentsPage = () => {
     const [error, setError] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedDoc, setSelectedDoc] = useState(null);
+    const { mode, toggleMode } = useTheme();
 
     // Check if user is pending approval
     useEffect(() => {

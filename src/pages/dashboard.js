@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Header from "@/layouts/header";
 import Sidebar from "@/layouts/sidebar";
 import toast from 'react-hot-toast';
-import useTheme from '@/hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import useSidebar from '@/hooks/useSidebar';
 import useSignOut from '@/hooks/useSignOut';
 import { useUser } from '@/context/UserContext';
@@ -17,11 +17,11 @@ import { Icon } from '@iconify/react';
 
 const Dashboard = () => {
     const router = useRouter();
-    const { mode, toggleMode } = useTheme();
     const { isSidebarOpen, toggleSidebar } = useSidebar();
     const notify = (message) => toast(message);
     const { handleSignOut } = useSignOut();
     const { user } = useUser();
+    const { mode, toggleMode } = useTheme();
 
     // Handle card click for pending approval users
     const handleCardClick = () => {
@@ -168,7 +168,7 @@ const Dashboard = () => {
               </div>
 
               <div className="grid pb-14 gap-8 grid-cols-1 h-full">
-                <CardWrapper href="/working-group-documentation" isPendingApproval={isPendingApproval}>
+                <CardWrapper href="/working-group-docs" isPendingApproval={isPendingApproval}>
                   <WorkingGroupDocumentation mode={mode} isPendingApproval={isPendingApproval} />
                 </CardWrapper>
               </div>

@@ -4,67 +4,29 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Toaster } from 'react-hot-toast';
 import { UserProvider, useUser } from '@/context/UserContext';
+import { ThemeProvider, useTheme } from '@/hooks/useTheme';
 import SessionExpired from '../components/SessionExpired';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
-    const [mode, setMode] = useState('light');
-    const [isSessionExpired, setIsSessionExpired] = useState(false);
-    const router = useRouter();
-
-    useEffect(() => {
-        const savedMode = localStorage.getItem('mode');
-        if (savedMode) {
-            setMode(savedMode);
-        } else {
-            const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            setMode(systemMode);
-        }
-
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = (e) => {
-            if (!localStorage.getItem('mode') || localStorage.getItem('mode') === 'system') {
-                setMode(e.matches ? 'dark' : 'light');
-            }
-        };
-        mediaQuery.addEventListener('change', handleChange);
-
-        return () => {
-            mediaQuery.removeEventListener('change', handleChange);
-        };
-    }, []);
-
-    return (
-        <UserProvider>
-            <Head>
-                <title>NDSI Member Dashboard</title>
-                <meta name="description" content="NDSI Member Dashboard - Access your member portal" />
-            </Head>
-            <UserComponent
-                mode={mode}
-                isSessionExpired={isSessionExpired}
-                setIsSessionExpired={setIsSessionExpired}
-                router={router}
-                Component={Component}
-                pageProps={pageProps}
-            />
-            <Toaster 
-                position="top-center"
-                toastOptions={{
-                    duration: 4000,
-                    style: {
-                        background: mode === 'dark' ? '#374151' : '#fff',
-                        color: mode === 'dark' ? '#fff' : '#374151',
-                        border: mode === 'dark' ? '1px solid #4B5563' : '1px solid #E5E7EB',
-                    },
-                }}
-            />
-        </UserProvider>
-    );
+  return (
+    <ThemeProvider>
+      <UserProvider>
+        <Head>
+          <title>NDSI Member Dashboard</title>
+          <meta name="description" content="NDSI Member Dashboard - Access your member portal" />
+        </Head>
+        <UserComponent Component={Component} pageProps={pageProps} />
+      </UserProvider>
+    </ThemeProvider>
+  );
 }
 
-const UserComponent = ({ mode, isSessionExpired, setIsSessionExpired, router, Component, pageProps }) => {
-    const { token, isLoading } = useUser();
+const UserComponent = ({ Component, pageProps }) => {
+  const { mode, toggleMode } = useTheme();
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+  const router = useRouter();
+  const { token, isLoading } = useUser();
 
     useEffect(() => {
         if (isLoading) return;
@@ -103,7 +65,7 @@ const UserComponent = ({ mode, isSessionExpired, setIsSessionExpired, router, Co
 
     return (
         <div className={mode === 'dark' ? 'dark' : ''}>
-            <Component {...pageProps} mode={mode} />
+            <Component {...pageProps} mode={mode} toggleMode={toggleMode} />
         </div>
     );
 };

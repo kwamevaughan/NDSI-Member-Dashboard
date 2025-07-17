@@ -3,20 +3,20 @@ import { useRouter } from 'next/router';
 import Header from "@/layouts/header";
 import Sidebar from "@/layouts/sidebar";
 import toast from 'react-hot-toast';
-import useTheme from '@/hooks/useTheme';
 import useSidebar from '@/hooks/useSidebar';
 import { useUser } from '@/context/UserContext';
 import useSignOut from '@/hooks/useSignOut';
 import DocumentGrid from '@/components/DocumentGrid';
+import { useTheme } from '@/hooks/useTheme';
 
 
 const TrainingMaterialsPage = () => {
     const router = useRouter();
-    const { mode, toggleMode } = useTheme();
     const { isSidebarOpen, toggleSidebar } = useSidebar();
     const notify = (message) => toast(message);
     const { handleSignOut } = useSignOut();
     const { user } = useUser();
+    const { mode, toggleMode } = useTheme();
 
     // Check if user is pending approval
     useEffect(() => {
