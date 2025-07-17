@@ -22,35 +22,37 @@ export const deleteImage = async (fileId) => {
     }
 };
 
-export const uploadImage = async (file, userName, referralCode) => {
-    try {
-        const timestamp = Date.now();
-        const customFileName = `${userName}_${referralCode}_${timestamp}.${file.name.split('.').pop()}`;
+export const uploadImage = async (file, fullName) => {
+  try {
+    const timestamp = Date.now();
+    const customFileName = `${fullName}_${timestamp}.${file.name
+      .split(".")
+      .pop()}`;
 
-        const response = await imagekit.upload({
-            file: file,
-            fileName: customFileName,
-            useUniqueFileName: false,
-            folder: 'Credit_Bank_Campaign_User_Photos',
-            options: {
-                transformation: [
-                    {
-                        width: 800,
-                        height: 600,
-                        quality: 80
-                    }
-                ]
-            }
-        });
+    const response = await imagekit.upload({
+      file: file,
+      fileName: customFileName,
+      useUniqueFileName: false,
+      folder: "ProfilePictures",
+      options: {
+        transformation: [
+          {
+            width: 800,
+            height: 600,
+            quality: 80,
+          },
+        ],
+      },
+    });
 
-        const fileUrl = response.url;
-        const fileId = response.fileId;
+    const fileUrl = response.url;
+    const fileId = response.fileId;
 
-        return { fileUrl, fileId };
-    } catch (error) {
-        console.error("Image upload failed:", error);
-        throw error;
-    }
+    return { fileUrl, fileId };
+  } catch (error) {
+    console.error("Image upload failed:", error);
+    throw error;
+  }
 };
 
 export const listFilesInFolder = async (folder = '/StrategicDocs') => {
