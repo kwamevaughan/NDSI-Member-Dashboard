@@ -561,23 +561,23 @@ export default function AdminDashboard() {
                             {admin.id === adminUser?.id && (
                               <p className="text-xs text-gray-500">(You)</p>
                             )}
-                            {adminManagement.isSuperAdmin &&
-                              admin.id !== adminUser?.id && (
-                                <div className="flex items-center gap-1">
+                            {adminManagement.isSuperAdmin && (
+                              <div className="flex items-center gap-1">
+                                {/* Show edit for all admins, including self */}
+                                <button
+                                  onClick={() => handleEditAdminClick(admin)}
+                                  className="p-1 text-ndsi-blue hover:text-ndsi-green hover:bg-ndsi-blue rounded"
+                                  title="Edit Admin"
+                                >
+                                  <Icon
+                                    icon="mdi:pencil"
+                                    className="h-4 w-4"
+                                  />
+                                </button>
+                                {/* Only show delete for other admins, not self */}
+                                {admin.id !== adminUser?.id && (
                                   <button
-                                    onClick={() => handleEditAdminClick(admin)}
-                                    className="p-1 text-ndsi-blue hover:text-ndsi-green hover:bg-ndsi-blue rounded"
-                                    title="Edit Admin"
-                                  >
-                                    <Icon
-                                      icon="mdi:pencil"
-                                      className="h-4 w-4"
-                                    />
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteAdminClick(admin)
-                                    }
+                                    onClick={() => handleDeleteAdminClick(admin)}
                                     className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
                                     title="Delete Admin"
                                   >
@@ -586,8 +586,9 @@ export default function AdminDashboard() {
                                       className="h-4 w-4"
                                     />
                                   </button>
-                                </div>
-                              )}
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1045,6 +1046,7 @@ export default function AdminDashboard() {
                   value={editAdminData.role}
                   onChange={e => setEditAdminData({ ...editAdminData, role: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={adminToEdit && adminToEdit.id === adminUser?.id}
                 >
                   <option value="admin">Administrator</option>
                   <option value="super_admin">Super Admin</option>
