@@ -88,9 +88,9 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
               aria-label="Toggle dark mode"
             >
               {mode === "dark" ? (
-                <Icon icon="heroicons:sun" className="h-2 w-2" />
+                <Icon icon="heroicons:sun" className="h-6 w-6" />
               ) : (
-                <Icon icon="heroicons:moon" className="h-2 w-2" />
+                <Icon icon="heroicons:moon" className="h-6 w-6" />
               )}
             </button>
             <label className="hidden md:inline-flex items-center cursor-pointer">

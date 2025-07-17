@@ -107,7 +107,7 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                     }`}
                     aria-label="Collapse sidebar"
                   >
-                    <Icon icon="heroicons:chevron-left" className="h-5 w-5" />
+                    <Icon icon="heroicons:chevron-left" className="h-6 w-6 sm:h-6 sm:w-6 h-8 w-8" />
                   </button>
                 </>
               ) : (
@@ -121,7 +121,7 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                     }`}
                     aria-label="Expand sidebar"
                   >
-                    <Icon icon="heroicons:chevron-right" className="h-5 w-5" />
+                    <Icon icon="heroicons:chevron-right" className="h-6 w-6 sm:h-6 sm:w-6 h-8 w-8" />
                   </button>
                 </>
               )}
