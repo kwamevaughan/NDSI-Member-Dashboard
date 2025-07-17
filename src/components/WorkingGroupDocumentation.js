@@ -132,11 +132,11 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                         View All Documents
                     </button>
                 ) : (
-                    <Link href="/working-group-docs" legacyBehavior>
-                        <a className="transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-center rounded-full hover:translate-y-[-5px] mt-auto text-center block">
-                            View All Documents
-                        </a>
-                    </Link>
+                    <button
+                        className="transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-center rounded-full hover:translate-y-[-5px] mt-auto text-center block"
+                    >
+                        View All Documents
+                    </button>
                 )}
             </div>
             <SimpleModal
