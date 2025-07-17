@@ -466,7 +466,10 @@ export function GenericTable({
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
       {(title || searchable || onAddNew || enableDateFilter) && (
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div
+          className="p-6 border-b bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-white/30 dark:border-gray-700/40"
+          style={{ boxShadow: '0 4px 24px 0 rgba(30, 41, 59, 0.04)' }}
+        >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {title && (
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-0">
@@ -694,7 +697,7 @@ export function GenericTable({
       {/* Table */}
       <div className="overflow-x-auto h-[600px] max-h-full md:max-h-screen overflow-y-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+          <thead className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-b border-white/30 dark:border-gray-700/40 sticky top-0 z-10">
             <tr>
               {selectable && (
                 <th className="w-12 px-4 py-4">
