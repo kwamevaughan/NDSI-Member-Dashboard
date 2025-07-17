@@ -81,19 +81,25 @@ export function useAdminManagement(getAdminToken, onRefresh) {
     const token = getAdminToken();
 
     try {
+      // Build the request body and include password if present
+      const body = {
+        adminId,
+        full_name: editAdminData.full_name.trim(),
+        email: editAdminData.email.trim().toLowerCase(),
+        organization_name: editAdminData.organization_name.trim(),
+        is_super_admin: editAdminData.is_super_admin,
+      };
+      if (editAdminData.password && editAdminData.password.length > 0) {
+        body.password = editAdminData.password;
+      }
+
       const response = await fetch("/api/admin/admins", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          adminId,
-          full_name: editAdminData.full_name.trim(),
-          email: editAdminData.email.trim().toLowerCase(),
-          organization_name: editAdminData.organization_name.trim(),
-          is_super_admin: editAdminData.is_super_admin,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {

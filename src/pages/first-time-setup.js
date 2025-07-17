@@ -224,7 +224,7 @@ export default function FirstTimeSetup() {
         </div>
 
         {step === 3 ? (
-          <div className="text-center py-8">
+          <div className="text-center py-2">
             <div className="mb-6">
               <Icon
                 icon="mdi:check-circle"

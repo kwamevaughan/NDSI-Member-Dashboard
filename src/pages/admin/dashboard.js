@@ -40,13 +40,17 @@ export default function AdminDashboard() {
     full_name: '',
     email: '',
     organization_name: '',
-    is_super_admin: false
+    is_super_admin: false,
+    password: '', // <-- add this
   });
   const [isSessionExpired, setIsSessionExpired] = useState(false);
   const [showBulkApproveModal, setShowBulkApproveModal] = useState(false);
   const [showBulkRejectModal, setShowBulkRejectModal] = useState(false);
   const [bulkRejectReason, setBulkRejectReason] = useState("");
   const [bulkActionUserIds, setBulkActionUserIds] = useState([]);
+
+  // Add state for password visibility
+  const [showEditAdminPassword, setShowEditAdminPassword] = useState(false);
 
   // Initialize hooks
   const userManagement = useUserManagement(getAdminToken, () => setIsSessionExpired(true));
@@ -130,14 +134,25 @@ export default function AdminDashboard() {
       full_name: admin.full_name || '',
       email: admin.email || '',
       organization_name: admin.organization_name || '',
-      is_super_admin: admin.is_super_admin || false
+      is_super_admin: admin.is_super_admin || false,
+      password: '', // <-- reset password field
     });
     setShowEditAdminModal(true);
   };
 
   const handleEditAdmin = async () => {
     if (adminToEdit) {
-      const success = await adminManagement.handleEditAdmin(adminToEdit.id, editAdminData);
+      // Build payload
+      const payload = {
+        full_name: editAdminData.full_name,
+        email: editAdminData.email,
+        organization_name: editAdminData.organization_name,
+        is_super_admin: editAdminData.is_super_admin,
+      };
+      if (editAdminData.password) {
+        payload.password = editAdminData.password;
+      }
+      const success = await adminManagement.handleEditAdmin(adminToEdit.id, payload);
       if (success) {
         setShowEditAdminModal(false);
         setAdminToEdit(null);
@@ -411,8 +426,7 @@ export default function AdminDashboard() {
                       userManagement.handleApproval(row.id, "approve");
                     }
                   },
-                  show: (row) =>
-                    row.is_approved === false || row.is_approved === null,
+                  show: (row) => !row.is_approved && row.approval_status !== 'rejected',
                 },
                 {
                   label: (row) =>
@@ -429,8 +443,7 @@ export default function AdminDashboard() {
                       handleRejectClick(row);
                     }
                   },
-                  show: (row) =>
-                    row.is_approved === false || row.is_approved === null,
+                  show: (row) => !row.is_approved && row.approval_status !== 'rejected',
                 },
                 {
                   label: (row) =>
@@ -994,6 +1007,33 @@ export default function AdminDashboard() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter organization name"
                 />
+              </div>
+
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Password (optional)
+                </label>
+                <input
+                  type={showEditAdminPassword ? "text" : "password"}
+                  value={editAdminData.password}
+                  onChange={(e) =>
+                    setEditAdminData({
+                      ...editAdminData,
+                      password: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                  placeholder="Enter new password (leave blank to keep current)"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowEditAdminPassword((v) => !v)}
+                  className="absolute top-1/2 right-3 inset-y-0 flex items-center text-gray-400 hover:text-gray-700"
+                  tabIndex={-1}
+                  aria-label={showEditAdminPassword ? "Hide password" : "Show password"}
+                >
+                  <Icon icon={showEditAdminPassword ? "mdi:eye-off" : "mdi:eye"} className="w-5 h-5" />
+                </button>
               </div>
 
               <div className="flex items-center">

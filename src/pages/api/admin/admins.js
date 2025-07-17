@@ -1,5 +1,6 @@
 import { supabaseAdmin } from 'lib/supabase';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE') {
@@ -147,7 +148,7 @@ export default async function handler(req, res) {
             return res.status(403).json({ error: 'Super admin access required to modify administrators' });
         }
 
-        const { adminId, full_name, email, organization_name, is_super_admin } = req.body;
+        const { adminId, full_name, email, organization_name, is_super_admin, password } = req.body;
 
         if (!adminId) {
             return res.status(400).json({ error: 'Admin ID is required' });
@@ -166,6 +167,12 @@ export default async function handler(req, res) {
                 is_super_admin: is_super_admin,
                 updated_at: new Date().toISOString()
             };
+
+            // If password is provided, hash and update
+            if (password && password.length > 0) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                updateData.password = hashedPassword;
+            }
 
             // Remove undefined values
             Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);

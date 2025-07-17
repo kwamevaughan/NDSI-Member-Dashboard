@@ -21,18 +21,36 @@ export default async function handler(req, res) {
     }
 
     const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword) {
-        return res.status(400).json({ error: 'Current and new password are required' });
+    if (!newPassword) {
+        return res.status(400).json({ error: 'New password is required' });
     }
 
     try {
         const { data: user, error } = await supabaseAdmin
             .from('users')
-            .select('password')
+            .select('password, is_first_time')
             .eq('id', userId)
             .single();
         if (error || !user) {
             return res.status(404).json({ error: 'User not found' });
+        }
+
+        // If user is first time, allow password change without current password
+        if (user.is_first_time) {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            const { error: updateError } = await supabaseAdmin
+                .from('users')
+                .update({ password: hashedPassword, is_first_time: false })
+                .eq('id', userId);
+            if (updateError) {
+                throw updateError;
+            }
+            return res.status(200).json({ message: 'Password changed successfully' });
+        }
+
+        // Otherwise, require current password
+        if (!currentPassword) {
+            return res.status(400).json({ error: 'Current password is required' });
         }
         const passwordMatch = await bcrypt.compare(currentPassword, user.password);
         if (!passwordMatch) {

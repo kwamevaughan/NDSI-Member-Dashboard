@@ -81,6 +81,15 @@ export default function Home() {
       if (result && result.token) {
         toast.dismiss(toastId);
         
+        // Redirect to first-time-setup if required
+        if (result.enforcePasswordChange) {
+          toast.success("Welcome! Please complete your first-time setup.");
+          localStorage.setItem("rememberMe", rememberMe);
+          setTimeout(() => {
+            router.push("/first-time-setup");
+          }, 100);
+          return;
+        }
         // Check if user is pending approval
         if (result.isPendingApproval) {
           const welcomeMessage = `Welcome ${result.user.full_name || "User"}! Your account is pending approval.`;
