@@ -69,7 +69,7 @@ export default async function handler(req, res) {
                         <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
                     </div>
                     <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Hello ${firstName},</h2>
+                        <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Hello ${fullName},</h2>
                         <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                             We’ve received a request to reset your NDSI account password. Click the button below to create a new one:
                         </p>

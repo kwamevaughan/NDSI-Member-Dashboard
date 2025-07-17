@@ -16,6 +16,7 @@ function MyApp({ Component, pageProps }) {
           <title>NDSI Member Dashboard</title>
           <meta name="description" content="NDSI Member Dashboard - Access your member portal" />
         </Head>
+        <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
         <UserComponent Component={Component} pageProps={pageProps} />
       </UserProvider>
     </ThemeProvider>
