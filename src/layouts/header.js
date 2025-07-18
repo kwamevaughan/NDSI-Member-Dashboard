@@ -42,7 +42,7 @@ const Header = ({ isSidebarOpen, mode, toggleMode, onLogout }) => {
         <div className="flex items-center justify-between p-2 md:p-4">
           {/* Left Section: Logo and Search (Desktop) */}
           <div className="flex items-center space-x-4">
-            <div className={`${isSidebarOpen ? "hidden md:hidden" : "block"}`}>
+            <div className={`${isSidebarOpen ? "hidden md:hidden" : "block"} ml-6`}>
               <Image
                 src={
                   mode === "dark"

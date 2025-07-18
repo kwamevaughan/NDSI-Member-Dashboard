@@ -85,7 +85,7 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
               isOpen ? "px-4" : "px-0"
             }`}
           >
-            <div className="flex items-center justify-center w-full gap-6">
+            <div className="flex items-center justify-center  w-full gap-6">
               {isOpen ? (
                 <>
                   <Image
@@ -107,21 +107,27 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                     }`}
                     aria-label="Collapse sidebar"
                   >
-                    <Icon icon="heroicons:chevron-left" className="h-6 w-6 sm:h-6 sm:w-6 h-8 w-8" />
+                    <Icon
+                      icon="heroicons:chevron-left"
+                      className="md:h-6 md:w-6 h-10 w-10"
+                    />
                   </button>
                 </>
               ) : (
                 <>
                   <button
                     onClick={toggleSidebar}
-                    className={`p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white ${
+                    className={`p-2 rounded-lg transition-all duration-300 hover:bg-[#28A8E0] hover:text-white md:m-0 -mt-4 ml-8 ${
                       mode === "dark"
                         ? "text-white hover:bg-[#28A8E0]"
                         : "text-[#403F41] hover:bg-[#28A8E0]"
                     }`}
                     aria-label="Expand sidebar"
                   >
-                    <Icon icon="heroicons:chevron-right" className="h-6 w-6 sm:h-6 sm:w-6 h-8 w-8" />
+                    <Icon
+                      icon="heroicons:chevron-right"
+                      className="md:h-6 md:w-6 h-10 w-10"
+                    />
                   </button>
                 </>
               )}
@@ -174,7 +180,11 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                 className="flex items-center p-4 cursor-pointer bg-ndsi-blue "
                 onClick={() => setShowLogout((prev) => !prev)}
               >
-                <div className={`relative flex items-center ${isOpen ? "gap-2" : "justify-center w-full group"}`}>
+                <div
+                  className={`relative flex items-center ${
+                    isOpen ? "gap-2" : "justify-center w-full group"
+                  }`}
+                >
                   {isOpen && (
                     <span className="text-sm font-medium text-white">
                       {user.full_name}
@@ -195,7 +205,9 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
               >
                 <div className="flex flex-col gap-2 text-white text-sm pt-2">
                   <div
-                    className={`relative flex items-center ${isOpen ? "gap-2" : "justify-center w-full group"} cursor-pointer hover:bg-ndsi-green rounded-2xl p-2`}
+                    className={`relative flex items-center ${
+                      isOpen ? "gap-2" : "justify-center w-full group"
+                    } cursor-pointer hover:bg-ndsi-green rounded-2xl p-2`}
                     onClick={() => router.push("/profile")}
                   >
                     <Icon icon="mdi:account-outline" className="h-5 w-5" />
@@ -207,7 +219,9 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                     )}
                   </div>
                   <div
-                    className={`relative flex items-center ${isOpen ? "gap-2" : "justify-center w-full group"} py-2 cursor-pointer hover:bg-ndsi-green rounded-2xl p-2`}
+                    className={`relative flex items-center ${
+                      isOpen ? "gap-2" : "justify-center w-full group"
+                    } py-2 cursor-pointer hover:bg-ndsi-green rounded-2xl p-2`}
                     onClick={() => toggleMode()}
                   >
                     <Icon
@@ -217,9 +231,7 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                           : "line-md:moon-alt-to-sunny-outline-loop-transition"
                       }
                       className={`h-5 w-5 ${
-                        mode === "dark"
-                          ? "text-paan-blue"
-                          : "text-paan-yellow"
+                        mode === "dark" ? "text-paan-blue" : "text-paan-yellow"
                       }`}
                     />
                     {isOpen && (
@@ -236,7 +248,9 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                   <hr className="border-t border-white" />
                   <div
                     onClick={onLogout}
-                    className={`relative flex items-center ${isOpen ? "gap-2" : "justify-center w-full group"} mb-4 text-paan-red hover:text-paan-red transition-colors hover:bg-ndsi-green rounded-2xl p-2 cursor-pointer`}
+                    className={`relative flex items-center ${
+                      isOpen ? "gap-2" : "justify-center w-full group"
+                    } mb-4 text-paan-red hover:text-paan-red transition-colors hover:bg-ndsi-green rounded-2xl p-2 cursor-pointer`}
                   >
                     <Icon icon="mdi:logout" className="h-5 w-5" />
                     {isOpen && <span>Sign Out</span>}
