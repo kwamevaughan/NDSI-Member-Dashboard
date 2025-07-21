@@ -341,8 +341,8 @@ export default function GeneralSettings({ getAdminToken }) {
         width="max-w-4xl"
       >
         <div className="space-y-8">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="md:col-span-2">
+          <div className="grid gap-6 md:grid-cols-1">
+            <div className="md:col-span-1">
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 <Icon icon="mdi:format-title" className="w-4 h-4" />
                 Subject Line
