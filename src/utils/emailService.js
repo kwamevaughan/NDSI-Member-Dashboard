@@ -32,6 +32,9 @@ async function getTemplate(key, variables = {}) {
     return { subject, html, text };
 }
 
+// Office365: The 'from' address must match the authenticated user (EMAIL_USER)
+const FROM_EMAIL = process.env.EMAIL_USER;
+
 export async function sendApprovalEmail(user, action, reason = null) {
     try {
         const displayName = user.full_name || 'User';
@@ -65,7 +68,7 @@ export async function sendApprovalEmail(user, action, reason = null) {
             }
         }
         const mailOptions = {
-            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+            from: FROM_EMAIL,
             to: user.email,
             subject: template.subject,
             text: template.text,
@@ -97,7 +100,7 @@ export async function sendDeletionEmail(user) {
             };
         }
         const mailOptions = {
-            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+            from: FROM_EMAIL,
             to: user.email,
             subject: template.subject,
             text: template.text,
@@ -123,7 +126,7 @@ export async function sendAdminWelcomeEmail(user, password) {
         const text = `Hello ${displayName},\n\nWelcome to the NDSI team! Your administrator account has been created successfully.\n\nLogin Details:\nEmail: ${user.email}\nPassword: ${password}\n\nPlease log in at: ${adminLoginLink}\n\nImportant: Please change your password after your first login for security.\n\nBest regards,\nThe NDSI Team`;
         const html = `<div>Admin welcome for ${displayName}</div>`;
         const mailOptions = {
-            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+            from: FROM_EMAIL,
             to: user.email,
             subject: subject,
             text: text,
@@ -134,5 +137,17 @@ export async function sendAdminWelcomeEmail(user, password) {
     } catch (error) {
         console.error('Error sending admin welcome email:', error);
         throw error;
+    }
+}
+
+// Export a function to test the transporter connection
+export async function testEmailConnection() {
+    try {
+        await transporter.verify();
+        console.log('SMTP connection successful');
+        return true;
+    } catch (err) {
+        console.error('SMTP connection failed:', err);
+        return false;
     }
 }

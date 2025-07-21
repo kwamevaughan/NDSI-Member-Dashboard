@@ -122,10 +122,15 @@ export default async function handler(req, res) {
             // Send email notification to user if enabled
             if (user) {
                 const { sendApprovalEmail } = await import('../../../utils/emailService');
-                if (action === 'approve' && settings?.notify_on_approve) {
-                    await sendApprovalEmail(user, action, reason);
-                } else if (action === 'reject' && settings?.notify_on_reject) {
-                    await sendApprovalEmail(user, action, reason);
+                try {
+                    if (action === 'approve' && settings?.notify_on_approve) {
+                        await sendApprovalEmail(user, action, reason);
+                    } else if (action === 'reject' && settings?.notify_on_reject) {
+                        await sendApprovalEmail(user, action, reason);
+                    }
+                } catch (emailError) {
+                    console.error('Error sending approve email:', emailError);
+                    // Do not throw, just log
                 }
             }
 

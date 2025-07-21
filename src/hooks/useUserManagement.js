@@ -217,6 +217,37 @@ export function useUserManagement(getAdminToken, onSessionExpired) {
     }
   };
 
+  const handleAddUser = async (newUserData) => {
+    setProcessingUser('add');
+    const token = getAdminToken();
+    try {
+      const response = await fetch("/api/admin/users/bulk-upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ users: [newUserData] }),
+      });
+      await handleApiError(response);
+      const data = await response.json();
+      if (data.results && data.results[0] && data.results[0].success) {
+        toast.success("User created successfully");
+        await fetchPendingUsers();
+        return true;
+      } else {
+        toast.error(data.results[0]?.error || "Failed to create user");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast.error(error.message || "Failed to create user");
+      return false;
+    } finally {
+      setProcessingUser(null);
+    }
+  };
+
   const calculateStats = (userData) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -282,5 +313,6 @@ export function useUserManagement(getAdminToken, onSessionExpired) {
     handleBulkReject,
     getApprovedUsers,
     getRejectedUsers,
+    handleAddUser,
   };
 } 

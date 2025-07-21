@@ -11,6 +11,7 @@ import ExportModal from "./ExportModal";
 import SimpleModal from "./SimpleModal";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
+import AddUserModal from "./admin/AddUserModal";
 
 // Enhanced useTable hook
 function useTable(data, initialPageSize = 20) {
@@ -145,6 +146,7 @@ export function GenericTable({
   importType,
   enableDateFilter = false,
   onRefresh,
+  onAddUser,
 }) {
   // Ensure data is an array and filter out any null/undefined items
   const safeData = Array.isArray(data) ? data.filter(item => item != null) : [];
@@ -162,6 +164,7 @@ export function GenericTable({
   const buttonRef = useRef();
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
   // Detect mode (light/dark)
   const [mode, setMode] = useState('light');
   useEffect(() => {
@@ -202,6 +205,7 @@ export function GenericTable({
   // Use filtered data for table
   const table = useTable(filteredByDate);
   const [selectAllMode, setSelectAllMode] = useState(false);
+  const [addUserLoading, setAddUserLoading] = useState(false);
 
   const handleBulkDelete = () => {
     if (table.selected.length > 0) {
@@ -596,6 +600,15 @@ export function GenericTable({
               </div>
               {/* Export, Import, and Add New on the right */}
               <div className="flex items-center gap-3 ml-auto">
+                {onAddUser && (
+                  <button
+                    onClick={() => setShowAddUserModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm bg-ndsi-blue text-white rounded-lg hover:bg-ndsi-blue-700 transition-colors focus:ring-2 focus:ring-ndsi-blue focus:ring-offset-2"
+                  >
+                    <Icon icon="mdi:account-plus" className="w-4 h-4" />
+                    Add User
+                  </button>
+                )}
                 <button
                   onClick={() => setShowImportModal(true)}
                   className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -610,7 +623,6 @@ export function GenericTable({
                   <Icon icon="mdi:download" className="w-4 h-4" />
                   Export Data
                 </button>
-
                 {onAddNew && (
                   <button
                     onClick={onAddNew}
@@ -1103,6 +1115,21 @@ export function GenericTable({
           </div>
         </div>
       </SimpleModal>
+      {/* AddUserModal */}
+      {onAddUser && (
+        <AddUserModal
+          isOpen={showAddUserModal}
+          onClose={() => setShowAddUserModal(false)}
+          loading={addUserLoading}
+          onSubmit={async (formData) => {
+            setAddUserLoading(true);
+            const success = await onAddUser(formData);
+            setAddUserLoading(false);
+            if (success) setShowAddUserModal(false);
+            return success;
+          }}
+        />
+      )}
     </div>
   );
 }

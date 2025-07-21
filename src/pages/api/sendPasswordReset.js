@@ -59,7 +59,8 @@ export default async function handler(req, res) {
 
         const fullName = user.full_name || 'User';
         const mailOptions = {
-            from: `"NDSI Team" <${process.env.EMAIL_USER}>`,
+            // Office365: The 'from' address must match the authenticated user (EMAIL_USER)
+            from: process.env.EMAIL_USER,
             to: normalizedEmail,
             subject: 'Reset Your NDSI Password',
             text: `Hello ${fullName},\n\nWe received a request to reset your NDSI account password. Click the link below to set a new one:\n\n${resetLink}\n\nThis link expires in 1 hour. If you didn’t request this, feel free to ignore this email.\n\nWarm regards,\nThe NDSI Team`,

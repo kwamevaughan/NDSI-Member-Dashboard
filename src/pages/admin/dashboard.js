@@ -466,6 +466,7 @@ export default function AdminDashboard() {
               searchable={true}
               selectable={true}
               enableDateFilter={true}
+              onAddUser={userManagement.handleAddUser}
             />
           </>
         )}
