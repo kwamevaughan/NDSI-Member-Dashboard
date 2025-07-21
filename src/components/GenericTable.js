@@ -147,6 +147,7 @@ export function GenericTable({
   enableDateFilter = false,
   onRefresh,
   onAddUser,
+  loading = false, // <-- Add loading prop, default false
 }) {
   // Ensure data is an array and filter out any null/undefined items
   const safeData = Array.isArray(data) ? data.filter(item => item != null) : [];
@@ -786,7 +787,21 @@ export function GenericTable({
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {table.paged.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0) + 1}
+                  className="px-4 py-12 text-center"
+                >
+                  <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                    <div className="flex justify-center text-4xl mb-3 ">
+                      <Icon icon="mdi:loading" className="w-10 h-10 animate-spin" />
+                    </div>
+                    <div className="text-sm font-medium">Please wait, loading data...</div>
+                  </div>
+                </td>
+              </tr>
+            ) : table.paged.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0) + 1}
