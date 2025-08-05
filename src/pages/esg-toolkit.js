@@ -59,49 +59,16 @@ const ESGToolkitPage = () => {
           <div
             className={`flex-1 transition-margin duration-300 ${
               isSidebarOpen ? "lg:ml-[250px]" : "ml-0 lg:ml-[80px]"
-            }`}
+            } h-full min-h-screen`}
           >
             <main
-              className={`flex flex-col items-center justify-center h-full w-full min-h-screen ${
+              className={`h-full min-h-screen w-full ${
                 mode === "dark"
                   ? "bg-[#0a0c1d] text-white"
                   : "bg-[#ececec] text-black"
               }`}
             >
-              <div className="flex flex-col items-center justify-center h-full w-full py-24">
-                <div className="mb-8">
-                  <Icon
-                    icon="mdi:alert-circle-outline"
-                    width="96"
-                    height="96"
-                    className="text-ndsi-blue"
-                  />
-                </div>
-                <h2
-                  className="text-4xl font-bold mb-4 text-center"
-                  style={{ color: mode === "dark" ? "#28A8E0" : "#172840" }}
-                >
-                  ESG Toolkit
-                  <br />
-                  Coming Soon
-                </h2>
-                <p className="text-lg text-center max-w-xl mb-8 text-gray-500 dark:text-gray-300">
-                  We&apos;re finalizing the ESG Toolkit content to ensure you
-                  get the best resources and experience. Please check back soon!
-                </p>
-                <div className="flex justify-center">
-                  <span className="inline-block animate-bounce rounded-full bg-[#28A8E0] dark:bg-[#172840] h-4 w-4 mr-2"></span>
-                  <span
-                    className="inline-block animate-bounce rounded-full bg-[#28A8E0] dark:bg-[#172840] h-4 w-4 mr-2"
-                    style={{ animationDelay: "0.2s" }}
-                  ></span>
-                  <span
-                    className="inline-block animate-bounce rounded-full bg-[#28A8E0] dark:bg-[#172840] h-4 w-4"
-                    style={{ animationDelay: "0.4s" }}
-                  ></span>
-                </div>
-              </div>
-              {/* <ESGToolkitEmbed /> */}
+              <ESGToolkitEmbed />
             </main>
           </div>
         </div>

@@ -26,7 +26,7 @@ const ESGToolkitEmbed = () => {
     };
 
     return (
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full ">
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg z-10">
                     <div className="text-center">
@@ -56,7 +56,7 @@ const ESGToolkitEmbed = () => {
 
             <iframe
                 src="/esg-toolkit/content/index.html"
-                className="w-full h-[calc(100vh-200px)] border-0 rounded-lg shadow-lg"
+                className="w-full h-full border-0 rounded-lg shadow-lg mt-20"
                 onLoad={handleLoad}
                 onError={handleError}
                 title="ESG Toolkit"
