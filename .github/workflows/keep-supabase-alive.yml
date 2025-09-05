@@ -1,0 +1,25 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping keepalive URL
+        env:
+          KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}
+        run: |
+          if [ -z "$KEEPALIVE_URL" ]; then
+            echo "KEEPALIVE_URL secret is not set. Configure it in the repository settings under Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "Pinging $KEEPALIVE_URL ..."
+          # Use a short timeout and fail fast if unreachable
+          curl -fsS -m 20 -A "github-actions-keepalive" "$KEEPALIVE_URL" >/dev/null
+          echo "Keepalive ping succeeded" 
