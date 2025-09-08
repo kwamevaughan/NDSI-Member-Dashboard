@@ -88,7 +88,9 @@ export default async function handler(req, res) {
                     for (const user of usersToDelete) {
                         const mailOptions = {
                             // Office365: The 'from' address must match the authenticated user (EMAIL_USER)
-                            from: process.env.EMAIL_USER,
+                            from: process.env.EMAIL_FROM_NAME 
+                                ? `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_USER}>`
+                                : process.env.EMAIL_USER,
                             to: user.email,
                             subject: 'NDSI Account Deletion Notice',
                             text: `Hello ${user.full_name || 'User'},\n\nYour NDSI account has been permanently deleted by an administrator. If you believe this was done in error, please contact us immediately.\n\nBest regards,\nThe NDSI Team`,

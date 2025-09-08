@@ -90,7 +90,9 @@ export default async function handler(req, res) {
 
                 const mailOptions = {
                     // Office365: The 'from' address must match the authenticated user (EMAIL_USER)
-                    from: process.env.EMAIL_USER,
+                    from: process.env.EMAIL_FROM_NAME 
+                        ? `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_USER}>`
+                        : process.env.EMAIL_USER,
                     to: normalizedEmail,
                     subject: 'NDSI Registration - Pending Approval',
                     text: `Hello ${displayName},\n\nThank you for registering with NDSI! Your account is currently pending approval. You will receive another email once your account has been approved and you can access the member dashboard.\n\nBest,\nThe NDSI Team`,

@@ -33,7 +33,9 @@ async function getTemplate(key, variables = {}) {
 }
 
 // Office365: The 'from' address must match the authenticated user (EMAIL_USER)
-const FROM_EMAIL = process.env.EMAIL_USER;
+const FROM_EMAIL = process.env.EMAIL_FROM_NAME 
+    ? `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_USER}>`
+    : process.env.EMAIL_USER;
 
 export async function sendApprovalEmail(user, action, reason = null) {
     try {

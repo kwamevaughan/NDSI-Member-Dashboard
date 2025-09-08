@@ -1,70 +1,74 @@
 // src/pages/api/sendPasswordReset.js
-import { supabaseAdmin } from 'lib/supabase';
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
+import { supabaseAdmin } from "lib/supabase";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { email } = req.body;
+  const normalizedEmail = email.toLowerCase();
+
+  if (!normalizedEmail) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const { data: user, error: userError } = await supabaseAdmin
+      .from("users")
+      .select("email, full_name")
+      .eq("email", normalizedEmail)
+      .single();
+
+    if (userError || !user) {
+      return res
+        .status(200)
+        .json({ message: "If the email exists, a reset link has been sent." });
     }
 
-    const { email } = req.body;
-    const normalizedEmail = email.toLowerCase();
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-    if (!normalizedEmail) {
-        return res.status(400).json({ error: 'Email is required' });
+    const { error: insertError } = await supabaseAdmin
+      .from("password_resets")
+      .insert({
+        email: normalizedEmail,
+        token: resetToken,
+        expires_at: expiresAt,
+      });
+
+    if (insertError) {
+      throw new Error("Failed to store reset token");
     }
 
-    try {
-        const { data: user, error: userError } = await supabaseAdmin
-            .from('users')
-            .select('email, full_name')
-            .eq('email', normalizedEmail)
-            .single();
+    const protocol = req.headers["x-forwarded-proto"] || "http";
+    const host = req.headers["x-forwarded-host"] || req.headers.host;
+    const baseUrl = `${protocol}://${host}`;
+    const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
 
-        if (userError || !user) {
-            return res.status(200).json({ message: 'If the email exists, a reset link has been sent.' });
-        }
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: parseInt(process.env.EMAIL_PORT, 10),
+      secure: process.env.EMAIL_SECURE === "true",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      // Removed debug: true and logger: true
+    });
 
-        const resetToken = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-
-        const { error: insertError } = await supabaseAdmin
-            .from('password_resets')
-            .insert({
-                email: normalizedEmail,
-                token: resetToken,
-                expires_at: expiresAt,
-            });
-
-        if (insertError) {
-            throw new Error('Failed to store reset token');
-        }
-
-        const protocol = req.headers['x-forwarded-proto'] || 'http';
-        const host = req.headers['x-forwarded-host'] || req.headers.host;
-        const baseUrl = `${protocol}://${host}`;
-        const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
-
-        const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: parseInt(process.env.EMAIL_PORT, 10),
-            secure: process.env.EMAIL_SECURE === 'true',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-            // Removed debug: true and logger: true
-        });
-
-        const fullName = user.full_name || 'User';
-        const mailOptions = {
-            // Office365: The 'from' address must match the authenticated user (EMAIL_USER)
-            from: process.env.EMAIL_USER,
-            to: normalizedEmail,
-            subject: 'Reset Your NDSI Password',
-            text: `Hello ${fullName},\n\nWe received a request to reset your NDSI account password. Click the link below to set a new one:\n\n${resetLink}\n\nThis link expires in 1 hour. If you didn’t request this, feel free to ignore this email.\n\nWarm regards,\nThe NDSI Team`,
-            html: `
+    const fullName = user.full_name || "User";
+    const mailOptions = {
+      // Office365: The 'from' address must match the authenticated user (EMAIL_USER)
+      from: process.env.EMAIL_FROM_NAME
+        ? `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_USER}>`
+        : process.env.EMAIL_USER,
+      to: normalizedEmail,
+      subject: "Reset Your NDSI Password",
+      text: `Hello ${fullName},\n\nWe received a request to reset your NDSI account password. Click the link below to set a new one:\n\n${resetLink}\n\nThis link expires in 1 hour. If you didn’t request this, feel free to ignore this email.\n\nWarm regards,\nThe NDSI Team`,
+      html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ececec; border-radius: 8px;">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="width: 200px; height: auto;" />
@@ -90,19 +94,21 @@ export default async function handler(req, res) {
                     </div>
                 </div>
             `,
-        };
+    };
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent successfully:', mailOptions);
-        } catch (emailError) {
-            console.error('Email send error:', emailError);
-            throw emailError;
-        }
-
-        return res.status(200).json({ message: 'If the email exists, a reset link has been sent.' });
-    } catch (error) {
-        console.error('Password reset error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully:", mailOptions);
+    } catch (emailError) {
+      console.error("Email send error:", emailError);
+      throw emailError;
     }
+
+    return res
+      .status(200)
+      .json({ message: "If the email exists, a reset link has been sent." });
+  } catch (error) {
+    console.error("Password reset error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
