@@ -13,7 +13,7 @@ import DocumentGrid from "@/components/DocumentGrid";
 import { useTheme } from '@/hooks/useTheme';
 
 // Accept mode and toggleMode as props
-const CommsPage = () => {
+const EngagementAndAdvocacyDocumentPage = () => {
   const { mode, toggleMode } = useTheme();
   const router = useRouter();
   const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -75,8 +75,8 @@ const CommsPage = () => {
           >
             <DocumentGrid
               folder="Comms"
-              title="Comms Documents"
-              description="Browse and filter comms documents below."
+              title="Engagement and Advocacy Documents"
+              description="Browse and filter engagement and advocacy documents below."
               mode={mode}
             />
           </main>
@@ -86,4 +86,4 @@ const CommsPage = () => {
   );
 };
 
-export default CommsPage;
+export default EngagementAndAdvocacyDocumentPage;

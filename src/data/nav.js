@@ -19,9 +19,9 @@ const navLinks = [
   },
   { href: "/esg-toolkit", icon: "mdi:briefcase-outline", label: "ESG Toolkit" },
   {
-    href: "/comms",
+    href: "/engagement-advocacy",
     icon: "ic:outline-comment",
-    label: "Comms",
+    label: "Engagement and Advocacy Document",
   },
 ];
 

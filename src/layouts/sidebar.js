@@ -158,7 +158,7 @@ const Sidebar = ({ isOpen, onLogout, toggleSidebar }) => {
                         : "text-[#403F41] group-hover:text-white"
                     }`}
                   />
-                  {isOpen && <span>{label}</span>}
+                  {isOpen && <span className="w-full">{label}</span>}
                   {!isOpen && (
                     <span className="absolute left-full ml-2 text-xs text-white bg-gray-700 rounded py-1 px-2 opacity-0 group-hover:opacity-75 transition-opacity whitespace-nowrap">
                       {label}
