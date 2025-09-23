@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '@/context/UserContext';
 import { Icon } from '@iconify/react';
-import { listFilesInFolder } from '@/utils/imageKitService';
-import Link from 'next/link';
+import { listAllFilesByPrefix } from '@/utils/imageKitService';
 import SimpleModal from './SimpleModal';
 import toast from 'react-hot-toast';
 
@@ -31,24 +30,44 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
             setLoading(true);
             setError(null);
             try {
-                const files = await listFilesInFolder('/WorkingGroups');
-                const docs = files.filter(f => {
-                    const ext = f.name.split('.').pop().toLowerCase();
-                    return ext === 'pdf' || ext === 'docx';
-                }).map(f => ({
-                    name: f.name,
-                    category: f.folder ? f.folder.split('/').pop() : 'General',
-                    url: f.url,
-                    id: f.fileId,
-                    type: f.name.split('.').pop().toLowerCase(),
-                }));
+                console.log('Fetching all working group files');
+                const files = await listAllFilesByPrefix('/WorkingGroups');
+                
+                const docs = files
+                    .filter(f => {
+                        const ext = f.name.split('.').pop().toLowerCase();
+                        const isValid = ['pdf', 'docx'].includes(ext);
+                        if (!isValid) {
+                            console.log('Skipping file with unsupported extension:', f.name);
+                        }
+                        return isValid;
+                    })
+                    .map(f => {
+                        // Extract category from folder path or use 'General' as default
+                        const category = f.folderPath 
+                            ? f.folderPath.split('/').pop() 
+                            : 'General';
+                            
+                        return {
+                            id: f.fileId,
+                            name: f.name,
+                            category: category || 'General',
+                            url: f.url,
+                            type: f.name.split('.').pop().toLowerCase(),
+                            folderPath: f.folderPath
+                        };
+                    });
+                
+                console.log('Processed documents:', docs);
                 setDocuments(docs);
             } catch (e) {
-                setError('Failed to load documents.');
+                console.error('Error fetching documents:', e);
+                setError('Failed to load documents. Please try again later.');
             } finally {
                 setLoading(false);
             }
         };
+        
         fetchDocs();
     }, []);
 
@@ -61,7 +80,14 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
             } h-full`}
         >
             <div className="flex flex-col justify-between p-8 h-full">  {/* Full height for content */}
-                <h3 className={`font-bold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Working Group Documentation</h3>
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className={`font-bold text-xl ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Working Group Documentation</h3>
+                    {!loading && !error && documents.length > 0 && (
+                        <div className="text-sm text-gray-500">
+                            Showing {documents.length} document{documents.length !== 1 ? 's' : ''}
+                        </div>
+                    )}
+                </div>
 
                 {/* Table section */}
                 <div className="overflow-x-auto">
@@ -107,7 +133,7 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                                                 <Icon icon="mdi:eye-circle" className="text-2xl mr-2"/> View
                                             </button>
                                             <button
-                                                onClick={isPendingApproval ? handleButtonClick : () => window.open(doc.url, '_blank')}
+                                                onClick={isPendingApproval ? handleButtonClick : () => window.open(doc.url, '_self')}
                                                 disabled={isPendingApproval}
                                                 className={`flex items-center transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white text-base font-normal px-4 py-2 rounded-full hover:translate-y-[-5px] w-1/2 justify-center
                                                     ${isPendingApproval ? 'opacity-50 cursor-not-allowed' : ''}`}

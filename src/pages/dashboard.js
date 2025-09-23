@@ -46,9 +46,22 @@ const Dashboard = () => {
         }
         
         return (
-            <Link href={href} className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" style={{textDecoration: 'none'}}>
+            <div 
+                className="w-full flex-grow hover:translate-y-[-5px] transition-all duration-300 block" 
+                style={{textDecoration: 'none'}}
+                onClick={(e) => {
+                    // Check if the clicked element is a button or has a button ancestor
+                    const clickedButton = e.target.closest('button');
+                    if (clickedButton) {
+                        // Don't navigate if a button was clicked
+                        return;
+                    }
+                    // Navigate to the page if clicking elsewhere on the card
+                    router.push(href);
+                }}
+            >
                 {children}
-            </Link>
+            </div>
         );
     };
 
