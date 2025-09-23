@@ -34,6 +34,7 @@ const StrategicDocuments = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, on
                 <h3 className={`font-semibold text-xl mb-4 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>NDSI Strategic Documents</h3>
                 <p className={`mb-6 ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Access key documents including the NDSI Charter, strategy, and official logos.</p>
                 {/* <Link href="/" */}
+                                {isPendingApproval ? (
                 <button
                     onClick={handleButtonClick}
                     disabled={isPendingApproval}
@@ -43,6 +44,17 @@ const StrategicDocuments = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, on
                 >
                     View Documents
                 </button>
+            ) : (
+                <button
+                    onClick={() => window.open('/strategic-documents', '_self')}
+                    disabled={isPendingApproval}
+                    className={`transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-end rounded-full hover:translate-y-[-5px] 
+                        ${mode === 'dark' ? 'hover:bg-sky-400' : 'hover:bg-sky-600'}
+                        ${isPendingApproval ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    View Documents
+                </button>
+            )}
             </div>
         </main>
     );

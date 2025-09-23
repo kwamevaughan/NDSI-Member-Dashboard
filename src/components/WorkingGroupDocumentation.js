@@ -159,6 +159,7 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                     </button>
                 ) : (
                     <button
+                        onClick={() => window.open('/working-group-docs', '_self')}
                         className="transition-all duration-300 hover:bg-sky-500 bg-lime-500 text-white px-4 py-2 self-center rounded-full hover:translate-y-[-5px] mt-auto text-center block"
                     >
                         View All Documents
