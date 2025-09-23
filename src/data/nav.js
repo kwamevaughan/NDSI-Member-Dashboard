@@ -15,13 +15,13 @@ const navLinks = [
   {
     href: "/working-group-docs",
     icon: "pixelarticons:group",
-    label: "Working Group Docs",
+    label: "Working Groups",
   },
   { href: "/esg-toolkit", icon: "mdi:briefcase-outline", label: "ESG Toolkit" },
   {
     href: "/engagement-advocacy",
     icon: "ic:outline-comment",
-    label: "Engagement and Advocacy Document",
+    label: "Engagement & Advocacy",
   },
 ];
 
