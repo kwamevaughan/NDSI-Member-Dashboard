@@ -28,6 +28,15 @@ const downloadFile = async (url, filename) => {
   }
 };
 
+// Returns a cleaned title without extension and leading year/date prefixes
+function getDisplayTitle(title) {
+  if (!title) return "";
+  let base = title.replace(/\.[^.]+$/, "");
+  base = base.replace(/^\s*\d{4}\s*[-_\s]+\s*(?:\d{1,2}[-_\/]\d{1,2}[-_\/]\d{2,4}\s*[-_\s]+)?/i, "");
+  base = base.replace(/\s{2,}/g, " ").trim();
+  return base;
+}
+
 
 
 // Reusable DocumentGrid component
@@ -358,14 +367,14 @@ const DocumentGrid = ({
           setModalOpen(false);
           setSelectedDoc(null);
         }}
-        title={selectedDoc?.title || ""}
+        title={getDisplayTitle(selectedDoc?.title || "")}
         mode={mode}
         width="max-w-5xl"
       >
         {selectedDoc?.type === "pdf" ? (
           <iframe
             src={selectedDoc.url}
-            title={selectedDoc.title}
+            title={getDisplayTitle(selectedDoc.title)}
             className="w-full h-[70vh] rounded-xl border"
           />
         ) : selectedDoc?.type === "docx" ? (
@@ -373,7 +382,7 @@ const DocumentGrid = ({
             src={`https://docs.google.com/gview?url=${encodeURIComponent(
               selectedDoc.url
             )}&embedded=true`}
-            title={selectedDoc.title}
+            title={getDisplayTitle(selectedDoc.title)}
             className={`w-full h-[70vh] rounded-xl border ${
               mode === "dark" ? "bg-[#286380]" : "bg-white"
             }`}

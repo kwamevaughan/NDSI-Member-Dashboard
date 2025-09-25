@@ -5,7 +5,29 @@ function truncateText(text, maxLength = 20) {
     return text.slice(0, maxLength - 1) + "…";
   }
 
+// Extracts a webinar label like "Webinar 3" from a title string
+function extractWebinarLabel(title) {
+  if (!title) return null;
+  const match = title.match(/webinar\s*(\d+)?/i);
+  if (!match) return null;
+  const number = match[1];
+  return number ? `Webinar ${number}` : "Webinar";
+}
+
+// Returns a cleaned title without extension and leading year/date prefixes
+function getDisplayTitle(title) {
+  if (!title) return "";
+  let base = title.replace(/\.[^.]+$/, "");
+  // Remove leading patterns like: 2023 - 24-05-23 - ..., or 2023 - ..., supporting -, _, or spaces
+  base = base.replace(/^\s*\d{4}\s*[-_\s]+\s*(?:\d{1,2}[-_\/]\d{1,2}[-_\/]\d{2,4}\s*[-_\s]+)?/i, "");
+  // Collapse extra whitespace and separators
+  base = base.replace(/\s{2,}/g, " ").trim();
+  return base;
+}
+
 export default function DocumentCard({ doc, mode, onView, onDownload }) {
+  const webinarLabel = extractWebinarLabel(doc.title);
+  const displayTitle = getDisplayTitle(doc.title);
   return (
     <div
       className={`group relative flex flex-col p-6 rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer ${
@@ -54,15 +76,22 @@ export default function DocumentCard({ doc, mode, onView, onDownload }) {
             mode === "dark" ? "text-white" : "text-gray-800"
           }`}
         >
-          <span className="sm:hidden">{truncateText(doc.title, 25)}</span>
+          <span className="sm:hidden">{truncateText(displayTitle, 25)}</span>
           <span className="hidden sm:inline">
-            {truncateText(doc.title, 20)}
+            {truncateText(displayTitle, 20)}
           </span>
         </h3>
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <Icon icon="heroicons:calendar-days" className="w-4 h-4" />
           <span>{doc.year}</span>
         </div>
+        {webinarLabel && (
+          <div className="flex items-center justify-center">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#28A8E0]/10 text-[#28A8E0] dark:bg-white/10 dark:text-white">
+              {webinarLabel}
+            </span>
+          </div>
+        )}
         <p className="text-xs text-gray-400 dark:text-gray-500">
           Uploaded: {new Date(doc.date).toLocaleDateString()}
         </p>
