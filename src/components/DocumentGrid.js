@@ -169,7 +169,7 @@ const DocumentGrid = ({
 
   // Filter documents based on selected category and other filters
   const getFilteredDocuments = () => {
-    if (showSubfolderFilter && subfolderFilter !== "all") {
+    if (showSubfolderFilter && subfolderFilter && subfolderFilter !== "all") {
       return documents.filter(doc => {
         const inFolder = 
           doc.folderPath?.toLowerCase().includes(subfolderFilter.toLowerCase()) || 
@@ -258,7 +258,7 @@ const DocumentGrid = ({
         <div className="space-y-2">
           <div className="w-full">
             <button
-              onClick={() => setSubfolderFilter("all")}
+              onClick={() => setSubfolderFilter(subfolderFilter === "all" ? null : "all")}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                 subfolderFilter === "all"
                   ? "bg-[#28A8E0] text-white"
@@ -289,7 +289,7 @@ const DocumentGrid = ({
               return (
                 <div key={folder} className="border rounded-lg overflow-hidden">
                   <button
-                    onClick={() => setSubfolderFilter(isExpanded ? "all" : folder)}
+                    onClick={() => setSubfolderFilter(isExpanded ? null : folder)}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left text-sm font-medium transition-colors ${
                       isExpanded
                         ? 'bg-[#28A8E0] text-white'

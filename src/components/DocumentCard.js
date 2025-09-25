@@ -74,7 +74,7 @@ export default function DocumentCard({ doc, mode, onView, onDownload }) {
             e.stopPropagation();
             onView();
           }}
-          className="flex-1 bg-ndsi-blue hover:bg-ndsi-blue/80 text-white font-normal py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          className="flex-1 bg-ndsi-blue hover:bg-ndsi-green text-white font-normal py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
           <Icon icon="heroicons:eye" className="w-4 h-4" />
           View
@@ -84,7 +84,7 @@ export default function DocumentCard({ doc, mode, onView, onDownload }) {
             e.stopPropagation();
             onDownload();
           }}
-          className="flex-1 bg-ndsi-green hover:bg-ndsi-green/80 text-white font-normal py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          className="flex-1 bg-ndsi-blue hover:bg-ndsi-green text-white font-normal py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
           <Icon icon="heroicons:arrow-down-tray" className="w-4 h-4" />
           Download
