@@ -218,8 +218,8 @@ const DocumentGrid = ({
 
   const filteredDocuments = getFilteredDocuments();
   const showDocumentGrid = !loading && !error;
-  const years = Array.from(new Set(documents.map(doc => doc.year))).sort((a, b) => b - a);
-
+    const years = Array.from(new Set(documents.map(doc => doc.year))).sort((a, b) => b - a);
+ 
   // Webinar options
   const webinarOptions = useMemo(() => {
     const set = new Set();
@@ -239,6 +239,7 @@ const DocumentGrid = ({
     });
     return arr;
   }, [documents]);
+  const hasWebinarOptions = webinarOptions.length > 0;
 
   return (
     <div className="space-y-8">
@@ -252,7 +253,7 @@ const DocumentGrid = ({
       </header>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${hasWebinarOptions ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-3`}>
         <input
           type="text"
           placeholder="Search documents..."
@@ -277,20 +278,22 @@ const DocumentGrid = ({
           <option value="pdf">PDF</option>
           <option value="docx">DOCX</option>
         </select>
-        <select
-          value={webinarFilter}
-          onChange={(e) => setWebinarFilter(e.target.value)}
-          className={`w-full rounded-lg border px-3 py-2 text-sm ${
-            mode === "dark"
-              ? "bg-transparent text-white border-gray-700"
-              : "bg-white text-black border-gray-300"
-          }`}
-        >
-          <option value="all">All Webinars</option>
-          {webinarOptions.map((w) => (
-            <option key={w} value={w}>{w}</option>
-          ))}
-        </select>
+        {hasWebinarOptions && (
+          <select
+            value={webinarFilter}
+            onChange={(e) => setWebinarFilter(e.target.value)}
+            className={`w-full rounded-lg border px-3 py-2 text-sm ${
+              mode === "dark"
+                ? "bg-transparent text-white border-gray-700"
+                : "bg-white text-black border-gray-300"
+            }`}
+          >
+            <option value="all">All Webinars</option>
+            {webinarOptions.map((w) => (
+              <option key={w} value={w}>{w}</option>
+            ))}
+          </select>
+        )}
         <select
           value={yearFilter}
           onChange={(e) => setYearFilter(e.target.value)}
