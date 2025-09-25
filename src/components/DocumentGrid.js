@@ -37,6 +37,15 @@ function getDisplayTitle(title) {
   return base;
 }
 
+// Extract webinar label like "Webinar 3" from a title
+function getWebinarLabel(title) {
+  if (!title) return null;
+  const match = title.match(/webinar\s*(\d+)?/i);
+  if (!match) return null;
+  const number = match[1];
+  return number ? `Webinar ${number}` : "Webinar";
+}
+
 
 
 // Reusable DocumentGrid component
@@ -70,6 +79,7 @@ const DocumentGrid = ({
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
+  const [webinarFilter, setWebinarFilter] = useState("all");
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -158,8 +168,9 @@ const DocumentGrid = ({
     const baseFilteredDocs = documents.filter(doc => {
       const matchesType = typeFilter === "all" || doc.type === typeFilter;
       const matchesYear = yearFilter === "all" || doc.year === Number(yearFilter);
+      const matchesWebinar = webinarFilter === "all" || getWebinarLabel(doc.title) === webinarFilter;
       const matchesSearch = search === "" || doc.title.toLowerCase().includes(search.toLowerCase());
-      return matchesType && matchesYear && matchesSearch;
+      return matchesType && matchesYear && matchesWebinar && matchesSearch;
     });
     
     baseFilteredDocs.forEach(doc => {
@@ -174,7 +185,7 @@ const DocumentGrid = ({
     });
     
     return counts;
-  }, [documents, subfolders, typeFilter, yearFilter, search]);
+  }, [documents, subfolders, typeFilter, yearFilter, webinarFilter, search]);
 
   // Filter documents based on selected category and other filters
   const getFilteredDocuments = () => {
@@ -188,24 +199,46 @@ const DocumentGrid = ({
         
         const matchesType = typeFilter === "all" || doc.type === typeFilter;
         const matchesYear = yearFilter === "all" || doc.year === Number(yearFilter);
+        const matchesWebinar = webinarFilter === "all" || getWebinarLabel(doc.title) === webinarFilter;
         const matchesSearch = search === "" || doc.title.toLowerCase().includes(search.toLowerCase());
         
-        return matchesType && matchesYear && matchesSearch;
+        return matchesType && matchesYear && matchesWebinar && matchesSearch;
       });
     }
     
     return documents.filter(doc => {
       const matchesType = typeFilter === "all" || doc.type === typeFilter;
       const matchesYear = yearFilter === "all" || doc.year === Number(yearFilter);
+      const matchesWebinar = webinarFilter === "all" || getWebinarLabel(doc.title) === webinarFilter;
       const matchesSearch = search === "" || doc.title.toLowerCase().includes(search.toLowerCase());
       
-      return matchesType && matchesYear && matchesSearch;
+      return matchesType && matchesYear && matchesWebinar && matchesSearch;
     });
   };
 
   const filteredDocuments = getFilteredDocuments();
   const showDocumentGrid = !loading && !error;
   const years = Array.from(new Set(documents.map(doc => doc.year))).sort((a, b) => b - a);
+
+  // Webinar options
+  const webinarOptions = useMemo(() => {
+    const set = new Set();
+    documents.forEach(d => {
+      const label = getWebinarLabel(d.title);
+      if (label) set.add(label);
+    });
+    const arr = Array.from(set);
+    // Sort numerically if possible (Webinar 1, Webinar 2, ...), fallback alphabetical
+    arr.sort((a, b) => {
+      const na = Number(a.match(/(\d+)/)?.[1] || 0);
+      const nb = Number(b.match(/(\d+)/)?.[1] || 0);
+      if (na && nb) return na - nb;
+      if (na) return -1;
+      if (nb) return 1;
+      return a.localeCompare(b);
+    });
+    return arr;
+  }, [documents]);
 
   return (
     <div className="space-y-8">
@@ -219,7 +252,7 @@ const DocumentGrid = ({
       </header>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <input
           type="text"
           placeholder="Search documents..."
@@ -243,6 +276,20 @@ const DocumentGrid = ({
           <option value="all">All Types</option>
           <option value="pdf">PDF</option>
           <option value="docx">DOCX</option>
+        </select>
+        <select
+          value={webinarFilter}
+          onChange={(e) => setWebinarFilter(e.target.value)}
+          className={`w-full rounded-lg border px-3 py-2 text-sm ${
+            mode === "dark"
+              ? "bg-transparent text-white border-gray-700"
+              : "bg-white text-black border-gray-300"
+          }`}
+        >
+          <option value="all">All Webinars</option>
+          {webinarOptions.map((w) => (
+            <option key={w} value={w}>{w}</option>
+          ))}
         </select>
         <select
           value={yearFilter}
