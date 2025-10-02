@@ -57,7 +57,7 @@ const UserComponent = ({ Component, pageProps }) => {
         } else {
             setIsSessionExpired(false);
         }
-    }, [router.pathname, token, isLoading, setIsSessionExpired]);
+    }, [router, router.pathname, token, isLoading, setIsSessionExpired]);
 
     if (isLoading) {
         return <div>Loading...</div>;

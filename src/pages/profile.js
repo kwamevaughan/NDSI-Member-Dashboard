@@ -80,7 +80,7 @@ const usePasswordForm = (token) => {
       passwords.current.length > 0 &&
       passwordValidation.isValid &&
       passwordsMatch,
-    [passwords.current, passwordValidation.isValid, passwordsMatch]
+    [passwords, passwordValidation.isValid, passwordsMatch]
   );
 
   const updatePassword = useCallback((field, value) => {

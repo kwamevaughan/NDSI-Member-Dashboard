@@ -150,7 +150,9 @@ export function GenericTable({
   loading = false, // <-- Add loading prop, default false
 }) {
   // Ensure data is an array and filter out any null/undefined items
-  const safeData = Array.isArray(data) ? data.filter(item => item != null) : [];
+  const safeData = useMemo(() => {
+    return Array.isArray(data) ? data.filter(item => item != null) : [];
+  }, [data]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateRange, setDateRange] = useState([
     {

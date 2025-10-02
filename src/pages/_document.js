@@ -1,4 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 
 class MyDocument extends Document {
   render() {
@@ -30,20 +31,18 @@ class MyDocument extends Document {
             href="/favicon-16x16.png"
           />
           {/* Google tag (gtag.js) */}
-          <script
-            async
+          <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-8G01J8Y0HM"
-          ></script>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                                window.dataLayer = window.dataLayer || [];
-                                function gtag(){dataLayer.push(arguments);}
-                                gtag('js', new Date());
-                                gtag('config', 'G-8G01J8Y0HM');
-                            `,
-            }}
+            strategy="afterInteractive"
           />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-8G01J8Y0HM');
+            `}
+          </Script>
         </Head>
         <body>
           <Main />

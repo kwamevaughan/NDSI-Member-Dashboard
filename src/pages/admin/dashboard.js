@@ -62,7 +62,7 @@ export default function AdminDashboard() {
       userManagement.fetchPendingUsers();
       adminManagement.fetchAdminUsers(adminUser);
     }
-  }, [adminUser, authLoading]);
+  }, [adminUser, authLoading, adminManagement, userManagement]);
 
   // User management handlers
   const handleRejectClick = (user) => {
