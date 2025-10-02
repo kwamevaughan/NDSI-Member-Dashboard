@@ -1,9 +1,9 @@
 import { Icon } from "@iconify/react";
 
 function truncateText(text, maxLength = 20) {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength - 1) + "…";
-  }
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 1) + "…";
+}
 
 // Extracts a webinar label like "Webinar 3" from a title string
 function extractWebinarLabel(title) {
@@ -14,12 +14,24 @@ function extractWebinarLabel(title) {
   return number ? `Webinar ${number}` : "Webinar";
 }
 
+// Extracts a series label like "Series 5" from a title string
+function extractSeriesLabel(title) {
+  if (!title) return null;
+  const match = title.match(/series\s*(\d+)?/i);
+  if (!match) return null;
+  const number = match[1];
+  return number ? `Series ${number}` : "Series";
+}
+
 // Returns a cleaned title without extension and leading year/date prefixes
 function getDisplayTitle(title) {
   if (!title) return "";
   let base = title.replace(/\.[^.]+$/, "");
   // Remove leading patterns like: 2023 - 24-05-23 - ..., or 2023 - ..., supporting -, _, or spaces
-  base = base.replace(/^\s*\d{4}\s*[-_\s]+\s*(?:\d{1,2}[-_\/]\d{1,2}[-_\/]\d{2,4}\s*[-_\s]+)?/i, "");
+  base = base.replace(
+    /^\s*\d{4}\s*[-_\s]+\s*(?:\d{1,2}[-_\/]\d{1,2}[-_\/]\d{2,4}\s*[-_\s]+)?/i,
+    ""
+  );
   // Collapse extra whitespace and separators
   base = base.replace(/\s{2,}/g, " ").trim();
   return base;
@@ -27,13 +39,14 @@ function getDisplayTitle(title) {
 
 export default function DocumentCard({ doc, mode, onView, onDownload }) {
   const webinarLabel = extractWebinarLabel(doc.title);
+  const seriesLabel = extractSeriesLabel(doc.title);
   const displayTitle = getDisplayTitle(doc.title);
   return (
     <div
       className={`group relative flex flex-col p-6 rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer ${
         mode === "dark"
-          ? "bg-gradient-to-br from-[#1a5a75] to-[#0f3d52] border-gray-700/50 hover:border-[#28A8E0]/30"
-          : "bg-gradient-to-br from-white to-gray-50 border-gray-200/60 hover:border-[#28A8E0]/30 hover:shadow-blue-100/50"
+          ? "bg-gradient-to-br from-[#1a5a75] to-[#0f3d52] border-gray-700/50 hover:border-l-blue/30"
+          : "bg-gradient-to-br from-white to-gray-50 border-gray-200/60 hover:border-ndsi-blue/30 hover:shadow-blue-100/50"
       }`}
       onClick={onView}
     >
@@ -85,11 +98,18 @@ export default function DocumentCard({ doc, mode, onView, onDownload }) {
           <Icon icon="heroicons:calendar-days" className="w-4 h-4" />
           <span>{doc.year}</span>
         </div>
-        {webinarLabel && (
-          <div className="flex items-center justify-center">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#28A8E0]/10 text-[#28A8E0] dark:bg-white/10 dark:text-white">
-              {webinarLabel}
-            </span>
+        {(webinarLabel || seriesLabel) && (
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            {webinarLabel && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-ndsi-blue/10 text-ndsi-blue dark:bg-white/10 dark:text-white">
+                {webinarLabel}
+              </span>
+            )}
+            {seriesLabel && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-ndsi-blue/10 text-ndsi-blue dark:bg-white/10 dark:text-white">
+                {seriesLabel}
+              </span>
+            )}
           </div>
         )}
         <p className="text-xs text-gray-400 dark:text-gray-500">

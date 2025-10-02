@@ -46,28 +46,75 @@ function getWebinarLabel(title) {
   return number ? `Webinar ${number}` : "Webinar";
 }
 
+// Extract series label like "Series 5" from a title
+function getSeriesLabel(title) {
+  if (!title) return null;
+  const match = title.match(/series\s*(\d+)?/i);
+  if (!match) return null;
+  const number = match[1];
+  return number ? `Series ${number}` : "Series";
+}
+
+// Smart sorting function for training materials
+function smartSort(documents) {
+  return documents.sort((a, b) => {
+    const aSeriesLabel = getSeriesLabel(a.title);
+    const bSeriesLabel = getSeriesLabel(b.title);
+    const aWebinarLabel = getWebinarLabel(a.title);
+    const bWebinarLabel = getWebinarLabel(b.title);
+    
+    // Extract numbers for comparison
+    const aSeriesNum = aSeriesLabel ? Number(aSeriesLabel.match(/(\d+)/)?.[1] || 0) : null;
+    const bSeriesNum = bSeriesLabel ? Number(bSeriesLabel.match(/(\d+)/)?.[1] || 0) : null;
+    const aWebinarNum = aWebinarLabel ? Number(aWebinarLabel.match(/(\d+)/)?.[1] || 0) : null;
+    const bWebinarNum = bWebinarLabel ? Number(bWebinarLabel.match(/(\d+)/)?.[1] || 0) : null;
+    
+    // Priority 1: Series documents come first, sorted by number
+    if (aSeriesNum !== null && bSeriesNum !== null) {
+      return aSeriesNum - bSeriesNum;
+    }
+    if (aSeriesNum !== null && bSeriesNum === null) return -1;
+    if (aSeriesNum === null && bSeriesNum !== null) return 1;
+    
+    // Priority 2: Webinar documents come second, sorted by number
+    if (aWebinarNum !== null && bWebinarNum !== null) {
+      return aWebinarNum - bWebinarNum;
+    }
+    if (aWebinarNum !== null && bWebinarNum === null) return -1;
+    if (aWebinarNum === null && bWebinarNum !== null) return 1;
+    
+    // Priority 3: Everything else alphabetically by title
+    return a.title.localeCompare(b.title);
+  });
+}
+
 
 
 // Reusable DocumentGrid component
-const DocumentGridComponent = ({ documents, mode, onViewDoc, onDownloadDoc, emptyMessage = "No documents found matching your criteria." }) => (
-  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    {documents.length > 0 ? (
-      documents.map((doc) => (
-        <DocumentCard
-          key={doc.id}
-          doc={doc}
-          mode={mode}
-          onView={() => onViewDoc(doc)}
-          onDownload={() => onDownloadDoc(doc)}
-        />
-      ))
-    ) : (
-      <div className="text-center py-20 text-gray-400 col-span-full">
-        {emptyMessage}
-      </div>
-    )}
-  </div>
-);
+const DocumentGridComponent = ({ documents, mode, onViewDoc, onDownloadDoc, emptyMessage = "No documents found matching your criteria." }) => {
+  // Apply smart sorting to the documents before rendering
+  const sortedDocuments = smartSort([...documents]);
+  
+  return (
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {sortedDocuments.length > 0 ? (
+        sortedDocuments.map((doc) => (
+          <DocumentCard
+            key={doc.id}
+            doc={doc}
+            mode={mode}
+            onView={() => onViewDoc(doc)}
+            onDownload={() => onDownloadDoc(doc)}
+          />
+        ))
+      ) : (
+        <div className="text-center py-20 text-gray-400 col-span-full">
+          {emptyMessage}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const DocumentGrid = ({
   folder,
@@ -80,6 +127,7 @@ const DocumentGrid = ({
   const [typeFilter, setTypeFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [webinarFilter, setWebinarFilter] = useState("all");
+  const [seriesFilter, setSeriesFilter] = useState("all");
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -148,10 +196,11 @@ const DocumentGrid = ({
             console.log('Processed document:', doc);
             return doc;
           })
-          .sort((a, b) => a.title.localeCompare(b.title));
+          // Apply smart sorting instead of simple alphabetical
+        const sortedDocs = smartSort(docs);
 
-        console.log('Final documents array:', docs);
-        setDocuments(docs);
+        console.log('Final documents array:', sortedDocs);
+        setDocuments(sortedDocs);
       } catch (err) {
         setError("Failed to load documents.");
       } finally {
@@ -169,8 +218,9 @@ const DocumentGrid = ({
       const matchesType = typeFilter === "all" || doc.type === typeFilter;
       const matchesYear = yearFilter === "all" || doc.year === Number(yearFilter);
       const matchesWebinar = webinarFilter === "all" || getWebinarLabel(doc.title) === webinarFilter;
+      const matchesSeries = seriesFilter === "all" || getSeriesLabel(doc.title) === seriesFilter;
       const matchesSearch = search === "" || doc.title.toLowerCase().includes(search.toLowerCase());
-      return matchesType && matchesYear && matchesWebinar && matchesSearch;
+      return matchesType && matchesYear && matchesWebinar && matchesSeries && matchesSearch;
     });
     
     baseFilteredDocs.forEach(doc => {
@@ -185,7 +235,7 @@ const DocumentGrid = ({
     });
     
     return counts;
-  }, [documents, subfolders, typeFilter, yearFilter, webinarFilter, search]);
+  }, [documents, typeFilter, yearFilter, webinarFilter, seriesFilter, search, subfolders]);
 
   // Filter documents based on selected category and other filters
   const getFilteredDocuments = () => {
@@ -200,9 +250,10 @@ const DocumentGrid = ({
         const matchesType = typeFilter === "all" || doc.type === typeFilter;
         const matchesYear = yearFilter === "all" || doc.year === Number(yearFilter);
         const matchesWebinar = webinarFilter === "all" || getWebinarLabel(doc.title) === webinarFilter;
+        const matchesSeries = seriesFilter === "all" || getSeriesLabel(doc.title) === seriesFilter;
         const matchesSearch = search === "" || doc.title.toLowerCase().includes(search.toLowerCase());
         
-        return matchesType && matchesYear && matchesWebinar && matchesSearch;
+        return matchesType && matchesYear && matchesWebinar && matchesSeries && matchesSearch;
       });
     }
     
@@ -210,9 +261,10 @@ const DocumentGrid = ({
       const matchesType = typeFilter === "all" || doc.type === typeFilter;
       const matchesYear = yearFilter === "all" || doc.year === Number(yearFilter);
       const matchesWebinar = webinarFilter === "all" || getWebinarLabel(doc.title) === webinarFilter;
+      const matchesSeries = seriesFilter === "all" || getSeriesLabel(doc.title) === seriesFilter;
       const matchesSearch = search === "" || doc.title.toLowerCase().includes(search.toLowerCase());
       
-      return matchesType && matchesYear && matchesWebinar && matchesSearch;
+      return matchesType && matchesYear && matchesWebinar && matchesSeries && matchesSearch;
     });
   };
 
@@ -241,6 +293,27 @@ const DocumentGrid = ({
   }, [documents]);
   const hasWebinarOptions = webinarOptions.length > 0;
 
+  // Series options
+  const seriesOptions = useMemo(() => {
+    const set = new Set();
+    documents.forEach(d => {
+      const label = getSeriesLabel(d.title);
+      if (label) set.add(label);
+    });
+    const arr = Array.from(set);
+    // Sort numerically if possible (Series 1, Series 2, ...), fallback alphabetical
+    arr.sort((a, b) => {
+      const na = Number(a.match(/(\d+)/)?.[1] || 0);
+      const nb = Number(b.match(/(\d+)/)?.[1] || 0);
+      if (na && nb) return na - nb;
+      if (na) return -1;
+      if (nb) return 1;
+      return a.localeCompare(b);
+    });
+    return arr;
+  }, [documents]);
+  const hasSeriesOptions = seriesOptions.length > 0;
+
   return (
     <div className="space-y-8">
       <header>
@@ -253,7 +326,7 @@ const DocumentGrid = ({
       </header>
 
       {/* Filters */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 ${hasWebinarOptions ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-3`}>
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${hasWebinarOptions || hasSeriesOptions ? (hasWebinarOptions && hasSeriesOptions ? 'lg:grid-cols-5' : 'lg:grid-cols-4') : 'lg:grid-cols-3'} gap-3`}>
         <input
           type="text"
           placeholder="Search documents..."
@@ -291,6 +364,22 @@ const DocumentGrid = ({
             <option value="all">All Webinars</option>
             {webinarOptions.map((w) => (
               <option key={w} value={w}>{w}</option>
+            ))}
+          </select>
+        )}
+        {hasSeriesOptions && (
+          <select
+            value={seriesFilter}
+            onChange={(e) => setSeriesFilter(e.target.value)}
+            className={`w-full rounded-lg border px-3 py-2 text-sm ${
+              mode === "dark"
+                ? "bg-transparent text-white border-gray-700"
+                : "bg-white text-black border-gray-300"
+            }`}
+          >
+            <option value="all">All Series</option>
+            {seriesOptions.map((s) => (
+              <option key={s} value={s}>{s}</option>
             ))}
           </select>
         )}
