@@ -53,6 +53,19 @@ export default function Home() {
       }
     };
     fetchQuotes();
+
+    // Load remembered credentials on component mount
+    const loadRememberedCredentials = () => {
+      const rememberedEmail = localStorage.getItem("rememberedEmail");
+      const isRemembered = localStorage.getItem("rememberMe") === "true";
+      
+      if (isRemembered && rememberedEmail) {
+        setLoginEmail(rememberedEmail);
+        setRememberMe(true);
+      }
+    };
+    
+    loadRememberedCredentials();
   }, []);
 
   const handleFormSwitch = (e) => {
@@ -61,7 +74,15 @@ export default function Home() {
     }
     setIsRegistering(!isRegistering);
     setError("");
-    setLoginEmail("");
+    
+    // Don't clear email if it's remembered when switching forms
+    const isRemembered = localStorage.getItem("rememberMe") === "true";
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    
+    if (!isRemembered || !rememberedEmail) {
+      setLoginEmail("");
+    }
+    
     setLoginPassword("");
     setCaptchaToken(null);
     if (recaptchaRef.current) recaptchaRef.current.reset();
@@ -84,17 +105,32 @@ export default function Home() {
         // Redirect to first-time-setup if required
         if (result.enforcePasswordChange) {
           toast.success("Welcome! Please complete your first-time setup.");
-          localStorage.setItem("rememberMe", rememberMe);
+          // Handle remember me functionality
+          if (rememberMe) {
+            localStorage.setItem("rememberMe", "true");
+            localStorage.setItem("rememberedEmail", loginEmail);
+          } else {
+            localStorage.removeItem("rememberMe");
+            localStorage.removeItem("rememberedEmail");
+          }
           setTimeout(() => {
             router.push("/first-time-setup");
           }, 100);
           return;
         }
+        // Handle remember me functionality
+        if (rememberMe) {
+          localStorage.setItem("rememberMe", "true");
+          localStorage.setItem("rememberedEmail", loginEmail);
+        } else {
+          localStorage.removeItem("rememberMe");
+          localStorage.removeItem("rememberedEmail");
+        }
+
         // Check if user is pending approval
         if (result.isPendingApproval) {
           const welcomeMessage = `Welcome ${result.user.full_name || "User"}! Your account is pending approval.`;
           toast.success(welcomeMessage);
-          localStorage.setItem("rememberMe", rememberMe);
           setTimeout(() => {
             router.push("/dashboard");
           }, 100);
@@ -103,7 +139,6 @@ export default function Home() {
             result.user.full_name || "User"
           }`;
           toast.success(welcomeMessage);
-          localStorage.setItem("rememberMe", rememberMe);
           setTimeout(() => {
             router.push("/dashboard");
           }, 100);
