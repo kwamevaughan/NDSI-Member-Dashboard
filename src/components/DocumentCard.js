@@ -1,8 +1,11 @@
 import { Icon } from "@iconify/react";
 
 function truncateText(text, maxLength = 20) {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 1) + "…";
+  if (!text) return "";
+  // Replace underscores with spaces first
+  const processedText = text.replace(/_/g, ' ');
+  if (processedText.length <= maxLength) return processedText;
+  return processedText.slice(0, maxLength - 1) + "…";
 }
 
 // Extracts a webinar label like "Webinar 3" from a title string

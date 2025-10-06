@@ -5,6 +5,12 @@ import { listAllFilesByPrefix } from '@/utils/imageKitService';
 import SimpleModal from './SimpleModal';
 import toast from 'react-hot-toast';
 
+// Helper function to format document names by replacing underscores with spaces
+const formatDocumentName = (name) => {
+  if (!name) return '';
+  return name.replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+};
+
 const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleMode, onLogout, isPendingApproval }) => {
     const { user } = useUser();
     const [documents, setDocuments] = useState([]);
@@ -120,7 +126,7 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
                                                 : 'bg-white hover:bg-sky-300'
                                     }`}
                                 >
-                                    <td className="px-6 py-6 border-b border-r" style={{borderColor: '#E2E2E2'}}>{doc.name}</td>
+                                    <td className="px-6 py-6 border-b border-r" style={{borderColor: '#E2E2E2'}}>{formatDocumentName(doc.name)}</td>
                                     <td className="px-6 py-6 text-center border-b border-r" style={{borderColor: '#E2E2E2'}}>{doc.category}</td>
                                     <td className="flex px-6 py-6 border-b" style={{borderColor: '#E2E2E2'}}>
                                         <div className="flex gap-4 w-full">
@@ -169,7 +175,7 @@ const WorkingGroupDocumentation = ({ toggleSidebar, isSidebarOpen, mode, toggleM
             <SimpleModal
                 isOpen={modalOpen}
                 onClose={() => { setModalOpen(false); setSelectedDoc(null); }}
-                title={selectedDoc ? selectedDoc.name : ''}
+                title={selectedDoc ? formatDocumentName(selectedDoc.name) : ''}
                 mode={mode}
                 width="max-w-4xl"
             >

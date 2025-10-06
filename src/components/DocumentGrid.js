@@ -33,6 +33,7 @@ function getDisplayTitle(title) {
   if (!title) return "";
   let base = title.replace(/\.[^.]+$/, "");
   base = base.replace(/^\s*\d{4}\s*[-_\s]+\s*(?:\d{1,2}[-_\/]\d{1,2}[-_\/]\d{2,4}\s*[-_\s]+)?/i, "");
+  base = base.replace(/_/g, ' '); // Replace all underscores with spaces
   base = base.replace(/\s{2,}/g, " ").trim();
   return base;
 }
