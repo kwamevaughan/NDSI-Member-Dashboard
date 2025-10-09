@@ -142,6 +142,77 @@ export async function sendAdminWelcomeEmail(user, password) {
     }
 }
 
+export async function sendWelcomeEmail(user) {
+    try {
+        const displayName = user.full_name || 'User';
+        const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+        const host = process.env.NEXT_PUBLIC_SITE_URL || 'localhost:3000';
+        const baseUrl = `${protocol}://${host}`;
+        const loginLink = `${baseUrl}/login`;
+        
+        const variables = {
+            displayName,
+            loginLink,
+            email: user.email,
+            siteEmail: process.env.EMAIL_USER,
+        };
+
+        // Try to get template from database
+        let template = await getTemplate('welcome_email', variables);
+        
+        // Fallback to hardcoded template if not found in database
+        if (!template) {
+            template = {
+                subject: 'Welcome to NDSI!',
+                text: `Hello ${displayName},\n\nThank you for registering with NDSI! We're excited to have you on board.\n\nYour account is currently pending approval. You will receive another email once your account has been approved and you can access all member features.\n\nIf you have any questions, feel free to reach out to us at ${process.env.EMAIL_USER}.\n\nBest regards,\nThe NDSI Team`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; border-radius: 8px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <img src="https://ik.imagekit.io/3x197uc7r/NDSI/nds_logo.png" alt="NDSI Logo" style="max-width: 200px; height: auto;" />
+                        </div>
+                        <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h2 style="color: #28A8E0; font-size: 24px; margin-bottom: 15px;">Welcome to NDSI, ${displayName}!</h2>
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                                Thank you for registering with NDSI! We're excited to have you on board.
+                            </p>
+                            <div style="background-color: #e8f4fc; border-left: 4px solid #28A8E0; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                                <p style="color: #0c5460; font-size: 14px; margin: 0;">
+                                    <strong>Your account is currently pending approval.</strong> You will receive another email once your account has been approved and you can access all member features.
+                                </p>
+                            </div>
+                            <p style="color: #666666; font-size: 14px; line-height: 1.5;">
+                                If you have any questions, feel free to reach out to us at 
+                                <a href="mailto:${process.env.EMAIL_USER}" style="color: #28A8E0; text-decoration: none;">${process.env.EMAIL_USER}</a>.
+                            </p>
+                            <p style="color: #666666; font-size: 14px; line-height: 1.5; margin-top: 20px;">
+                                Best regards,<br />
+                                <span style="color: #8DC63F; font-weight: bold;">The NDSI Team</span>
+                            </p>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px; border-top: 1px solid #d9d9d9; padding-top: 15px;">
+                            <p style="color: #999999; font-size: 12px;">© ${new Date().getFullYear()} NDSI. All rights reserved.</p>
+                        </div>
+                    </div>
+                `
+            };
+        }
+
+        const mailOptions = {
+            from: FROM_EMAIL,
+            to: user.email,
+            subject: template.subject,
+            text: template.text,
+            html: template.html,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Welcome email sent successfully to ${user.email}`);
+    } catch (error) {
+        console.error('Error sending welcome email:', error);
+        throw error;
+    }
+}
+
 // Export a function to test the transporter connection
 export async function testEmailConnection() {
     try {

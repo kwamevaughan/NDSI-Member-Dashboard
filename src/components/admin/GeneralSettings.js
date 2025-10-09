@@ -8,6 +8,7 @@ export default function GeneralSettings({ getAdminToken }) {
     notify_on_approve: true,
     notify_on_reject: true,
     notify_on_delete: true,
+    notify_on_registration: true,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,13 +29,25 @@ export default function GeneralSettings({ getAdminToken }) {
     async function fetchSettings() {
       setLoading(true);
       try {
-        const res = await fetch("/api/admin/settings");
+        const token = getAdminToken
+          ? getAdminToken()
+          : localStorage.getItem("admin_token");
+        const res = await fetch("/api/admin/settings", {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : undefined,
+        });
         const data = await res.json();
         if (data.settings) {
           setSettings({
             notify_on_approve: !!data.settings.notify_on_approve,
             notify_on_reject: !!data.settings.notify_on_reject,
             notify_on_delete: !!data.settings.notify_on_delete,
+            notify_on_registration: data.settings.notify_on_registration !== undefined 
+              ? !!data.settings.notify_on_registration 
+              : true,
           });
         }
       } catch (err) {
@@ -43,6 +56,7 @@ export default function GeneralSettings({ getAdminToken }) {
         setLoading(false);
       }
     }
+    
     fetchSettings();
   }, []);
 
@@ -131,6 +145,13 @@ export default function GeneralSettings({ getAdminToken }) {
   };
 
   const notificationSettings = [
+    {
+      key: "notify_on_registration",
+      label: "New User Registration",
+      description: "Send notification when a new user registers",
+      icon: "mdi:account-plus",
+      color: "text-blue-600",
+    },
     {
       key: "notify_on_approve",
       label: "User Approved",

@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 
 export function useUserManagement(getAdminToken, onSessionExpired) {
+  // Memoize the initial function to prevent recreation
+  const memoizedGetAdminToken = useCallback(() => getAdminToken(), [getAdminToken]);
+  const memoizedOnSessionExpired = useCallback(() => onSessionExpired?.(), [onSessionExpired]);
   const [users, setUsers] = useState([]);
   const [processingUser, setProcessingUser] = useState(null);
   const [stats, setStats] = useState({
@@ -10,7 +13,7 @@ export function useUserManagement(getAdminToken, onSessionExpired) {
     totalPending: 0
   });
 
-  const handleApiError = async (response) => {
+  const handleApiError = useCallback(async (response) => {
     if (!response.ok) {
       let errorData = {};
       try {
@@ -23,35 +26,47 @@ export function useUserManagement(getAdminToken, onSessionExpired) {
           (errorData.error.toLowerCase().includes('jwt expired') ||
            errorData.error.toLowerCase().includes('authentication failed')))
       ) {
-        if (onSessionExpired) onSessionExpired();
+        memoizedOnSessionExpired();
         throw new Error('Authentication failed');
       }
       throw new Error(errorData.error || 'Request failed');
     }
-  };
+  }, [memoizedOnSessionExpired]);
 
-  const fetchPendingUsers = async () => {
-    const token = getAdminToken();
+  const fetchPendingUsers = useCallback(async () => {
+    const token = memoizedGetAdminToken();
+    if (!token) return;
+    
     try {
       const response = await fetch("/api/admin/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      
       await handleApiError(response);
-
       const data = await response.json();
       const userData = data.users || [];
-      setUsers(userData);
-      calculateStats(userData);
+      
+      // Only update state if the data has changed
+      setUsers(prevUsers => {
+        if (JSON.stringify(prevUsers) !== JSON.stringify(userData)) {
+          calculateStats(userData);
+          return userData;
+        }
+        return prevUsers;
+      });
     } catch (error) {
       console.error("Error fetching users:", error);
       if (error.message === "Authentication failed") {
         throw error; // Let parent handle auth failure
       }
-      toast.error("Failed to load pending users");
+      // Don't show toast for silent refreshes
+      if (!error.silent) {
+        toast.error("Failed to load pending users");
+      }
     }
-  };
+  }, [memoizedGetAdminToken, handleApiError]);
 
   const handleApproval = async (userId, action, reason = null) => {
     setProcessingUser(userId);

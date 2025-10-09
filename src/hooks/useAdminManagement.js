@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 
-export function useAdminManagement(getAdminToken, onRefresh) {
+export function useAdminManagement(getAdminToken) {
+  // Memoize the initial function to prevent recreation
+  const memoizedGetAdminToken = useCallback(() => getAdminToken(), [getAdminToken]);
   const [adminUsers, setAdminUsers] = useState([]);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [addAdminLoading, setAddAdminLoading] = useState(false);
   const [editAdminLoading, setEditAdminLoading] = useState(false);
   const [deleteAdminLoading, setDeleteAdminLoading] = useState(false);
 
-  const fetchAdminUsers = async (adminUser) => {
-    const token = getAdminToken();
+  const fetchAdminUsers = useCallback(async (adminUser) => {
+    const token = memoizedGetAdminToken();
+    if (!token) return;
+    
     try {
       const response = await fetch("/api/admin/admins", {
         headers: {
@@ -25,15 +29,27 @@ export function useAdminManagement(getAdminToken, onRefresh) {
       }
 
       const data = await response.json();
-      setAdminUsers(data.admins || []);
+      const admins = data.admins || [];
+      
+      // Only update state if the data has changed
+      setAdminUsers(prevAdmins => {
+        if (JSON.stringify(prevAdmins) !== JSON.stringify(admins)) {
+          return admins;
+        }
+        return prevAdmins;
+      });
+      
       // Check if current user is super admin
-      const currentUser = data.admins?.find(admin => admin.id === adminUser?.id);
+      const currentUser = admins.find(admin => admin.id === adminUser?.id);
       setIsSuperAdmin(currentUser?.role === 'super_admin');
     } catch (error) {
       console.error("Error fetching admin users:", error);
-      // Don't show error toast for admin users fetch
+      // Don't show error toast for silent refreshes
+      if (!error.silent) {
+        toast.error("Failed to load admin users");
+      }
     }
-  };
+  }, [memoizedGetAdminToken]);
 
   const handleAddAdmin = async (newAdminData) => {
     setAddAdminLoading(true);
