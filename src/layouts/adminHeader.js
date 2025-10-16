@@ -1,10 +1,22 @@
 import Image from "next/image";
 import { Icon } from "@iconify/react";
-import { useAdminAuth } from "../hooks/useAdminAuth";
 import { useState, useEffect, useRef } from "react";
 
 export default function AdminHeader({ users = [] }) {
-  const { adminUser, logout } = useAdminAuth();
+  const [adminUser, setAdminUser] = useState(null);
+  const logout = () => {
+    try {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+    } catch {}
+    window.location.href = "/admin/login";
+  };
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("admin_user");
+      if (stored) setAdminUser(JSON.parse(stored));
+    } catch {}
+  }, []);
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef();
 
@@ -48,18 +60,18 @@ export default function AdminHeader({ users = [] }) {
               />
               <div className="absolute -inset-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity"></div>
             </div>
-            <div className="ml-6">
+            {/* <div className="ml-6">
               <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                 Admin Dashboard
               </h1>
               <p className="text-sm text-slate-500 font-medium">
                 User Approval Management
               </p>
-            </div>
+            </div> */}
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="/admin/dashboard" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Dashboard</a>
-            <a href="/admin/upload" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Upload</a>
+            <a href="/admin/dashboard" className="text-slate-600 hover:text-slate-900 text-md font-semibold">Dashboard</a>
+            <a href="/admin/upload" className="text-slate-600 hover:text-slate-900 text-md font-semibold">Upload Documents</a>
           </nav>
           <div className="flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
@@ -138,29 +150,38 @@ export default function AdminHeader({ users = [] }) {
               )}
             </div>
 
-            <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-              <div className="h-8 w-8 rounded-full bg-ndsi-blue flex items-center justify-center">
-                <Icon icon="mdi:account" className="h-4 w-4 text-white" />
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-semibold text-slate-800">
-                  {adminUser?.full_name || adminUser?.email}
-                </p>
-                <p className="text-xs text-slate-500 font-medium">
-                  Administrator
-                </p>
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(false)}
+                className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow transition-all"
+                onMouseDown={(e)=>e.stopPropagation()}
+                onClickCapture={(e)=>{
+                  e.stopPropagation();
+                  const next = document.getElementById('admin-user-menu');
+                  if (next) next.classList.toggle('hidden');
+                }}
+              >
+                <div className="h-8 w-8 rounded-full bg-ndsi-blue flex items-center justify-center">
+                  <Icon icon="mdi:account" className="h-4 w-4 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-slate-800">
+                    {adminUser?.full_name || adminUser?.email}
+                  </p>
+                  <p className="text-xs text-slate-500 font-medium">Administrator</p>
+                </div>
+                <Icon icon="mdi:chevron-down" className="h-4 w-4 text-slate-500" />
+              </button>
+              <div id="admin-user-menu" className="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
+                  onClick={logout}
+                >
+                  <Icon icon="mdi:logout" className="h-4 w-4 text-slate-600" />
+                  Logout
+                </button>
               </div>
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-all duration-200 group"
-            >
-              <Icon
-                icon="mdi:logout"
-                className="mr-2 group-hover:rotate-12 transition-transform"
-              />
-              Logout
-            </button>
           </div>
         </div>
       </div>
