@@ -36,7 +36,6 @@ const UserComponent = ({ Component, pageProps }) => {
         if (isLoading) return;
 
         const excludedPaths = ['/', '/reset-password', '/admin/login'];
-        const adminPaths = ['/admin/dashboard'];
         
         // Don't check authentication for excluded paths
         if (excludedPaths.includes(router.pathname)) {
@@ -44,8 +43,8 @@ const UserComponent = ({ Component, pageProps }) => {
             return;
         }
         
-        // For admin paths, let the admin pages handle their own authentication
-        if (adminPaths.includes(router.pathname)) {
+        // For ANY admin path, let the admin pages handle their own authentication
+        if (router.pathname.startsWith('/admin/')) {
             setIsSessionExpired(false);
             return;
         }
