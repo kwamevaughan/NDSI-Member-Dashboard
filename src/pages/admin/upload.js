@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import { Icon } from '@iconify/react';
 import { listAllFilesByPrefix } from '@/utils/imageKitService';
 import UploadGallery from '@/components/UploadGallery';
+import Select from 'react-select';
 
 const TARGET_FOLDERS = [
   { label: 'Strategic Documents', value: 'StrategicDocs' },
@@ -339,38 +340,6 @@ export default function AdminUploadPage() {
           </p>
 
           <section
-            className={`rounded-2xl border ${
-              mode === "dark"
-                ? "border-gray-700 bg-[#0f1429]"
-                : "border-gray-200 bg-white"
-            } p-5 md:p-6 mb-6`}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Destination
-                </label>
-                <select
-                  value={folder}
-                  onChange={(e) => setFolder(e.target.value)}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm ${
-                    mode === "dark"
-                      ? "bg-transparent text-white border-gray-700"
-                      : "bg-white text-black border-gray-300"
-                  }`}
-                >
-                  {TARGET_FOLDERS.map((f) => (
-                    <option key={f.value} value={f.value}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {/* Subfolder options removed */}
-            </div>
-          </section>
-
-          <section
             onDrop={onDrop}
             onDragOver={(e) => {
               e.preventDefault();
@@ -420,12 +389,38 @@ export default function AdminUploadPage() {
             />
           </section>
 
+          <div className="flex flex-col md:flex-row gap-4">
           <section
             className={`rounded-2xl border ${
               mode === "dark"
                 ? "border-gray-700 bg-[#0f1429]"
                 : "border-gray-200 bg-white"
-            } p-5 md:p-6 mb-6`}
+            } p-5 md:p-6 mb-6 w-full`}
+          >
+            <div className="grid w-full gap-4">
+                <label className="text-sm font-medium mb-2 block">Destination</label>
+                <Select
+                  value={TARGET_FOLDERS.find(f => f.value === folder) || null}
+                  onChange={(opt) => setFolder(opt?.value || TARGET_FOLDERS[0].value)}
+                  options={TARGET_FOLDERS}
+                  isClearable={false}
+                  classNamePrefix="rs"
+                  menuPosition="fixed"
+                  styles={{
+                    menu: (base) => ({ ...base, zIndex: 50 }),
+                    menuPortal: (base) => ({ ...base, zIndex: 50 }),
+                    container: (base) => ({ ...base, zIndex: 50 }),
+                  }}
+                />
+              </div>
+          </section>
+
+          <section
+            className={`rounded-2xl border ${
+              mode === "dark"
+                ? "border-gray-700 bg-[#0f1429]"
+                : "border-gray-200 bg-white"
+            } p-5 md:p-6 mb-6 w-full`}
           >
             <h2 className="text-base font-medium mb-3">Tips</h2>
             <ul className="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
@@ -433,9 +428,9 @@ export default function AdminUploadPage() {
                 Use a leading year in filenames (e.g., 2024 - Report.pdf) to
                 help sorting.
               </li>
-              
             </ul>
-          </section>
+            </section>
+            </div>
 
           {files.length > 0 && (
             <section
@@ -513,19 +508,23 @@ export default function AdminUploadPage() {
             }
             onSubmitRename={submitRename}
             onMove={async (sourceFilePath, destinationPath) => {
-              const token = adminTokenRef.current || localStorage.getItem('admin_token');
+              const token =
+                adminTokenRef.current || localStorage.getItem("admin_token");
               if (!token) return;
-              const toastId = toast.loading('Moving file...');
+              const toastId = toast.loading("Moving file...");
               try {
-                const res = await fetch('/api/admin/files-move', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                const res = await fetch("/api/admin/files-move", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
                   body: JSON.stringify({ sourceFilePath, destinationPath }),
                 });
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Move failed');
+                if (!res.ok) throw new Error(data.error || "Move failed");
                 toast.dismiss(toastId);
-                toast.success('File moved');
+                toast.success("File moved");
                 await loadGallery();
               } catch (e) {
                 toast.dismiss(toastId);

@@ -320,19 +320,25 @@ export default function UploadGallery({
             data={(files || []).map(f => ({
               id: f.fileId,
               name: f.name,
-              path: f.filePath,
+              destination: (() => {
+                const parts = (f.filePath || '').split('/').filter(Boolean);
+                const top = parts[0] || '';
+                const found = FOLDERS.find(x => x.value === top);
+                return found ? found.label : top || '-';
+              })(),
               url: f.url,
               raw: f,
             }))}
             columns={[
               { header: 'name', accessor: 'name', sortable: true },
-              { header: 'path', accessor: 'path' },
+              { header: 'destination', accessor: 'destination' },
             ]}
             title={"Files"}
             emptyMessage={"No files found"}
             searchable={true}
             loading={false}
             onRefresh={onRefresh}
+            showStatusFilter={false}
             onEdit={(row) => {
               const file = row.raw;
               setEditingFile(file);
@@ -406,7 +412,7 @@ export default function UploadGallery({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Folder</label>
+              <label className="block text-sm font-medium mb-2">Destination</label>
               <Select
                 value={editFolderOpt}
                 onChange={(opt) => setEditFolderOpt(opt)}

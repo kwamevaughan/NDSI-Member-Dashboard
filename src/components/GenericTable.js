@@ -148,6 +148,7 @@ export function GenericTable({
   onRefresh,
   onAddUser,
   loading = false, // <-- Add loading prop, default false
+  showStatusFilter = true,
 }) {
   // Ensure data is an array and filter out any null/undefined items
   const safeData = useMemo(() => {
@@ -503,18 +504,20 @@ export function GenericTable({
                   </div>
                 )}
                 {/* Status Filter */}
-                <div>
-                  <select
-                    value={table.statusFilter}
-                    onChange={(e) => table.setStatusFilter(e.target.value)}
-                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  >
-                    <option value="all">All</option>
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
-                </div>
+                {showStatusFilter && (
+                  <div>
+                    <select
+                      value={table.statusFilter}
+                      onChange={(e) => table.setStatusFilter(e.target.value)}
+                      className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    >
+                      <option value="all">All</option>
+                      <option value="approved">Approved</option>
+                      <option value="pending">Pending</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                )}
                 {/* Refresh Button */}
                 {onRefresh && (
                   <button

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function AdminHeader({ users = [] }) {
   const router = useRouter();
@@ -77,28 +78,32 @@ export default function AdminHeader({ users = [] }) {
             </div> */}
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <a
+            <Link
               href="/admin/dashboard"
-              className={`text-md font-semibold transition-colors ${
-                router.pathname === "/admin/dashboard"
-                  ? "text-ndsi-blue"
-                  : "text-slate-600 hover:text-slate-900"
+              className={`text-md font-semibold transition-colors relative ${
+                router.pathname.startsWith('/admin/dashboard')
+                  ? 'text-ndsi-blue'
+                  : 'text-slate-700 hover:text-slate-900'
               }`}
-              aria-current={router.pathname === "/admin/dashboard" ? "page" : undefined}
             >
               Dashboard
-            </a>
-            <a
+              {router.pathname.startsWith('/admin/dashboard') && (
+                <span className="absolute -bottom-2 left-0 h-0.5 w-full bg-ndsi-blue rounded" />
+              )}
+            </Link>
+            <Link
               href="/admin/upload"
-              className={`text-md font-semibold transition-colors ${
-                router.pathname === "/admin/upload"
-                  ? "text-ndsi-blue"
-                  : "text-slate-600 hover:text-slate-900"
+              className={`text-md font-semibold transition-colors relative ${
+                router.pathname.startsWith('/admin/upload')
+                  ? 'text-ndsi-blue'
+                  : 'text-slate-700 hover:text-slate-900'
               }`}
-              aria-current={router.pathname === "/admin/upload" ? "page" : undefined}
             >
               Upload Documents
-            </a>
+              {router.pathname.startsWith('/admin/upload') && (
+                <span className="absolute -bottom-2 left-0 h-0.5 w-full bg-ndsi-blue rounded" />
+              )}
+            </Link>
           </nav>
           <div className="flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
