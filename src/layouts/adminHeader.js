@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/router";
 
 export default function AdminHeader({ users = [] }) {
+  const router = useRouter();
   const [adminUser, setAdminUser] = useState(null);
   const logout = () => {
     try {
@@ -18,7 +20,9 @@ export default function AdminHeader({ users = [] }) {
     } catch {}
   }, []);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const dropdownRef = useRef();
+  const userMenuRef = useRef();
 
   // Calculate new registrations since last login
   const adminLastLogin = adminUser?.last_login_at ? new Date(adminUser.last_login_at) : new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -34,16 +38,19 @@ export default function AdminHeader({ users = [] }) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
     }
 
-    if (showNotifications) {
+    if (showNotifications || showUserMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showNotifications]);
+  }, [showNotifications, showUserMenu]);
 
   return (
     <header className="bg-white/80 backdrop-blur-lg border-b border-slate-200/50 sticky top-0 z-50">
@@ -70,8 +77,28 @@ export default function AdminHeader({ users = [] }) {
             </div> */}
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="/admin/dashboard" className="text-slate-600 hover:text-slate-900 text-md font-semibold">Dashboard</a>
-            <a href="/admin/upload" className="text-slate-600 hover:text-slate-900 text-md font-semibold">Upload Documents</a>
+            <a
+              href="/admin/dashboard"
+              className={`text-md font-semibold transition-colors ${
+                router.pathname === "/admin/dashboard"
+                  ? "text-ndsi-blue"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+              aria-current={router.pathname === "/admin/dashboard" ? "page" : undefined}
+            >
+              Dashboard
+            </a>
+            <a
+              href="/admin/upload"
+              className={`text-md font-semibold transition-colors ${
+                router.pathname === "/admin/upload"
+                  ? "text-ndsi-blue"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+              aria-current={router.pathname === "/admin/upload" ? "page" : undefined}
+            >
+              Upload Documents
+            </a>
           </nav>
           <div className="flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
@@ -150,16 +177,13 @@ export default function AdminHeader({ users = [] }) {
               )}
             </div>
 
-            <div className="relative">
+            <div className="relative" ref={userMenuRef}>
               <button
-                onClick={() => setShowNotifications(false)}
-                className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow transition-all"
-                onMouseDown={(e)=>e.stopPropagation()}
-                onClickCapture={(e)=>{
-                  e.stopPropagation();
-                  const next = document.getElementById('admin-user-menu');
-                  if (next) next.classList.toggle('hidden');
+                onClick={() => {
+                  setShowNotifications(false);
+                  setShowUserMenu((v) => !v);
                 }}
+                className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:shadow transition-all"
               >
                 <div className="h-8 w-8 rounded-full bg-ndsi-blue flex items-center justify-center">
                   <Icon icon="mdi:account" className="h-4 w-4 text-white" />
@@ -172,15 +196,17 @@ export default function AdminHeader({ users = [] }) {
                 </div>
                 <Icon icon="mdi:chevron-down" className="h-4 w-4 text-slate-500" />
               </button>
-              <div id="admin-user-menu" className="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
-                <button
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
-                  onClick={logout}
-                >
-                  <Icon icon="mdi:logout" className="h-4 w-4 text-slate-600" />
-                  Logout
-                </button>
-              </div>
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
+                  <button
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
+                    onClick={logout}
+                  >
+                    <Icon icon="mdi:logout" className="h-4 w-4 text-slate-600" />
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -16,20 +16,21 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
-    const { filePath, newName } = req.body || {};
-    if (!filePath || !newName) return res.status(400).json({ error: 'filePath and newName are required' });
+    const { sourceFilePath, destinationPath } = req.body || {};
+    if (!sourceFilePath || !destinationPath) {
+      return res.status(400).json({ error: 'sourceFilePath and destinationPath are required' });
+    }
 
-    // Perform rename using ImageKit's callback-style API and promisify it
-    const renamed = await new Promise((resolve, reject) => {
-      imagekit.renameFile({ filePath, newFileName: newName }, (err, result) => {
+    const result = await new Promise((resolve, reject) => {
+      imagekit.moveFile({ sourceFilePath, destinationPath }, (err, data) => {
         if (err) return reject(err);
-        resolve(result);
+        resolve(data);
       });
     });
-    return res.status(200).json({ ok: true, file: renamed });
+
+    return res.status(200).json({ ok: true, result });
   } catch (e) {
-    console.error('files-rename error:', e);
-    return res.status(500).json({ error: 'Failed to rename file', details: e.message });
+    return res.status(500).json({ error: 'Failed to move file', details: e.message });
   }
 }
 

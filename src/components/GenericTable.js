@@ -612,7 +612,7 @@ export function GenericTable({
                     Add User
                   </button>
                 )}
-                <button
+                {/* <button
                   onClick={() => setShowImportModal(true)}
                   className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
@@ -625,7 +625,7 @@ export function GenericTable({
                 >
                   <Icon icon="mdi:download" className="w-4 h-4" />
                   Export Data
-                </button>
+                </button> */}
                 {onAddNew && (
                   <button
                     onClick={onAddNew}

@@ -6,12 +6,23 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   try {
+    // Aggressive no-cache to prevent stale 304s
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    res.setHeader('ETag', `${Date.now()}`);
     const authHeader = req.headers.authorization || '';
     if (!authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Missing Authorization header' });
     }
     const token = authHeader.replace('Bearer ', '');
-    const adminUser = jwt.verify(token, process.env.JWT_SECRET);
+    let adminUser;
+    try {
+      adminUser = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (e) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
     if (!adminUser || (adminUser.role !== 'admin' && adminUser.role !== 'super_admin')) {
       return res.status(403).json({ error: 'Admin access required' });
     }
@@ -33,7 +44,6 @@ export default async function handler(req, res) {
     }
     return res.status(200).json({ files: all });
   } catch (e) {
-    console.error('files-list error:', e);
     return res.status(500).json({ error: 'Failed to list files', details: e.message });
   }
 }

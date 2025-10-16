@@ -34,14 +34,13 @@ export default async function handler(req, res) {
     const isDataUrl = /^data:.+;base64,/.test(fileBase64);
     const uploadFile = isDataUrl ? fileBase64 : Buffer.from(fileBase64, 'base64');
 
-    const now = Date.now();
     const safeFolder = folder.startsWith('/') ? folder : `/${folder}`;
 
     const response = await imagekit.upload({
       file: uploadFile,
-      fileName: `${now}-${fileName}`,
+      fileName: fileName,
       folder: safeFolder,
-      useUniqueFileName: true,
+      useUniqueFileName: false,
       tags: Array.isArray(tags) ? tags : undefined,
     });
 
