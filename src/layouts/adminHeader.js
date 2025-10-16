@@ -57,6 +57,10 @@ export default function AdminHeader({ users = [] }) {
               </p>
             </div>
           </div>
+          <nav className="hidden md:flex items-center space-x-6">
+            <a href="/admin/dashboard" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Dashboard</a>
+            <a href="/admin/upload" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Upload</a>
+          </nav>
           <div className="flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
               <button
